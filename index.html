@@ -590,6 +590,9 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
   .next .cd{font-size:13px;width:100%;padding-left:48px;margin-top:-4px}
   .datebar .btn{padding:0 10px}
 }
+.klist{max-height:62vh;padding:6px 24px 14px}
+.any-h.nd svg{color:#fb923c}.any-h.nd span{background:rgba(251,146,60,.15);color:#fb923c}
+@media (max-width:640px){ .klist{padding:6px 14px 12px;max-height:64vh} }
 </style>
 </head>
 <body>
@@ -692,6 +695,7 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
       <div class="seg" id="boardSeg"></div>
       <div class="timeline" id="timeline"></div>
       <div class="any" id="anytime"></div>
+      <div class="any" id="nodate"></div>
     </div>
 
     <aside class="side">
@@ -969,7 +973,7 @@ const todayKey = () => ymd(new Date());
 const addDays = (key,n) => { const d=parseYmd(key); d.setDate(d.getDate()+n); return ymd(d); };
 const dmy = key => key ? key.split("-").reverse().join("-") : "";
 const hhmm = min => pad(Math.floor(min/60))+":"+pad(min%60);
-const S = { rows: [], page: "board", boardDate: todayKey(), boardStatus: "", boardType: "", hasLoc: false, sort: {k: "dt", dir: 1}, lastSync: null, charts: {}, notify: false, fetching: false, hash: "", source: "",
+const S = { rows: [], page: "board", boardDate: todayKey(), boardStatus: "", boardType: "", addType: "", hasLoc: false, sort: {k: "dt", dir: 1}, lastSync: null, charts: {}, notify: false, fetching: false, hash: "", source: "",
   cal: { y: new Date().getFullYear(), m: new Date().getMonth(), sel: todayKey(), status: "" } };
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const title = s => String(s||"").toLowerCase().replace(/(^|[\s\-\/&(])([a-z])/g, (m,a,b) => a+b.toUpperCase());
@@ -996,8 +1000,8 @@ const colorOf = (s,i) => PALETTE[(i ?? hash(s))%PALETTE.length];
 /* TYPE OF SCHEDULE */
 const TYPES = { TASK:{l:"Task",p:"Tasks",c:"#60a5fa",i:"task"}, REMINDER:{l:"Reminder",p:"Reminders",c:"#f472b6",i:"bell"}, PERSONAL:{l:"Personal",p:"Personal",c:"#2dd4bf",i:"user"} };
 const TYPE_KEYS = ["TASK","REMINDER","PERSONAL"];
-function typeKey(t){ const u=String(t||"").toUpperCase(); if(/REMIND/.test(u)) return "REMINDER"; if(/TASK/.test(u)) return "TASK"; if(/PERSON/.test(u)) return "PERSONAL"; return u.trim()? "OTHER" : ""; }
-function typeInfo(r){ return TYPES[r.tkey] || {l: r.type? title(r.type) : "Untyped", p: r.type? title(r.type) : "Untyped", c:"#8e98c2", i:"total"}; }
+function typeKey(t){ const u=String(t||"").toUpperCase(); if(/REM(A)?IND/.test(u)) return "REMINDER"; if(/TASK/.test(u)) return "TASK"; if(/PERSON/.test(u)) return "PERSONAL"; return u.trim()? "OTHER" : ""; }
+function typeInfo(r){ return TYPES[r.tkey] || {l: r.type? title(r.type) : "Untyped", p: r.type? title(r.type) : "Untyped", c: r.type? colorOf(r.type.toUpperCase()) : "#8e98c2", i:"total"}; }
 function typeBadge(r){ if(!r.type) return ""; const T=typeInfo(r); return `<span class="typ" style="--tc:${T.c}">${svg(T.i)}${esc(T.l.toUpperCase())}</span>`; }
 
 /* CSV parser (handles quotes, commas, newlines) */
@@ -1212,8 +1216,8 @@ function withEnds(list){
 function nowMin(){ const d=new Date(); return d.getHours()*60+d.getMinutes(); }
 function stateOf(r, key, nm){ const t=todayKey(); if(key!==t) return key<t?"past":"future"; if(r.ws==null||r.endC==null) return "future"; if(nm>=r.ws && nm<r.endC) return "now"; if(nm>=r.endC) return "past"; return "future"; }
 function buckets(rows){
-  const t=todayKey(), open=rows.filter(r=>isPend(r.status) && r.key);
-  return { open, pending:open.filter(r=>r.key<=t), overdue:open.filter(r=>r.key<t), today:open.filter(r=>r.key===t),
+  const t=todayKey(), open=rows.filter(r=>isPend(r.status) && (r.key || r.schedule));
+  return { open, pending:open.filter(r=>!r.key || r.key<=t), nodate:open.filter(r=>!r.key), overdue:open.filter(r=>r.key && r.key<t), today:open.filter(r=>r.key===t),
     upcoming:open.filter(r=>r.key>t), up7:open.filter(r=>r.key>t && r.key<=addDays(t,CONFIG.UPCOMING_DAYS)),
     resch:rows.filter(isResch), done:rows.filter(r=>isDone(r.status)) };
 }
@@ -1252,14 +1256,14 @@ function renderBoard(){
   $("#boardSub").textContent = fmtDate(d);
   const all = withEnds(dayRows(key)), ty=S.boardType||"";
   const done=all.filter(r=>isDone(r.status)).length, pct = all.length? Math.round(done/all.length*100) : 0;
-  const other=all.filter(r=>!TYPES[r.tkey]).length;
+  const R=S.rows, rDone=R.filter(r=>isDone(r.status)).length, rPct=R.length? Math.round(rDone/R.length*100) : 0;
+  const stat=arr=>{ const dn=arr.filter(r=>isDone(r.status)).length, op=arr.filter(r=>isPend(r.status)).length, td=arr.filter(r=>r.key===today).length; return `${op} open · ${dn} done`+(td?` · ${td} today`:""); };
   $("#boardKpis").innerHTML = kpiHTML([
-    {l:isToday?"Today's Schedule":"Day's Schedule", v:all.length, s:`${done} done · ${all.length-done} open`+(other?` · ${other} other`:""), c:"#6366f1", ring:pct, f:""},
-    ...TYPE_KEYS.map(k=>{ const l=all.filter(r=>r.tkey===k), dn=l.filter(r=>isDone(r.status)).length, T=TYPES[k];
-      return {l:T.p, v:l.length, s:l.length? `${l.length-dn} open · ${dn} done` : (isToday?"none today":"none"), c:T.c, i:T.i, f:k}; })
-  ], ty, true);
+    {l:"Total Schedule", v:R.length, s:stat(R), c:"#6366f1", ring:rPct, f:"ALL"},
+    ...TYPE_KEYS.map(k=>{ const l=R.filter(r=>r.tkey===k), T=TYPES[k]; return {l:T.p, v:l.length, s:l.length? stat(l) : "none yet", c:T.c, i:T.i, f:k}; })
+  ], "", true);
   animateKpis($("#boardKpis"));
-  $$("#boardKpis [data-f]").forEach(el=>el.onclick=()=>{ const f=el.dataset.f; S.boardType = (S.boardType===f || !f)? "" : f; S.boardStatus=""; renderBoard(); });
+  $$("#boardKpis [data-f]").forEach(el=>{ el.title="Tap to see all"; el.onclick=()=>openKpiList(el.dataset.f); });
 
   const byType = all.filter(r=>!ty || r.tkey===ty);
   const sts = {}; byType.forEach(r=>sts[r.status]=(sts[r.status]||0)+1);
@@ -1276,7 +1280,7 @@ function renderBoard(){
     html = anyL.length ? `<div class="empty" style="padding:26px 20px 10px"><b>No timed schedule</b>${anyL.length} item${anyL.length>1?"s":""} without a time ${anyL.length>1?"are":"is"} listed below.</div>`
       : `<div class="empty"><div class="em">${svg("cal")}</div><b>${all.length? "Nothing matches this filter":"No schedule for this day"}</b>${all.length? "Tap the card again or clear the filter.":"Tap <b style=\"display:inline\">+ Add</b> to schedule something — it saves straight to the Google Sheet."}</div>`;
   } else timed.forEach((r,i)=>{
-    const state = stateOf(r, key, nm), st=r.start;
+    const state0 = stateOf(r, key, nm), state = state0==="now" && (isDone(r.status)||isCancel(r.status)) ? "past" : state0, st=r.start;
     if(!nowPlaced && !r.allDay && st!=null && st>nm && state!=="now"){ html += `<div class="now-line"><span class="l">${fmt12(nm).replace(" ","")}</span><span class="d"><i></i></span><span class="bar"></span></div>`; nowPlaced=true; }
     if(state==="now" && !r.allDay) nowPlaced=true;
     const A = r.allDay ? adInfo(r.allDay) : null;
@@ -1285,7 +1289,7 @@ function renderBoard(){
     html += `<div class="tl-item ${state} ${isDone(r.status)?"done":""} ${A?"allday":""}" data-id="${esc(r.id)}" style="--sc:${statusColor(r.status)};animation-delay:${i*60}ms">
       <div class="tl-time ${A?"ad":""}"><b>${esc(t[0])}</b><small>${esc(t[1])}</small></div>
       <div class="tl-rail"><span class="tl-dot"></span></div>
-      <div class="tl-card"><div class="tl-head"><div class="tl-title">${esc(title(r.schedule))}</div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${typeBadge(r)}${A?`<span class="adb">☀ ${esc(A.l.toUpperCase())}</span>`:""}${state==="now"?'<span class="now-badge">NOW</span>':""}<span class="status">${esc(r.status)}</span></div></div>
+      <div class="tl-card"><div class="tl-head"><div class="tl-title">${esc(title(r.schedule))}</div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${typeBadge(r)}${A?`<span class="adb">☀ ${esc(A.l.toUpperCase())}</span>`:""}${state==="now" && !isDone(r.status)?'<span class="now-badge">NOW</span>':""}<span class="status">${esc(r.status)}</span></div></div>
         ${r.remarks?`<div class="tl-rem">${esc(r.remarks)}</div>`:""}
         <div class="tl-meta"><span class="tag">${svg("cal")}${esc(dayTag)}</span><span class="tag">${svg("clock")}${esc(timeLabel(r,true))}</span>${r.dept?`<span class="tag">${svg("brief")}${esc(r.dept)}</span>`:""}${r.location?`<span class="tag">${svg("pin")}${esc(r.location)}</span>`:""}${from?`<span class="rsb">${svg("resch")}from ${esc(from.label)}</span>`:""}</div>
       </div></div>`;
@@ -1301,11 +1305,32 @@ function renderBoard(){
     <div class="any-grid">${anySorted.map(anyItem).join("")}</div>` : "";
   bindOpen("#anytime");
 
+  // rows with no date → backlog list (always visible)
+  const nd=S.rows.filter(r=>!r.key && r.schedule), ndOpen=nd.filter(r=>isPend(r.status)), ndDone=nd.filter(r=>isDone(r.status)).length;
+  $("#nodate").innerHTML = ndOpen.length ? `<div class="any-h nd">${svg("cal")}<b>No date set</b><span>${ndOpen.length}</span><em>${ndDone? ndDone+" completed · ":""}tap an item → Set date</em></div>
+    <div class="any-grid">${ndOpen.map(anyItem).join("")}</div>` : "";
+  bindOpen("#nodate");
+
   $("#deptBars").innerHTML = barsHTML(countBy(all,r=>r.dept), "No tasks for this day."); growBars("#deptBars");
   const up = S.rows.filter(r=>r.key>key && isPend(r.status)).sort((a,b)=>a.key.localeCompare(b.key) || a.sortMin-b.sortMin).slice(0,6);
   $("#upSub").textContent = up.length? "next "+up.length+" open" : "";
   $("#upList").innerHTML = up.length? up.map(r=>miniHTML(r, relDay(r.key)+(r.type?" · "+typeInfo(r).l:"")+(r.dept?" · "+r.dept:""))).join("") : `<div class="kpi-sub">Nothing scheduled ahead yet.</div>`;
   bindOpen("#upList");
+}
+function openKpiList(f){
+  const rows = f==="ALL" ? S.rows : S.rows.filter(r=>r.tkey===f);
+  const T = f==="ALL" ? {p:"All Schedules", c:"#6366f1"} : TYPES[f], t=todayKey();
+  const srt=a=>[...a].sort((x,y)=>(x.key||"").localeCompare(y.key||"") || x.sortMin-y.sortMin);
+  const open=rows.filter(r=>isPend(r.status));
+  const groups=[["Today",srt(open.filter(r=>r.key===t)),"#22d3ee"],["Overdue",srt(open.filter(r=>r.key && r.key<t)),"#f87171"],["No date set",srt(open.filter(r=>!r.key)),"#fbbf24"],
+    ["Upcoming",srt(open.filter(r=>r.key>t)),"#a855f7"],["Completed",srt(rows.filter(r=>isDone(r.status))).reverse(),"#34d399"],["Cancelled",srt(rows.filter(r=>isCancel(r.status))),"#8e98c2"]];
+  const body=groups.filter(g=>g[1].length).map(([l,list,c])=>`<div class="ogh" style="--gc:${c}">${l} <span>${list.length}</span></div>`+list.map(r=>oItem(r, l==="Overdue"?`<span class="odue">${dayDiff(r.key,t)}d overdue</span>`:"")).join("")).join("");
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${esc(T.p)} <span class="mono" style="color:${T.c}">${rows.length}</span></h2><p>${open.length} open · ${rows.filter(r=>isDone(r.status)).length} completed · all dates</p></div>
+    <div class="olist klist" id="kList">${body || `<div class="empty"><b>Nothing here yet</b>Add one with the + button.</div>`}</div>
+    <div class="mfoot"><button class="btn" id="kReg">${svg("sheet")}Open in Overview register</button><button class="btn pri" id="kAdd">${svg("plus")}Add ${f==="ALL"?"task":esc(T.l.toLowerCase())}</button></div>`, T.c);
+  bindOpen("#kList");
+  $("#kReg").onclick=()=>{ closeModal(); go("overview"); $("#oType").value = f==="ALL"?"":f; renderOverview(); setTimeout(()=>$("#tSearch").closest(".card").scrollIntoView({behavior:"smooth"}),150); };
+  $("#kAdd").onclick=()=>{ S.addType = f==="ALL"? "" : f; openForm(null, todayKey()); };
 }
 function anyItem(r){
   const T=typeInfo(r), done=isDone(r.status), qid=esc(r.id).replace(/'/g,"\\'");
@@ -1379,7 +1404,7 @@ function openModal(id){
   const qid = esc(id).replace(/'/g,"\\'");
   openSheet(`
     <div class="mhero"><button class="mclose" onclick="closeModal()">${XI}</button>
-      <div class="mtime">${esc(when)} · ${r.date? fmtDate(r.date):esc(r.dRaw)}</div>
+      <div class="mtime">${esc(when)} · ${r.date? fmtDate(r.date):(esc(r.dRaw)||"No date set")}</div>
       <div class="mtitle">${esc(title(r.schedule))}</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${typeBadge(r)}<span class="status" style="--sc:${st}">${esc(r.status)}</span>${r.allDay?`<span class="adb">☀ ${esc(adInfo(r.allDay).l.toUpperCase())}</span>`:""}${from?`<span class="rsb">${svg("resch")}from ${esc(from.label)}</span>`:""}</div></div>
     <div class="mgrid">
@@ -1395,7 +1420,7 @@ function openModal(id){
     </div>
     <div class="qa">
       ${done? `<button class="q-ok" onclick="markStatus('${qid}','PENDING')">${svg("undo")}Reopen</button>` : `<button class="q-ok" onclick="markStatus('${qid}','COMPLETED')">${svg("check")}Complete</button>`}
-      <button class="q-rs" onclick="openReschedule('${qid}')">${svg("resch")}Reschedule</button>
+      <button class="q-rs" onclick="openReschedule('${qid}')">${svg(r.key?"resch":"cal")}${r.key?"Reschedule":"Set date"}</button>
       <button class="q-ed" onclick="openForm('${qid}')">${svg("edit")}Edit</button>
       <button class="q-del" onclick="deleteTask('${qid}')">${svg("trash")}Delete</button>
     </div>
@@ -1448,8 +1473,11 @@ function openForm(id, presetKey){
   const r = id ? S.rows.find(x=>x.id===id) : null;
   const key = r ? (r.key||todayKey()) : (presetKey||todayKey());
   const opts = [...new Set([...STATUS_OPTIONS, ...S.rows.map(x=>x.status)])].filter(Boolean);
-  const tOpts = [...new Set(["TASK","REMINDER","PERSONAL", ...S.rows.map(x=>(x.type||"").toUpperCase())])].filter(Boolean);
-  const tSel = r && r.type ? r.type.toUpperCase() : (S.page==="board" && S.boardType ? S.boardType : "TASK");
+  const sheetTypes=[...new Set(S.rows.map(x=>(x.type||"").toUpperCase().trim()).filter(Boolean))];
+  const pick=k=>sheetTypes.find(x=>typeKey(x)===k) || ({TASK:"TASKS",REMINDER:"REMINDER",PERSONAL:"PERSONAL"})[k];
+  const tOpts = [...new Set([...TYPE_KEYS.map(pick), ...sheetTypes])];
+  const want = S.addType || "TASK"; S.addType="";
+  const tSel = r && r.type ? r.type.toUpperCase().trim() : pick(want);
   openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${r?"Edit task":"Add new task"}</h2><p>${r?"Changes are written to row #"+esc(r.sl||r.row)+" of the Google Sheet.":"The task is added as a new row in the Google Sheet."}</p></div>
     <form class="form" id="tForm" autocomplete="off">
       <div class="fld full"><label>Schedule / task</label><input class="inp" id="fSched" required maxlength="140" placeholder="e.g. Marketing meeting with Thoufeeq" value="${esc(r?title(r.schedule):"")}"></div>
@@ -1487,16 +1515,17 @@ function openForm(id, presetKey){
 }
 function openReschedule(id, newKey){
   const r=S.rows.find(x=>x.id===id); if(!r || needConn()) return;
-  const nk = newKey || addDays(r.key||todayKey(),1);
-  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Reschedule</h2><p>${esc(title(r.schedule))}</p></div>
-    <div class="from-box">${svg("resch")}<div><b>Currently:</b> ${esc(r.date?fmtDate(r.date):r.dRaw)} · ${esc(timeLabel(r,true))}<br><small style="color:var(--muted)">Status becomes <b>RESCHEDULED</b> and the original date is kept in “RESCHEDULED FROM”.</small></div></div>
+  const undated=!r.key;
+  const nk = newKey || (undated? todayKey() : addDays(r.key,1));
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${undated?"Set date":"Reschedule"}</h2><p>${esc(title(r.schedule))}</p></div>
+    <div class="from-box">${svg(undated?"cal":"resch")}<div>${undated? `<b>No date yet.</b><br><small style="color:var(--muted)">Pick a date (and time) — status stays <b>${esc(r.status)}</b>.</small>` : `<b>Currently:</b> ${esc(r.date?fmtDate(r.date):r.dRaw)} · ${esc(timeLabel(r,true))}<br><small style="color:var(--muted)">Status becomes <b>RESCHEDULED</b> and the original date is kept in “RESCHEDULED FROM”.</small>`}</div></div>
     <form class="form" id="rForm" autocomplete="off">
       <div class="fld full"><label>New date</label><input type="date" class="inp" id="rDate" required value="${nk}"></div>
       ${timeFields("rt","", r.start!=null?hhmm(r.start):"", r.end!=null?hhmm(r.end):"")}
       <div class="fld full"><label>Reason (optional — added to remarks)</label><input class="inp" id="rWhy" placeholder="e.g. Client requested next week"></div>
       <div class="ferr" id="rErr"></div>
     </form>
-    <div class="mfoot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn pri" id="rSave">${svg("resch")}Reschedule</button></div>`, "#a855f7");
+    <div class="mfoot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn pri" id="rSave">${svg(undated?"cal":"resch")}${undated?"Save date":"Reschedule"}</button></div>`, "#a855f7");
   wireTT("rt", ttInit(r));
   const submit=()=>{
     const date=$("#rDate").value, time=readTime("rt"), why=$("#rWhy").value.trim();
@@ -1504,10 +1533,10 @@ function openReschedule(id, newKey){
     if(!date) return err("Pick the new date."); if(time===null) return err("Pick a start time, or choose No time / Full day / Half day.");
     if(date===r.key && time===r.tRaw) return err("That's the same date and time.");
     const fromStr = (dmy(r.key)||r.dRaw)+(r.tRaw? " "+r.tRaw : "");
-    const set={ date:dmy(date), time, status:"RESCHEDULED", rfrom:fromStr };
+    const set= undated ? { date:dmy(date), time } : { date:dmy(date), time, status:"RESCHEDULED", rfrom:fromStr };
     if(why) set.remarks=(r.remarks? r.remarks+" | ":"")+"Rescheduled: "+why;
     closeModal();
-    doWrite("update", {...rowRef(r), set}, ()=>{ const t=parseTime(time); Object.assign(r,{key:date,date:parseYmd(date),dRaw:set.date,tRaw:time,start:t.start,end:t.end,allDay:t.allDay,status:"RESCHEDULED",rfrom:fromStr, remarks:set.remarks??r.remarks, sortMin:t.allDay?-2:(t.start??9999)}); },
+    doWrite("update", {...rowRef(r), set}, ()=>{ const t=parseTime(time); Object.assign(r,{key:date,date:parseYmd(date),dRaw:set.date,tRaw:time,start:t.start,end:t.end,allDay:t.allDay,status:set.status||r.status,rfrom:set.rfrom??r.rfrom, remarks:set.remarks??r.remarks, sortMin:t.allDay?-2:(t.start??9999)}); },
       `${title(r.schedule)} → ${shortDate(parseYmd(date))} · ${time}`);
   };
   $("#rSave").onclick=submit; $("#rForm").onsubmit=e=>{ e.preventDefault(); submit(); };
@@ -1628,7 +1657,7 @@ function regRows(){ const q=($("#tSearch").value||"").toLowerCase(); return ovRo
 function oItem(r, extra, acts=true){
   const qid=esc(r.id).replace(/'/g,"\\'");
   return `<div class="oitem" data-id="${esc(r.id)}" style="--sc:${statusColor(r.status)}">
-    <div class="od"><b>${esc(shortTime(r))}</b><small>${r.date?esc(shortDate(r.date)):"—"}</small></div>
+    <div class="od"><b>${esc(shortTime(r))}</b><small>${r.date?esc(shortDate(r.date)):"No date"}</small></div>
     <div class="ox"><b>${esc(title(r.schedule))}</b><small>${extra||""}${typeBadge(r)}${r.dept?`<span>${esc(r.dept)}</span>`:""}${r.location?`<span>· ${esc(r.location)}</span>`:""}</small></div>
     ${acts&&isPend(r.status)?`<div class="acts" data-act-id="1"><button class="a-ok" title="Mark complete" onclick="event.stopPropagation();markStatus('${qid}','COMPLETED')">${svg("check")}</button><button class="a-rs" title="Reschedule" onclick="event.stopPropagation();openReschedule('${qid}')">${svg("resch")}</button></div>`:""}
   </div>`;
@@ -1638,7 +1667,7 @@ function renderOverview(){
   const pct=rows.length?Math.round(B.done.length/rows.length*100):0;
   $("#ovKpis").innerHTML=kpiHTML([
     {l:"Completion", v:pct+"%", s:`${B.done.length} of ${rows.length} done`, c:"#6366f1", ring:pct},
-    {l:"Pending now", v:B.pending.length, s:`${B.today.length} today · up to today`, c:"#fbbf24", i:"clock"},
+    {l:"Pending now", v:B.pending.length, s:`${B.today.length} today`+(B.nodate.length?` · ${B.nodate.length} no date`:""), c:"#fbbf24", i:"clock"},
     {l:"Overdue", v:B.overdue.length, s:"date passed, still open", c:"#f87171", i:"alert"},
     {l:"Upcoming", v:B.upcoming.length, s:"future open tasks", c:"#22d3ee", i:"up"},
     {l:"Rescheduled", v:B.resch.length, s:`${B.resch.filter(r=>isPend(r.status)).length} still open`, c:"#a855f7", i:"resch"}
@@ -1648,7 +1677,8 @@ function renderOverview(){
   $("#ovPendSub").textContent=`${B.pending.length} open`;
   $("#ovPending").innerHTML = B.pending.length ?
     (od.length?`<div class="ogh" style="--gc:#f87171">Overdue <span>${od.length}</span></div>`+od.map(r=>oItem(r,`<span class="odue">${dayDiff(r.key,t)}d overdue</span>`)).join(""):"")+
-    (td.length?`<div class="ogh" style="--gc:#fbbf24">Today <span>${td.length}</span></div>`+td.map(r=>oItem(r, isResch(r)?`<span class="rsb" style="padding:1px 6px">↻</span>`:"")).join(""):"")
+    (td.length?`<div class="ogh" style="--gc:#fbbf24">Today <span>${td.length}</span></div>`+td.map(r=>oItem(r, isResch(r)?`<span class="rsb" style="padding:1px 6px">↻</span>`:"")).join(""):"")+
+    (B.nodate.length?`<div class="ogh" style="--gc:#fb923c">No date set <span>${B.nodate.length}</span></div>`+B.nodate.map(r=>oItem(r,"")).join(""):"")
     : `<div class="empty" style="padding:30px 10px"><div class="em">${svg("star")}</div><b>Nothing pending</b>Everything up to today is closed. 🎯</div>`;
 
   const up=[...B.upcoming].sort((a,b)=>a.key.localeCompare(b.key)||a.sortMin-b.sortMin);
@@ -1759,6 +1789,7 @@ function exportExcel(){
   const byDate=(a,b)=>a.dt-b.dt;
   if(S.page==="board"){
     const rs=dayRows(S.boardDate); add(rs,"Day "+S.boardDate);
+    add(S.rows.filter(r=>!r.key && r.schedule),"No Date Set");
     const done=rs.filter(r=>isDone(r.status)).length;
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["CEO Board Summary"],["Date",fmtDate(parseYmd(S.boardDate))],["Total",rs.length],["Completed",done],["Pending",rs.filter(r=>isPend(r.status)).length],["Rescheduled",rs.filter(isResch).length],...TYPE_KEYS.map(k=>[TYPES[k].p,rs.filter(r=>r.tkey===k).length]),["Completion %",rs.length?Math.round(done/rs.length*100)+"%":"0%"],["Exported",new Date().toLocaleString()]]), "Summary");
   } else if(S.page==="calendar"){
@@ -1787,6 +1818,7 @@ function voiceBrief(){
   t += rs.length? `You have ${rs.length} items on ${key===todayKey()?"today's":"this day's"} schedule${tc.length?": "+tc.join(", "):""}. ${rs.filter(r=>isDone(r.status)).length} completed and ${pend.length} pending. ` : "Your calendar is clear for this day. ";
   pend.slice(0,6).forEach(r=>{ t+= r.allDay? `${adInfo(r.allDay).l}: ${title(r.schedule)}. ` : `At ${timeLabel(r).replace(/^0/,"")}, ${title(r.schedule)}${r.location?", at "+r.location:""}. `; });
   if(B.overdue.length) t+=`${B.overdue.length} overdue item${B.overdue.length>1?"s need":" needs"} attention. `;
+  if(B.nodate.length) t+=`${B.nodate.length} open item${B.nodate.length>1?"s have":" has"} no date yet. `;
   t += "Remember, stress begins when passion fades. Have a great day.";
   const u=new SpeechSynthesisUtterance(t); u.rate=1.02; const v=speechSynthesis.getVoices().find(v=>/en-(IN|GB)/i.test(v.lang))||speechSynthesis.getVoices().find(v=>/^en/i.test(v.lang)); if(v) u.voice=v;
   speechSynthesis.speak(u); toast("Voice briefing","Playing your agenda — tap again to stop.","#a855f7","bell");
