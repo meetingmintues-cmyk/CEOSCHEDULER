@@ -12,7 +12,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@2.5.0/dist/html2canvas-pro.min.js"></script>
 <style>
@@ -430,7 +429,7 @@ footer b{color:var(--muted)}
 .fld label{font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:1.2px;text-transform:uppercase}
 .fld .inp{width:100%;height:42px;font-size:14px}
 .fld textarea.inp{height:78px;padding:10px 12px;resize:vertical;line-height:1.45}
-.ttype{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ttype{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .ttype button{padding:10px 4px;border-radius:10px;border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--muted);background:var(--panel2);transition:.2s}
 .ttype button.active{color:var(--text);border-color:var(--cyan);background:rgba(34,211,238,.12)}
 .ferr{grid-column:1/-1;color:var(--red);font-size:12.5px;display:none}
@@ -554,6 +553,43 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
   .oitem .od{width:48px}
   .from-box,.steps,.conn-st{margin-left:18px;margin-right:18px}
 }
+/* =================== v4: type of schedule =================== */
+.kpis.k4{grid-template-columns:repeat(4,1fr)}
+.kpis.k4 .kpi:first-child{grid-column:auto}
+.kpis.k4 .kpi{cursor:pointer}
+.kpis.k4 .kpi.sel{outline:2px solid var(--kc);outline-offset:-2px;box-shadow:0 0 0 4px color-mix(in srgb,var(--kc) 18%,transparent)}
+.typ{font-size:10px;font-weight:800;letter-spacing:1px;padding:4px 8px;border-radius:6px;color:var(--tc);background:color-mix(in srgb,var(--tc) 14%,transparent);border:1px solid color-mix(in srgb,var(--tc) 40%,transparent);display:inline-flex;gap:5px;align-items:center;white-space:nowrap;line-height:1}
+.typ svg{width:11px;height:11px}
+.oitem .ox small .typ,.any-item .typ{padding:2px 6px;font-size:9.5px}
+.any{padding:0 20px 22px}
+.any:empty{display:none}
+.any-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 0 12px;border-top:1px dashed var(--line2);margin-top:4px}
+.any-h svg{width:16px;height:16px;color:var(--amber)}
+.any-h b{font-size:13.5px}
+.any-h span{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(251,191,36,.14);color:var(--amber)}
+.any-h em{font-style:normal;font-size:11.5px;color:var(--muted);margin-left:auto}
+.any-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.any-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--tc);cursor:pointer;transition:.2s;min-width:0}
+.any-item:hover{border-color:var(--line2);transform:translateY(-2px);box-shadow:var(--glow)}
+.any-chk{width:26px;height:26px;border-radius:8px;border:2px solid var(--tc);display:grid;place-items:center;flex:none;color:transparent;transition:.2s}
+.any-chk svg{width:14px;height:14px}
+.any-chk:hover{background:color-mix(in srgb,var(--tc) 20%,transparent);color:var(--tc)}
+.any-item.done .any-chk{background:var(--green);border-color:var(--green);color:#05261a}
+.any-item.done .ax b{text-decoration:line-through;opacity:.65}
+.any-item .ax{flex:1;min-width:0}
+.any-item .ax b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.any-item .ax small{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;font-size:11px;color:var(--muted)}
+.any-item .status{font-size:9.5px;padding:4px 7px;flex:none}
+@media (max-width:900px){ .kpis.k4{grid-template-columns:1fr 1fr} .bnav-in{grid-template-columns:repeat(3,1fr)} }
+@media (max-width:640px){ .any{padding:0 12px 16px} .any-grid{grid-template-columns:1fr} .any-h em{margin-left:0;width:100%} .kpis.k4 .ringkpi{gap:10px} .kpis.k4 .ring-svg{width:56px;height:56px} }
+.next .nt small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){
+  .next{gap:10px;padding:12px;flex-wrap:wrap}
+  .next .nic{width:38px;height:38px}
+  .next .nt{flex:1 1 150px}
+  .next .cd{font-size:13px;width:100%;padding-left:48px;margin-top:-4px}
+  .datebar .btn{padding:0 10px}
+}
 </style>
 </head>
 <body>
@@ -573,7 +609,6 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
       <button class="tab active" data-page="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>CEO Board</button>
       <button class="tab" data-page="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Calendar</button>
       <button class="tab" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8M13 12h8M13 18h8"/></svg>Overview</button>
-      <button class="tab" data-page="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>Analytics</button>
     </nav>
     <div class="actions">
       <div class="live-pill load" id="livePill"><span class="live-dot"></span><span class="lt" id="liveTxt">Connecting…</span></div>
@@ -640,9 +675,7 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
     </div>
   </div>
 
-  <div class="kpis" id="boardKpis"></div>
-  <div class="snap-h">Overall snapshot · tap to open Overview</div>
-  <div class="snap" id="boardSnap"></div>
+  <div class="kpis k4" id="boardKpis"></div>
 
   <div class="board">
     <div class="card" id="timelineCard">
@@ -658,6 +691,7 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
       </div>
       <div class="seg" id="boardSeg"></div>
       <div class="timeline" id="timeline"></div>
+      <div class="any" id="anytime"></div>
     </div>
 
     <aside class="side">
@@ -714,7 +748,7 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
   <div class="card filters ovf">
     <div class="fgrp"><label>Month</label><select class="inp" id="oMonth"><option value="">All months</option></select></div>
     <div class="fgrp"><label>Department</label><select class="inp" id="oDept"><option value="">All departments</option></select></div>
-    <div class="fgrp"><label>Location</label><select class="inp" id="oLoc"><option value="">All locations</option></select></div>
+    <div class="fgrp"><label>Type of schedule</label><select class="inp" id="oType"><option value="">All types</option></select></div>
     <div class="fbtns" style="margin-left:auto"><button class="btn pri" id="oAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add task</button></div>
   </div>
   <div class="kpis" id="ovKpis"></div>
@@ -734,39 +768,7 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
   </div>
   <div class="ov-grid">
     <div class="card"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>Open Items by Department</h3></div><div class="card-b"><div class="bars" id="ovDeptBars"></div></div></div>
-    <div class="card"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>Open Items by Location</h3></div><div class="card-b"><div class="bars" id="ovLocBars"></div></div></div>
-  </div>
-</section>
-
-<!-- ================= ANALYTICS ================= -->
-<section class="page" id="page-analytics">
-  <div class="card filters">
-    <div class="quick" id="quick">
-      <button data-q="today">Today</button><button data-q="week">This week</button><button data-q="month">This month</button><button data-q="last30">Last 30 days</button><button data-q="all" class="active">All time</button>
-    </div>
-    <div class="fgrp"><label>Month</label><select class="inp" id="fMonth"><option value="">All months</option></select></div>
-    <div class="fgrp"><label>From date</label><input type="date" class="inp" id="fFrom"></div>
-    <div class="fgrp"><label>To date</label><input type="date" class="inp" id="fTo"></div>
-    <div class="fgrp"><label>Status</label><select class="inp" id="fStatus"><option value="">All status</option></select></div>
-    <div class="fgrp"><label>Location</label><select class="inp" id="fLoc"><option value="">All locations</option></select></div>
-    <div class="fgrp"><label>Department</label><select class="inp" id="fDept"><option value="">All departments</option></select></div>
-    <div class="fbtns"><button class="btn" id="fReset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Reset</button></div>
-  </div>
-  <div class="kpis" id="anaKpis"></div>
-  <div class="grid2">
-    <div class="card span8"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg></span>Day-wise Activity</h3><small>tasks per day, stacked by status</small></div><div class="card-b"><div class="chart-box"><canvas id="chDay"></canvas></div></div></div>
-    <div class="card span4"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>Status Split</h3></div><div class="card-b"><div class="chart-box"><canvas id="chStatus"></canvas></div></div></div>
-  </div>
-  <div class="grid2">
-    <div class="card span6"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>Location-wise</h3><small>with completion</small></div><div class="card-b"><div class="chart-box sm"><canvas id="chLoc"></canvas></div></div></div>
-    <div class="card span6"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>Department / Company-wise</h3><small>with completion</small></div><div class="card-b"><div class="chart-box sm"><canvas id="chDept"></canvas></div></div></div>
-  </div>
-  <div class="grid2">
-    <div class="card span6"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Time-slot Load</h3><small>when the day gets busy</small></div><div class="card-b"><div class="chart-box sm"><canvas id="chHour"></canvas></div></div></div>
-    <div class="card span6"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Weekday × Time Heatmap</h3><small>task density</small></div><div class="card-b"><div class="heat" id="heat"></div></div></div>
-  </div>
-  <div class="grid2">
-    <div class="card span12"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></span>Smart Insights</h3><small>auto-generated from the filtered data</small></div><div class="card-b"><div class="insights" id="insights"></div></div></div>
+    <div class="card"><div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg></span>Open Items by Type</h3></div><div class="card-b"><div class="bars" id="ovTypeBars"></div></div></div>
   </div>
   <div class="card">
     <div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></span><span>Schedule Register<br><small id="tblCount">—</small></span></h3>
@@ -775,6 +777,7 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
     <div class="card-b"><div class="tbl-wrap"><table><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div></div>
   </div>
 </section>
+
 <footer>Built for <b>Nihas KM</b> · Fourite Group · Team Explore</footer>
 </main>
 
@@ -783,7 +786,6 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
   <button class="active" data-page="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Board</button>
   <button data-page="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Calendar</button>
   <button data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8M13 12h8M13 18h8"/></svg>Overview</button>
-  <button data-page="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>Analytics</button>
 </div></nav>
 
 <div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
@@ -808,6 +810,7 @@ const FIELDS = {
   date:     [&quot;DATE&quot;],
   time:     [&quot;TIME&quot;],
   schedule: [&quot;SCHEDULE&quot;, &quot;TASK&quot;, &quot;EVENT&quot;, &quot;TITLE&quot;],
+  type:     [&quot;TYPEOFSCHEDULE&quot;, &quot;SCHEDULETYPE&quot;, &quot;TYPE&quot;, &quot;CATEGORY&quot;],
   status:   [&quot;STATUS&quot;],
   location: [&quot;LOCATION&quot;, &quot;PLACE&quot;, &quot;VENUE&quot;],
   dept:     [&quot;DEPARTMENTCOMPANY&quot;, &quot;DEPARTMENT&quot;, &quot;COMPANY&quot;, &quot;DEPT&quot;],
@@ -861,7 +864,7 @@ function col_(h, key) {
   const names = FIELDS[key];
   for (const n of names) { const i = h.indexOf(n); if (i &gt;= 0) return i + 1; }
   for (const n of names) {
-    const i = h.findIndex(x =&gt; x.includes(n) &amp;&amp; !(key === &quot;schedule&quot; &amp;&amp; x.startsWith(&quot;RESCHEDULED&quot;)) &amp;&amp; !(key === &quot;date&quot; &amp;&amp; x.startsWith(&quot;RESCHEDULED&quot;)));
+    const i = h.findIndex(x =&gt; x.includes(n) &amp;&amp; !(key === &quot;schedule&quot; &amp;&amp; (x.startsWith(&quot;RESCHEDULED&quot;) || x.includes(&quot;TYPE&quot;))) &amp;&amp; !(key === &quot;date&quot; &amp;&amp; x.startsWith(&quot;RESCHEDULED&quot;)));
     if (i &gt;= 0) return i + 1;
   }
   return 0;
@@ -917,13 +920,13 @@ function add_(d) {
   } else sl = 1;
   const row = s.getLastRow() + 1;
   setField_(s, row, h, &quot;sl&quot;, sl);
-  [&quot;date&quot;, &quot;time&quot;, &quot;schedule&quot;, &quot;status&quot;, &quot;location&quot;, &quot;dept&quot;, &quot;remarks&quot;, &quot;rfrom&quot;].forEach(k =&gt; { if (d[k] !== undefined) setField_(s, row, h, k, d[k]); });
+  [&quot;date&quot;, &quot;time&quot;, &quot;schedule&quot;, &quot;type&quot;, &quot;status&quot;, &quot;location&quot;, &quot;dept&quot;, &quot;remarks&quot;, &quot;rfrom&quot;].forEach(k =&gt; { if (d[k] !== undefined) setField_(s, row, h, k, d[k]); });
   return { ok: true, sl: String(sl), row };
 }
 function update_(d) {
   const s = sheet_(); const h = d.set &amp;&amp; d.set.rfrom ? ensureRfromCol_(s) : headers_(s);
   const row = findRow_(s, h, d);
-  [&quot;date&quot;, &quot;time&quot;, &quot;schedule&quot;, &quot;status&quot;, &quot;location&quot;, &quot;dept&quot;, &quot;remarks&quot;, &quot;rfrom&quot;].forEach(k =&gt; { if (d.set &amp;&amp; d.set[k] !== undefined) setField_(s, row, h, k, d.set[k]); });
+  [&quot;date&quot;, &quot;time&quot;, &quot;schedule&quot;, &quot;type&quot;, &quot;status&quot;, &quot;location&quot;, &quot;dept&quot;, &quot;remarks&quot;, &quot;rfrom&quot;].forEach(k =&gt; { if (d.set &amp;&amp; d.set[k] !== undefined) setField_(s, row, h, k, d.set[k]); });
   return { ok: true, row };
 }
 function del_(d) {
@@ -966,7 +969,7 @@ const todayKey = () => ymd(new Date());
 const addDays = (key,n) => { const d=parseYmd(key); d.setDate(d.getDate()+n); return ymd(d); };
 const dmy = key => key ? key.split("-").reverse().join("-") : "";
 const hhmm = min => pad(Math.floor(min/60))+":"+pad(min%60);
-const S = { rows: [], page: "board", boardDate: todayKey(), boardStatus: "", sort: {k: "dt", dir: 1}, lastSync: null, charts: {}, notify: false, fetching: false, hash: "", source: "",
+const S = { rows: [], page: "board", boardDate: todayKey(), boardStatus: "", boardType: "", hasLoc: false, sort: {k: "dt", dir: 1}, lastSync: null, charts: {}, notify: false, fetching: false, hash: "", source: "",
   cal: { y: new Date().getFullYear(), m: new Date().getMonth(), sel: todayKey(), status: "" } };
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const title = s => String(s||"").toLowerCase().replace(/(^|[\s\-\/&(])([a-z])/g, (m,a,b) => a+b.toUpperCase());
@@ -990,6 +993,12 @@ const isCancel = s => /CANCEL|NOT DONE|DROP/i.test(s||"");
 const isPend = s => !isDone(s) && !isCancel(s);
 const isResch = r => !!r.rfrom || /RESCHED/i.test(r.status||"");
 const colorOf = (s,i) => PALETTE[(i ?? hash(s))%PALETTE.length];
+/* TYPE OF SCHEDULE */
+const TYPES = { TASK:{l:"Task",p:"Tasks",c:"#60a5fa",i:"task"}, REMINDER:{l:"Reminder",p:"Reminders",c:"#f472b6",i:"bell"}, PERSONAL:{l:"Personal",p:"Personal",c:"#2dd4bf",i:"user"} };
+const TYPE_KEYS = ["TASK","REMINDER","PERSONAL"];
+function typeKey(t){ const u=String(t||"").toUpperCase(); if(/REMIND/.test(u)) return "REMINDER"; if(/TASK/.test(u)) return "TASK"; if(/PERSON/.test(u)) return "PERSONAL"; return u.trim()? "OTHER" : ""; }
+function typeInfo(r){ return TYPES[r.tkey] || {l: r.type? title(r.type) : "Untyped", p: r.type? title(r.type) : "Untyped", c:"#8e98c2", i:"total"}; }
+function typeBadge(r){ if(!r.type) return ""; const T=typeInfo(r); return `<span class="typ" style="--tc:${T.c}">${svg(T.i)}${esc(T.l.toUpperCase())}</span>`; }
 
 /* CSV parser (handles quotes, commas, newlines) */
 function parseCSV(t){
@@ -1038,25 +1047,27 @@ function timeLabel(r, long){
   if(r.start!=null) return fmt12(r.start)+(long && r.end? " – "+fmt12(r.end) : "");
   return r.tRaw || "—";
 }
-function shortTime(r){ if(r.allDay) return r.allDay==="FULL"?"FULL":"HALF"; return r.start!=null? fmt12(r.start).replace(" ","") : (r.tRaw||"—"); }
+function shortTime(r){ if(r.allDay) return r.allDay==="FULL"?"FULL":"HALF"; return r.start!=null? fmt12(r.start).replace(" ","") : (r.tRaw? r.tRaw.slice(0,6) : "ANY"); }
 
 /* header → column finder (exact match first, then contains) */
 function colFinder(headers){
   const H=headers.map(h=>String(h).toUpperCase().replace(/[^A-Z]/g,""));
   return (...keys)=>{ for(const k of keys){ const i=H.indexOf(k); if(i>=0) return i; }
-    for(const k of keys){ const i=H.findIndex(h=>h.includes(k) && (k.startsWith("RESCHED") || !h.startsWith("RESCHEDULED"))); if(i>=0) return i; } return -1; };
+    for(const k of keys){ const i=H.findIndex(h=>h.includes(k) && (k.startsWith("RESCHED") || !h.startsWith("RESCHEDULED")) && (k.startsWith("TYPE") || k==="SCHEDULETYPE" || !h.includes("TYPE"))); if(i>=0) return i; } return -1; };
 }
 function ingest(table, rowNums){
   const f=colFinder(table[0]);
   const C={ sl:f("SINO","SLNO","SNO","SERIAL","NO"), date:f("DATE"), time:f("TIME"), schedule:f("SCHEDULE","TASK","EVENT","TITLE"), status:f("STATUS"),
-    location:f("LOCATION","PLACE","VENUE"), dept:f("DEPARTMENTCOMPANY","DEPARTMENT","COMPANY","DEPT"), remarks:f("REMARKS","REMARK","NOTES","NOTE","DESCRIPTION"), rfrom:f("RESCHEDULEDFROM","RESCHEDULED") };
+    location:f("LOCATION","PLACE","VENUE"), dept:f("DEPARTMENTCOMPANY","DEPARTMENT","COMPANY","DEPT"), remarks:f("REMARKS","REMARK","NOTES","NOTE","DESCRIPTION"), rfrom:f("RESCHEDULEDFROM","RESCHEDULED"), type:f("TYPEOFSCHEDULE","SCHEDULETYPE","TYPE","CATEGORY") };
+  S.hasLoc = C.location>=0;
   return table.slice(1).map((r,i)=>mapRow(r,C,rowNums? rowNums[i] : i+2)).filter(o=>o.schedule||o.date);
 }
 function mapRow(r, C, rowNum){
   const g = k => C[k]>=0 ? String(r[C[k]] ?? "").trim() : "";
   const dRaw=g("date"), tRaw=g("time"), date=parseDate(dRaw), t=parseTime(tRaw);
   const o = { sl:g("sl"), row:rowNum, dRaw, tRaw, date, start:t.start, end:t.end, allDay:t.allDay,
-    schedule:g("schedule"), status:(g("status")||"PENDING").toUpperCase(), location:g("location"), dept:g("dept"), remarks:g("remarks"), rfrom:g("rfrom") };
+    schedule:g("schedule"), status:(g("status")||"PENDING").toUpperCase(), location:g("location"), dept:g("dept"), remarks:g("remarks"), rfrom:g("rfrom"), type:g("type") };
+  o.tkey = typeKey(o.type);
   if(!o.rfrom){ const m=o.remarks.match(/resched\w*\s+from\s+(\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}(?:\s+[\w:.() -]+)?)/i); if(m) o.rfrom=m[1].trim(); }
   o.key = date ? ymd(date) : "";
   o.sortMin = o.allDay ? (o.allDay==="FULL"?-3:o.allDay==="PM"?-1:-2) : (o.start ?? 9999);
@@ -1180,7 +1191,7 @@ const ICON = {
   resch:'<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M12 8v4l3 2"/>', edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
   trash:'<path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>', plus:'<path d="M12 5v14M5 12h14"/>',
   undo:'<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/>', up:'<path d="M5 12h14M13 6l6 6-6 6"/>', sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
-  chev:'<path d="m9 18 6-6-6-6"/>', sheet:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/>', share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>'
+  chev:'<path d="m9 18 6-6-6-6"/>', task:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/>', user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', sheet:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/>', share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>'
 };
 const svg = (k, c="currentColor") => `<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2">${ICON[k]}</svg>`;
 const XI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>';
@@ -1208,7 +1219,7 @@ function buckets(rows){
 }
 function kpiHTML(items, sel, clickable){
   return items.map(k=> k.ring!=null ? `
-    <div class="card kpi" style="--kc:${k.c}">
+    <div class="card kpi ${clickable && k.f!=null && sel===k.f && k.f ? "sel":""}" style="--kc:${k.c}" ${clickable && k.f!=null? `data-f="${k.f}"`:""}>
       <div class="ringkpi">
         <svg class="ring-svg" viewBox="0 0 80 80"><circle class="bgc" cx="40" cy="40" r="32"/><circle class="fg" cx="40" cy="40" r="32" stroke-dasharray="201" stroke-dashoffset="201" data-off="${201-201*k.ring/100}"/></svg>
         <div><div class="kpi-lbl">${k.l}</div><div class="kpi-val">${k.v}</div><div class="kpi-sub">${esc(k.s)}</div></div>
@@ -1239,65 +1250,69 @@ function renderBoard(){
   $("#boardDate").value = key;
   $("#boardTitle").textContent = isToday ? "Today's Schedule" : key===addDays(today,1) ? "Tomorrow's Schedule" : key===addDays(today,-1) ? "Yesterday's Schedule" : "Schedule";
   $("#boardSub").textContent = fmtDate(d);
-  const all = withEnds(dayRows(key));
-  const done=all.filter(r=>isDone(r.status)).length, pend=all.filter(r=>isPend(r.status)).length, rs=all.filter(isResch).length;
-  const pct = all.length? Math.round(done/all.length*100) : 0;
-  const ad = all.filter(r=>r.allDay).length;
+  const all = withEnds(dayRows(key)), ty=S.boardType||"";
+  const done=all.filter(r=>isDone(r.status)).length, pct = all.length? Math.round(done/all.length*100) : 0;
+  const other=all.filter(r=>!TYPES[r.tkey]).length;
   $("#boardKpis").innerHTML = kpiHTML([
-    {l:"Completion", v:pct+"%", s:`${done} of ${all.length} done`, c:"#6366f1", ring:pct},
-    {l:"Total tasks", v:all.length, s:(isToday?"on today's agenda":"on this day")+(ad?` · ${ad} all/half-day`:""), c:"#22d3ee", i:"total", f:""},
-    {l:"Completed", v:done, s:"wrapped up", c:"#34d399", i:"check", f:"DONE"},
-    {l:"Pending", v:pend, s:"needs attention", c:"#fbbf24", i:"clock", f:"PEND"},
-    {l:"Rescheduled", v:rs, s:"moved to/within this day", c:"#a855f7", i:"resch", f:"RESCH"}
-  ], S.boardStatus, true);
+    {l:isToday?"Today's Schedule":"Day's Schedule", v:all.length, s:`${done} done · ${all.length-done} open`+(other?` · ${other} other`:""), c:"#6366f1", ring:pct, f:""},
+    ...TYPE_KEYS.map(k=>{ const l=all.filter(r=>r.tkey===k), dn=l.filter(r=>isDone(r.status)).length, T=TYPES[k];
+      return {l:T.p, v:l.length, s:l.length? `${l.length-dn} open · ${dn} done` : (isToday?"none today":"none"), c:T.c, i:T.i, f:k}; })
+  ], ty, true);
   animateKpis($("#boardKpis"));
-  $$("#boardKpis [data-f]").forEach(el=>el.onclick=()=>{ const f=el.dataset.f; S.boardStatus = S.boardStatus===f? "" : f; renderBoard(); });
+  $$("#boardKpis [data-f]").forEach(el=>el.onclick=()=>{ const f=el.dataset.f; S.boardType = (S.boardType===f || !f)? "" : f; S.boardStatus=""; renderBoard(); });
 
-  // overall snapshot
-  const B=buckets(S.rows);
-  const snaps=[["Pending now",B.pending.length,"#fbbf24","clock",`${B.today.length} today`],["Overdue",B.overdue.length,"#f87171","alert","past date, still open"],
-    [`Upcoming · ${CONFIG.UPCOMING_DAYS} days`,B.up7.length,"#22d3ee","up",`${B.upcoming.length} in total`],["Rescheduled",B.resch.length,"#a855f7","resch",`${B.resch.filter(r=>isPend(r.status)).length} still open`]];
-  $("#boardSnap").innerHTML = snaps.map(([l,v,c,i,s])=>`<div class="card snap-c" style="--kc:${c}" title="${esc(s)}"><span class="si">${svg(i)}</span><div class="sx"><div class="sv">${v}</div><div class="sl">${l}</div></div><span class="sa">${svg("chev")}</span></div>`).join("");
-  $$("#boardSnap .snap-c").forEach(el=>el.onclick=()=>go("overview"));
-
-  // status segment
-  const sts = {}; all.forEach(r=>sts[r.status]=(sts[r.status]||0)+1);
-  const segs = [["","All",all.length], ...Object.entries(sts).map(([k,v])=>[k,title(k),v])];
-  $("#boardSeg").innerHTML = all.length ? segs.map(([k,l,n])=>`<button class="${S.boardStatus===k?"active":""}" data-s="${esc(k)}">${k?`<i style="width:7px;height:7px;border-radius:50%;background:${statusColor(k)}"></i>`:""}${esc(l)} <span class="n">${n}</span></button>`).join("") : "";
-  $$("#boardSeg button").forEach(b=>b.onclick=()=>{ S.boardStatus=b.dataset.s; renderBoard(); });
+  const byType = all.filter(r=>!ty || r.tkey===ty);
+  const sts = {}; byType.forEach(r=>sts[r.status]=(sts[r.status]||0)+1);
+  const segs = [["",ty? TYPES[ty].p+" · all" : "All",byType.length], ...Object.entries(sts).map(([k,v])=>[k,title(k),v])];
+  $("#boardSeg").innerHTML = all.length ? segs.map(([k,l,n])=>`<button class="${S.boardStatus===k?"active":""}" data-s="${esc(k)}">${k?`<i style="width:7px;height:7px;border-radius:50%;background:${statusColor(k)}"></i>`:""}${esc(l)} <span class="n">${n}</span></button>`).join("") + (ty?`<button data-clr="1">✕ Clear type</button>`:"") : "";
+  $$("#boardSeg button").forEach(b=>b.onclick=()=>{ if(b.dataset.clr){ S.boardType=""; S.boardStatus=""; } else S.boardStatus=b.dataset.s; renderBoard(); });
 
   const f=S.boardStatus;
-  const list = all.filter(r=> !f ? true : f==="DONE"? isDone(r.status) : f==="PEND"? isPend(r.status) : f==="RESCH"? isResch(r) : r.status===f);
-  const nm = nowMin();
+  const list = byType.filter(r=> !f ? true : f==="DONE"? isDone(r.status) : f==="PEND"? isPend(r.status) : f==="RESCH"? isResch(r) : r.status===f);
+  const timed = list.filter(r=>r.allDay || r.start!=null), anyL = list.filter(r=>!r.allDay && r.start==null);
+  const nm = nowMin(), dayTag = DAYS[d.getDay()]+", "+shortDate(d);
   let html="", nowPlaced = !isToday;
-  if(!list.length){
-    html = `<div class="empty"><div class="em">${svg("cal")}</div><b>${all.length? "No tasks match this filter":"No schedule for this day"}</b>${all.length? "Try another status.":"Tap <b style=\"display:inline\">+ Add</b> to schedule something — it saves straight to the Google Sheet."}</div>`;
-  } else list.forEach((r,i)=>{
+  if(!timed.length){
+    html = anyL.length ? `<div class="empty" style="padding:26px 20px 10px"><b>No timed schedule</b>${anyL.length} item${anyL.length>1?"s":""} without a time ${anyL.length>1?"are":"is"} listed below.</div>`
+      : `<div class="empty"><div class="em">${svg("cal")}</div><b>${all.length? "Nothing matches this filter":"No schedule for this day"}</b>${all.length? "Tap the card again or clear the filter.":"Tap <b style=\"display:inline\">+ Add</b> to schedule something — it saves straight to the Google Sheet."}</div>`;
+  } else timed.forEach((r,i)=>{
     const state = stateOf(r, key, nm), st=r.start;
     if(!nowPlaced && !r.allDay && st!=null && st>nm && state!=="now"){ html += `<div class="now-line"><span class="l">${fmt12(nm).replace(" ","")}</span><span class="d"><i></i></span><span class="bar"></span></div>`; nowPlaced=true; }
     if(state==="now" && !r.allDay) nowPlaced=true;
     const A = r.allDay ? adInfo(r.allDay) : null;
-    const t = A ? [A.a, A.b] : st!=null ? fmt12(st).split(" ") : [r.tRaw||"—",""];
+    const t = A ? [A.a, A.b] : fmt12(st).split(" ");
     const from = isResch(r) && r.rfrom ? parseFrom(r.rfrom) : null;
     html += `<div class="tl-item ${state} ${isDone(r.status)?"done":""} ${A?"allday":""}" data-id="${esc(r.id)}" style="--sc:${statusColor(r.status)};animation-delay:${i*60}ms">
       <div class="tl-time ${A?"ad":""}"><b>${esc(t[0])}</b><small>${esc(t[1])}</small></div>
       <div class="tl-rail"><span class="tl-dot"></span></div>
-      <div class="tl-card"><div class="tl-head"><div class="tl-title">${esc(title(r.schedule))}</div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${A?`<span class="adb">☀ ${esc(A.l.toUpperCase())}</span>`:""}${state==="now"?'<span class="now-badge">NOW</span>':""}<span class="status">${esc(r.status)}</span></div></div>
+      <div class="tl-card"><div class="tl-head"><div class="tl-title">${esc(title(r.schedule))}</div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${typeBadge(r)}${A?`<span class="adb">☀ ${esc(A.l.toUpperCase())}</span>`:""}${state==="now"?'<span class="now-badge">NOW</span>':""}<span class="status">${esc(r.status)}</span></div></div>
         ${r.remarks?`<div class="tl-rem">${esc(r.remarks)}</div>`:""}
-        <div class="tl-meta">${r.dept?`<span class="tag">${svg("brief")}${esc(r.dept)}</span>`:""}${r.location?`<span class="tag">${svg("pin")}${esc(r.location)}</span>`:""}${r.end&&!A?`<span class="tag">${svg("clock")}till ${fmt12(r.end)}</span>`:""}${from?`<span class="rsb">${svg("resch")}from ${esc(from.label)}</span>`:""}</div>
+        <div class="tl-meta"><span class="tag">${svg("cal")}${esc(dayTag)}</span><span class="tag">${svg("clock")}${esc(timeLabel(r,true))}</span>${r.dept?`<span class="tag">${svg("brief")}${esc(r.dept)}</span>`:""}${r.location?`<span class="tag">${svg("pin")}${esc(r.location)}</span>`:""}${from?`<span class="rsb">${svg("resch")}from ${esc(from.label)}</span>`:""}</div>
       </div></div>`;
   });
-  if(!nowPlaced && list.length && isToday) html += `<div class="now-line"><span class="l">${fmt12(nm).replace(" ","")}</span><span class="d"><i></i></span><span class="bar"></span></div>`;
+  if(!nowPlaced && timed.length && isToday) html += `<div class="now-line"><span class="l">${fmt12(nm).replace(" ","")}</span><span class="d"><i></i></span><span class="bar"></span></div>`;
   $("#timeline").innerHTML = html;
   bindOpen("#timeline");
 
-  $("#deptBars").innerHTML = barsHTML(countBy(all,r=>r.dept), "No tasks for this day."); growBars("#deptBars");
+  // items without a time → list below the timeline, grouped by type
+  const order=[...TYPE_KEYS,"OTHER",""];
+  const anySorted=order.flatMap(k=>anyL.filter(r=>(r.tkey||"")===k));
+  $("#anytime").innerHTML = anyL.length ? `<div class="any-h">${svg("clock")}<b>No fixed time · ${isToday?"Today":esc(dayTag)}</b><span>${anyL.length}</span><em>${TYPE_KEYS.map(k=>{ const n=anyL.filter(r=>r.tkey===k).length; return n? `${n} ${TYPES[k].p.toLowerCase()}`:""; }).filter(Boolean).join(" · ")}</em></div>
+    <div class="any-grid">${anySorted.map(anyItem).join("")}</div>` : "";
+  bindOpen("#anytime");
 
-  // upcoming after the board date
+  $("#deptBars").innerHTML = barsHTML(countBy(all,r=>r.dept), "No tasks for this day."); growBars("#deptBars");
   const up = S.rows.filter(r=>r.key>key && isPend(r.status)).sort((a,b)=>a.key.localeCompare(b.key) || a.sortMin-b.sortMin).slice(0,6);
   $("#upSub").textContent = up.length? "next "+up.length+" open" : "";
-  $("#upList").innerHTML = up.length? up.map(r=>miniHTML(r, relDay(r.key)+(r.location?" · "+r.location:""))).join("") : `<div class="kpi-sub">Nothing scheduled ahead yet.</div>`;
+  $("#upList").innerHTML = up.length? up.map(r=>miniHTML(r, relDay(r.key)+(r.type?" · "+typeInfo(r).l:"")+(r.dept?" · "+r.dept:""))).join("") : `<div class="kpi-sub">Nothing scheduled ahead yet.</div>`;
   bindOpen("#upList");
+}
+function anyItem(r){
+  const T=typeInfo(r), done=isDone(r.status), qid=esc(r.id).replace(/'/g,"\\'");
+  return `<div class="any-item ${done?"done":""}" data-id="${esc(r.id)}" style="--tc:${T.c}">
+    <button class="any-chk" data-act-id="1" title="${done?"Reopen":"Mark complete"}" onclick="event.stopPropagation();markStatus('${qid}','${done?"PENDING":"COMPLETED"}')">${svg("check")}</button>
+    <div class="ax"><b>${esc(title(r.schedule))}</b><small>${typeBadge(r)}${r.dept?`<span>${esc(r.dept)}</span>`:""}${r.tRaw?`<span>· ${esc(r.tRaw)}</span>`:""}</small></div>
+    <span class="status" style="--sc:${statusColor(r.status)}">${esc(r.status)}</span></div>`;
 }
 
 /* ---------- clock / next ---------- */
@@ -1366,10 +1381,11 @@ function openModal(id){
     <div class="mhero"><button class="mclose" onclick="closeModal()">${XI}</button>
       <div class="mtime">${esc(when)} · ${r.date? fmtDate(r.date):esc(r.dRaw)}</div>
       <div class="mtitle">${esc(title(r.schedule))}</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="status" style="--sc:${st}">${esc(r.status)}</span>${r.allDay?`<span class="adb">☀ ${esc(adInfo(r.allDay).l.toUpperCase())}</span>`:""}${from?`<span class="rsb">${svg("resch")}from ${esc(from.label)}</span>`:""}</div></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${typeBadge(r)}<span class="status" style="--sc:${st}">${esc(r.status)}</span>${r.allDay?`<span class="adb">☀ ${esc(adInfo(r.allDay).l.toUpperCase())}</span>`:""}${from?`<span class="rsb">${svg("resch")}from ${esc(from.label)}</span>`:""}</div></div>
     <div class="mgrid">
+      <div class="mf"><small>Type of schedule</small><b>${esc(r.type? typeInfo(r).l : "—")}</b></div>
       <div class="mf"><small>Department / Company</small><b>${esc(r.dept||"—")}</b></div>
-      <div class="mf"><small>Location</small><b>${esc(r.location||"—")}</b></div>
+      ${r.location?`<div class="mf full"><small>Location</small><b>${esc(r.location)}</b></div>`:""}
       <div class="mf"><small>Date</small><b>${esc(r.dRaw||"—")}</b></div>
       <div class="mf"><small>Time (sheet)</small><b>${esc(r.tRaw||"—")}</b></div>
       <div class="mf full"><small>Remarks</small><b>${esc(r.remarks||"No remarks added")}</b></div>
@@ -1411,7 +1427,7 @@ async function shareTask(id){
    ========================================================= */
 function timeFields(pref, tt, s, e){
   return `<div class="fld full"><label>Time</label><div class="ttype" id="${pref}TT">
-      <button type="button" data-t="TIME">Time</button><button type="button" data-t="FULL">Full day</button><button type="button" data-t="AM">Half · AM</button><button type="button" data-t="PM">Half · PM</button></div></div>
+      <button type="button" data-t="TIME">Time</button><button type="button" data-t="NONE">No time</button><button type="button" data-t="FULL">Full day</button><button type="button" data-t="AM">Half · AM</button><button type="button" data-t="PM">Half · PM</button></div></div>
     <div class="fld" id="${pref}SW"><label>Start time</label><input type="time" class="inp" id="${pref}S" value="${s||""}"></div>
     <div class="fld" id="${pref}EW"><label>End time (optional)</label><input type="time" class="inp" id="${pref}E" value="${e||""}"></div>`;
 }
@@ -1421,24 +1437,28 @@ function wireTT(pref, init){
 }
 function readTime(pref){
   const t=$(`#${pref}TT`).dataset.v;
+  if(t==="NONE") return "";
   if(t==="FULL") return "FULL DAY"; if(t==="AM") return "HALF DAY (MORNING)"; if(t==="PM") return "HALF DAY (AFTERNOON)";
   const s=$(`#${pref}S`).value, e=$(`#${pref}E`).value; if(!s) return null;
   return e && e>s ? s+"-"+e : s;
 }
-function ttInit(r){ return r && r.allDay ? (r.allDay==="HALF"?"AM":r.allDay) : "TIME"; }
+function ttInit(r){ if(r && r.allDay) return r.allDay==="HALF"?"AM":r.allDay; if(r && r.start==null) return "NONE"; return "TIME"; }
 function openForm(id, presetKey){
   if(needConn()) return;
   const r = id ? S.rows.find(x=>x.id===id) : null;
   const key = r ? (r.key||todayKey()) : (presetKey||todayKey());
   const opts = [...new Set([...STATUS_OPTIONS, ...S.rows.map(x=>x.status)])].filter(Boolean);
+  const tOpts = [...new Set(["TASK","REMINDER","PERSONAL", ...S.rows.map(x=>(x.type||"").toUpperCase())])].filter(Boolean);
+  const tSel = r && r.type ? r.type.toUpperCase() : (S.page==="board" && S.boardType ? S.boardType : "TASK");
   openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${r?"Edit task":"Add new task"}</h2><p>${r?"Changes are written to row #"+esc(r.sl||r.row)+" of the Google Sheet.":"The task is added as a new row in the Google Sheet."}</p></div>
     <form class="form" id="tForm" autocomplete="off">
       <div class="fld full"><label>Schedule / task</label><input class="inp" id="fSched" required maxlength="140" placeholder="e.g. Marketing meeting with Thoufeeq" value="${esc(r?title(r.schedule):"")}"></div>
       <div class="fld"><label>Date</label><input type="date" class="inp" id="fDate" required value="${key}"></div>
       <div class="fld"><label>Status</label><select class="inp" id="fStat">${opts.map(o=>`<option ${((r&&r.status)||"PENDING")===o?"selected":""}>${esc(o)}</option>`).join("")}</select></div>
       ${timeFields("ft", "", r&&r.start!=null?hhmm(r.start):"", r&&r.end!=null?hhmm(r.end):"")}
-      <div class="fld"><label>Location</label><input class="inp" id="fLocI" list="dlLoc" placeholder="HO" value="${esc(r?r.location:"")}"></div>
+      <div class="fld"><label>Type of schedule</label><select class="inp" id="fType">${tOpts.map(o=>`<option ${o===tSel?"selected":""}>${esc(o)}</option>`).join("")}</select></div>
       <div class="fld"><label>Department / Company</label><input class="inp" id="fDeptI" list="dlDept" placeholder="MARKETING" value="${esc(r?r.dept:"")}"></div>
+      ${S.hasLoc?`<div class="fld full"><label>Location</label><input class="inp" id="fLocI" list="dlLoc" placeholder="HO" value="${esc(r?r.location:"")}"></div>`:""}
       <div class="fld full"><label>Remarks</label><textarea class="inp" id="fRem" placeholder="Notes, agenda, people…">${esc(r?r.remarks:"")}</textarea></div>
       <div class="ferr" id="fErr"></div>
     </form>
@@ -1449,13 +1469,15 @@ function openForm(id, presetKey){
     const err=m=>{ $("#fErr").textContent=m; $("#fErr").style.display="block"; };
     if(!sched) return err("Please enter the schedule / task name.");
     if(!date) return err("Please pick a date.");
-    if(time===null) return err("Pick a start time, or choose Full day / Half day.");
-    const rec={ date:dmy(date), time, schedule:sched.toUpperCase(), status:$("#fStat").value, location:$("#fLocI").value.trim().toUpperCase(), dept:$("#fDeptI").value.trim().toUpperCase(), remarks:$("#fRem").value.trim() };
+    if(time===null) return err("Pick a start time, or choose No time / Full day / Half day.");
+    const rec={ date:dmy(date), time, schedule:sched.toUpperCase(), type:$("#fType").value, status:$("#fStat").value, dept:$("#fDeptI").value.trim().toUpperCase(), remarks:$("#fRem").value.trim() };
+    if($("#fLocI")) rec.location=$("#fLocI").value.trim().toUpperCase();
+    const CI={sl:0,date:1,time:2,schedule:3,status:4,location:5,dept:6,remarks:7,rfrom:8,type:9};
     closeModal();
     if(r){
-      doWrite("update", {...rowRef(r), set:rec}, ()=>{ Object.assign(r, mapRow([r.sl,rec.date,rec.time,rec.schedule,rec.status,rec.location,rec.dept,rec.remarks,r.rfrom],{sl:0,date:1,time:2,schedule:3,status:4,location:5,dept:6,remarks:7,rfrom:8},r.row), {id:r.id}); }, `Updated “${title(sched)}”`);
+      doWrite("update", {...rowRef(r), set:rec}, ()=>{ Object.assign(r, mapRow([r.sl,rec.date,rec.time,rec.schedule,rec.status,rec.location??r.location,rec.dept,rec.remarks,r.rfrom,rec.type],CI,r.row), {id:r.id}); }, `Updated “${title(sched)}”`);
     } else {
-      const tmp=mapRow(["",rec.date,rec.time,rec.schedule,rec.status,rec.location,rec.dept,rec.remarks,""],{sl:0,date:1,time:2,schedule:3,status:4,location:5,dept:6,remarks:7,rfrom:8},0); tmp.id="new"+Date.now();
+      const tmp=mapRow(["",rec.date,rec.time,rec.schedule,rec.status,rec.location||"",rec.dept,rec.remarks,"",rec.type],CI,0); tmp.id="new"+Date.now();
       const ok=await doWrite("add", rec, ()=>{ S.rows.push(tmp); }, `Added “${title(sched)}” on ${shortDate(parseYmd(date))}`);
       if(ok){ if(S.page==="board") S.boardDate=date; if(S.page==="calendar"){ const d=parseYmd(date); S.cal={...S.cal,y:d.getFullYear(),m:d.getMonth(),sel:date}; } }
     }
@@ -1479,7 +1501,7 @@ function openReschedule(id, newKey){
   const submit=()=>{
     const date=$("#rDate").value, time=readTime("rt"), why=$("#rWhy").value.trim();
     const err=m=>{ $("#rErr").textContent=m; $("#rErr").style.display="block"; };
-    if(!date) return err("Pick the new date."); if(time===null) return err("Pick a start time, or choose Full day / Half day.");
+    if(!date) return err("Pick the new date."); if(time===null) return err("Pick a start time, or choose No time / Full day / Half day.");
     if(date===r.key && time===r.tRaw) return err("That's the same date and time.");
     const fromStr = (dmy(r.key)||r.dRaw)+(r.tRaw? " "+r.tRaw : "");
     const set={ date:dmy(date), time, status:"RESCHEDULED", rfrom:fromStr };
@@ -1574,7 +1596,7 @@ function renderCalendar(){
     const show=list.slice(0,3);
     html+=`<div class="cal-cell ${out?"out":""} ${wk?"wk":""} ${k===today?"today":""} ${k===C.sel?"sel":""}" data-k="${k}">
       <div class="cal-top"><span class="cal-num">${d.getDate()}</span>${list.length?`<span class="cal-cnt">${list.length}</span>`:""}</div>
-      ${show.map(r=>`<div class="cal-pill ${isDone(r.status)?"dn":""}" draggable="${!mobile}" data-pid="${esc(r.id)}" style="--sc:${statusColor(r.status)}" title="${esc(timeLabel(r)+" · "+title(r.schedule)+" · "+r.status)}"><i>${esc(shortTime(r))}</i>${esc(title(r.schedule))}</div>`).join("")}
+      ${show.map(r=>`<div class="cal-pill ${isDone(r.status)?"dn":""}" draggable="${!mobile}" data-pid="${esc(r.id)}" style="--sc:${statusColor(r.status)}" title="${esc(timeLabel(r)+" · "+title(r.schedule)+(r.type?" · "+typeInfo(r).l:"")+" · "+r.status)}"><i>${esc(shortTime(r))}</i>${esc(title(r.schedule))}</div>`).join("")}
       ${list.length>3?`<div class="cal-more">+${list.length-3} more</div>`:""}
       <div class="cal-dots">${list.slice(0,4).map(r=>`<i style="--sc:${statusColor(r.status)}"></i>`).join("")}</div>
     </div>`;
@@ -1594,19 +1616,20 @@ function renderCalDay(){
   $("#calDayTitle").textContent=relDay(k)==="Today"? "Today · "+shortDate(d) : fmtDate(d);
   const p=list.filter(r=>isPend(r.status)).length;
   $("#calDaySub").textContent= list.length? `${list.length} task${list.length>1?"s":""} · ${p} open` : "No tasks";
-  $("#calDayList").innerHTML= list.length? list.map(r=>miniHTML(r, [r.location,r.dept].filter(Boolean).join(" · ")+(isResch(r)&&r.rfrom?" · ↻ from "+(parseFrom(r.rfrom).label||""):""))).join("") : `<div class="empty" style="padding:24px 10px"><div class="em">${svg("cal")}</div><b>Free day</b>Add a task and it will be saved to the sheet.</div>`;
+  $("#calDayList").innerHTML= list.length? list.map(r=>miniHTML(r, [r.type?typeInfo(r).l:"",r.dept,r.location].filter(Boolean).join(" · ")+(isResch(r)&&r.rfrom?" · ↻ from "+(parseFrom(r.rfrom).label||""):""))).join("") : `<div class="empty" style="padding:24px 10px"><div class="em">${svg("cal")}</div><b>Free day</b>Add a task and it will be saved to the sheet.</div>`;
   bindOpen("#calDayList");
 }
 
 /* =========================================================
    PAGE 3 — OVERVIEW (pending · upcoming · rescheduled)
    ========================================================= */
-function ovRows(){ const m=$("#oMonth").value, dp=$("#oDept").value, lc=$("#oLoc").value; return S.rows.filter(r=>(!m||r.key.startsWith(m)) && (!dp||r.dept===dp) && (!lc||r.location===lc)); }
+function ovRows(){ const m=$("#oMonth").value, dp=$("#oDept").value, ty=$("#oType").value; return S.rows.filter(r=>(!m||r.key.startsWith(m)) && (!dp||r.dept===dp) && (!ty||r.tkey===ty)); }
+function regRows(){ const q=($("#tSearch").value||"").toLowerCase(); return ovRows().filter(r=>!q || [r.schedule,r.remarks,r.dept,r.location,r.status,r.type].join(" ").toLowerCase().includes(q)); }
 function oItem(r, extra, acts=true){
   const qid=esc(r.id).replace(/'/g,"\\'");
   return `<div class="oitem" data-id="${esc(r.id)}" style="--sc:${statusColor(r.status)}">
     <div class="od"><b>${esc(shortTime(r))}</b><small>${r.date?esc(shortDate(r.date)):"—"}</small></div>
-    <div class="ox"><b>${esc(title(r.schedule))}</b><small>${extra||""}${r.dept?`<span>${esc(r.dept)}</span>`:""}${r.location?`<span>· ${esc(r.location)}</span>`:""}</small></div>
+    <div class="ox"><b>${esc(title(r.schedule))}</b><small>${extra||""}${typeBadge(r)}${r.dept?`<span>${esc(r.dept)}</span>`:""}${r.location?`<span>· ${esc(r.location)}</span>`:""}</small></div>
     ${acts&&isPend(r.status)?`<div class="acts" data-act-id="1"><button class="a-ok" title="Mark complete" onclick="event.stopPropagation();markStatus('${qid}','COMPLETED')">${svg("check")}</button><button class="a-rs" title="Reschedule" onclick="event.stopPropagation();openReschedule('${qid}')">${svg("resch")}</button></div>`:""}
   </div>`;
 }
@@ -1637,7 +1660,7 @@ function renderOverview(){
   const rs=[...B.resch].sort((a,b)=>b.key.localeCompare(a.key));
   $("#ovRsSub").textContent=`${rs.length} rescheduled · ${rs.filter(r=>isPend(r.status)).length} open`;
   $("#ovResch").innerHTML = rs.length ? rs.map(r=>{ const f=parseFrom(r.rfrom); const sh=f&&f.key&&r.key? dayDiff(f.key,r.key) : null;
-    return `<tr data-id="${esc(r.id)}"><td class="wrap"><b>${esc(title(r.schedule))}</b>${r.location?`<span class="sub">${esc(r.location)}</span>`:""}</td>
+    return `<tr data-id="${esc(r.id)}"><td class="wrap"><b>${esc(title(r.schedule))}</b>${r.type?`<span class="sub">${esc(typeInfo(r).l)}</span>`:""}</td>
       <td>${f? `<b>${esc(f.date?shortDate(f.date)+" "+f.date.getFullYear():f.label)}</b><span class="sub">${esc(f.date&&f.tRaw?timeLabel(f):"")}</span>` : `<span style="color:var(--dim)">not recorded</span>`}</td>
       <td class="arrow-c">→</td>
       <td><b>${r.date?esc(shortDate(r.date)+" "+r.date.getFullYear()):esc(r.dRaw)}</b><span class="sub">${esc(timeLabel(r))}</span></td>
@@ -1647,100 +1670,42 @@ function renderOverview(){
   bindOpen("#ovPending"); bindOpen("#ovUpcoming"); $$("#ovResch tr[data-id]").forEach(tr=>tr.onclick=()=>openModal(tr.dataset.id));
 
   $("#ovDeptBars").innerHTML=barsHTML(countBy(B.open,r=>r.dept).slice(0,10),"No open items."); growBars("#ovDeptBars");
-  $("#ovLocBars").innerHTML=barsHTML(countBy(B.open,r=>r.location).slice(0,10),"No open items."); growBars("#ovLocBars");
+  $("#ovTypeBars").innerHTML=barsHTML(countBy(B.open,r=>r.type?typeInfo(r).p:"Untyped"),"No open items."); growBars("#ovTypeBars");
+  renderTable(regRows());
 }
 
 /* =========================================================
-   PAGE 4 — ANALYTICS
+   FILTERS + SCHEDULE REGISTER (Overview)
    ========================================================= */
 function fillFilters(){
-  const opts=(id,vals,lbl)=>{ const el=$(id), v=el.value; el.innerHTML=`<option value="">${lbl}</option>`+vals.map(x=>`<option value="${esc(x)}">${esc(title(x))}</option>`).join(""); el.value=vals.includes(v)?v:""; };
   const uniq = f => [...new Set(S.rows.map(f).filter(Boolean))].sort();
-  const locs=uniq(r=>r.location), depts=uniq(r=>r.dept);
-  opts("#fStatus", uniq(r=>r.status), "All status");
-  opts("#fLoc", locs, "All locations"); opts("#oLoc", locs, "All locations");
-  opts("#fDept", depts, "All departments"); opts("#oDept", depts, "All departments");
+  const depts=uniq(r=>r.dept), locs=uniq(r=>r.location);
+  const dEl=$("#oDept"), dv=dEl.value; dEl.innerHTML=`<option value="">All departments</option>`+depts.map(x=>`<option value="${esc(x)}">${esc(title(x))}</option>`).join(""); dEl.value=depts.includes(dv)?dv:"";
+  const tk=[...TYPE_KEYS]; if(S.rows.some(r=>r.tkey==="OTHER")) tk.push("OTHER");
+  const tEl=$("#oType"), tv=tEl.value; tEl.innerHTML=`<option value="">All types</option>`+tk.map(k=>`<option value="${k}">${k==="OTHER"?"Other":TYPES[k].p}</option>`).join(""); tEl.value=tk.includes(tv)?tv:"";
   const months=[...new Set(S.rows.filter(r=>r.date).map(r=>r.key.slice(0,7)))].sort().reverse();
-  ["#fMonth","#oMonth"].forEach(id=>{ const el=$(id), mv=el.value; el.innerHTML=`<option value="">All months</option>`+months.map(m=>`<option value="${m}">${MONTHS_L[+m.slice(5)-1]} ${m.slice(0,4)}</option>`).join(""); el.value=months.includes(mv)?mv:""; });
+  const mEl=$("#oMonth"), mv=mEl.value; mEl.innerHTML=`<option value="">All months</option>`+months.map(m=>`<option value="${m}">${MONTHS_L[+m.slice(5)-1]} ${m.slice(0,4)}</option>`).join(""); mEl.value=months.includes(mv)?mv:"";
   $("#dlLoc").innerHTML=locs.map(x=>`<option value="${esc(x)}">`).join(""); $("#dlDept").innerHTML=depts.map(x=>`<option value="${esc(x)}">`).join("");
 }
-function filtered(){
-  const m=$("#fMonth").value, fr=$("#fFrom").value, to=$("#fTo").value, st=$("#fStatus").value, lo=$("#fLoc").value, de=$("#fDept").value, q=($("#tSearch").value||"").toLowerCase();
-  return S.rows.filter(r=> (!m||r.key.startsWith(m)) && (!fr||r.key>=fr) && (!to||r.key<=to) && (!st||r.status===st) && (!lo||r.location===lo) && (!de||r.dept===de)
-    && (!q || [r.schedule,r.remarks,r.dept,r.location,r.status].join(" ").toLowerCase().includes(q)));
-}
-function themeVars(){ const cs=getComputedStyle(document.documentElement); return {text:cs.getPropertyValue("--muted").trim(), grid:cs.getPropertyValue("--line").trim(), solid:cs.getPropertyValue("--panel-solid").trim(), main:cs.getPropertyValue("--text").trim()}; }
-function mkChart(id, cfg){ if(!window.Chart) return; if(S.charts[id]) S.charts[id].destroy(); S.charts[id]=new Chart($("#"+id), cfg); }
-function baseOpts(extra={}){ const t=themeVars(); return Object.assign({responsive:true,maintainAspectRatio:false,animation:{duration:900,easing:"easeOutQuart"},
-  plugins:{legend:{labels:{color:t.text,font:{family:"Sora",size:11},usePointStyle:true,pointStyle:"circle",boxWidth:8,padding:14}},tooltip:{backgroundColor:t.solid,titleColor:t.main,bodyColor:t.main,borderColor:t.grid,borderWidth:1,padding:12,cornerRadius:12,titleFont:{family:"Sora",weight:"700"},bodyFont:{family:"Sora"}}},
-  scales:{x:{ticks:{color:t.text,font:{family:"Sora",size:10.5}},grid:{display:false},border:{color:t.grid}},y:{beginAtZero:true,ticks:{color:t.text,precision:0,font:{family:"JetBrains Mono",size:10.5}},grid:{color:t.grid},border:{display:false}}}},extra); }
-function renderAnalytics(){
-  const rows=filtered(); const statuses=[...new Set(rows.map(r=>r.status))].sort((a,b)=>isDone(b)-isDone(a));
-  const done=rows.filter(r=>isDone(r.status)).length, pend=rows.filter(r=>isPend(r.status)).length, canc=rows.filter(r=>isCancel(r.status)).length;
-  const days=new Set(rows.map(r=>r.key).filter(Boolean)); const pct=rows.length?Math.round(done/rows.length*100):0;
-  $("#anaKpis").innerHTML=kpiHTML([
-    {l:"Completion rate", v:pct+"%", s:`${done} of ${rows.length} done`, c:"#6366f1", ring:pct},
-    {l:"Total schedules", v:rows.length, s:`across ${days.size} day${days.size==1?"":"s"}`, c:"#22d3ee", i:"total"},
-    {l:"Completed", v:done, s:"closed items", c:"#34d399", i:"check"},
-    {l:"Pending", v:pend, s:"open items", c:"#fbbf24", i:"clock"},
-    {l:"Avg / day", v:days.size? (rows.length/days.size).toFixed(1):"0", s:canc? `${canc} cancelled`:"workload intensity", c:"#f472b6", i:"bolt"}
-  ]); animateKpis($("#anaKpis"));
-  const dk=[...days].sort(); const dayLbl=dk.map(k=>{ const d=parseYmd(k); return d.getDate()+" "+MONTHS[d.getMonth()]; });
-  mkChart("chDay",{type:"bar",data:{labels:dayLbl,datasets:statuses.map(s=>({label:title(s),data:dk.map(k=>rows.filter(r=>r.key===k&&r.status===s).length),backgroundColor:statusColor(s),borderRadius:6,borderSkipped:false,maxBarThickness:34}))},
-    options:baseOpts({scales:{...baseOpts().scales,x:{...baseOpts().scales.x,stacked:true},y:{...baseOpts().scales.y,stacked:true}}})});
-  const t=themeVars();
-  mkChart("chStatus",{type:"doughnut",data:{labels:statuses.map(title),datasets:[{data:statuses.map(s=>rows.filter(r=>r.status===s).length),backgroundColor:statuses.map(statusColor),borderColor:t.solid,borderWidth:4,hoverOffset:10}]},
-    options:{...baseOpts(),scales:{},cutout:"68%",plugins:{...baseOpts().plugins,legend:{...baseOpts().plugins.legend,position:"bottom"}}},
-    plugins:[{id:"center",afterDraw(c){ const {ctx,chartArea:a}=c; if(!a) return; ctx.save(); ctx.textAlign="center"; ctx.fillStyle=t.main; ctx.font="800 28px JetBrains Mono"; ctx.fillText(rows.length,(a.left+a.right)/2,(a.top+a.bottom)/2+4); ctx.fillStyle=t.text; ctx.font="600 10px Sora"; ctx.fillText("TASKS",(a.left+a.right)/2,(a.top+a.bottom)/2+22); ctx.restore(); }}]});
-  const grp=(f)=>{ const m={}; rows.forEach(r=>{ const k=f(r)||"Unspecified"; m[k]=m[k]||{d:0,o:0}; isDone(r.status)?m[k].d++:m[k].o++; }); return Object.entries(m).sort((a,b)=>(b[1].d+b[1].o)-(a[1].d+a[1].o)).slice(0,12); };
-  const hbar=(id,data,c1,c2)=>mkChart(id,{type:"bar",data:{labels:data.map(x=>title(x[0])),datasets:[{label:"Completed",data:data.map(x=>x[1].d),backgroundColor:c1,borderRadius:6,borderSkipped:false,maxBarThickness:22},{label:"Open",data:data.map(x=>x[1].o),backgroundColor:c2,borderRadius:6,borderSkipped:false,maxBarThickness:22}]},
-    options:baseOpts({indexAxis:"y",scales:{x:{...baseOpts().scales.y,stacked:true},y:{...baseOpts().scales.x,stacked:true}}})});
-  hbar("chLoc",grp(r=>r.location),"#34d399","rgba(244,114,182,.75)");
-  hbar("chDept",grp(r=>r.dept),"#34d399","rgba(168,85,247,.75)");
-  const hrs=[...Array(13)].map((_,i)=>i+8); const hc=hrs.map(h=>rows.filter(r=>r.start!=null&&Math.floor(r.start/60)===h).length);
-  mkChart("chHour",{type:"line",data:{labels:hrs.map(h=>(h%12||12)+(h<12?"a":"p")),datasets:[{label:"Tasks",data:hc,fill:true,tension:.4,borderColor:"#22d3ee",borderWidth:3,pointBackgroundColor:"#a855f7",pointRadius:4,pointHoverRadius:7,
-    backgroundColor:(c)=>{ const {ctx,chartArea:a}=c.chart; if(!a) return "rgba(34,211,238,.2)"; const g=ctx.createLinearGradient(0,a.top,0,a.bottom); g.addColorStop(0,"rgba(34,211,238,.45)"); g.addColorStop(1,"rgba(168,85,247,0)"); return g; }}]},options:baseOpts({plugins:{...baseOpts().plugins,legend:{display:false}}})});
-  const hh=[...Array(10)].map((_,i)=>i+9), wd=[1,2,3,4,5,6,0];
-  const cnt=(w,h)=>rows.filter(r=>r.date&&r.date.getDay()===w&&r.start!=null&&Math.floor(r.start/60)===h).length;
-  const mat=wd.map(w=>hh.map(h=>cnt(w,h))); const hm=Math.max(1,...mat.flat());
-  $("#heat").innerHTML=`<div class="heat-row" style="--cols:${hh.length}"><span></span>${hh.map(h=>`<span class="heat-head">${h%12||12}${h<12?"a":"p"}</span>`).join("")}</div>`+
-    wd.map((w,i)=>`<div class="heat-row" style="--cols:${hh.length}"><span class="hl">${DAYS[w]}</span>${mat[i].map((v,j)=>`<span class="heat-cell" title="${DAYS[w]} ${hh[j]%12||12}${hh[j]<12?"am":"pm"}: ${v} task(s)" style="background:${v?`color-mix(in srgb, #a855f7 ${20+v/hm*80}%, #22d3ee)`:""};${v?"color:#fff":""};opacity:${v?.35+.65*v/hm:1}">${v||""}</span>`).join("")}</div>`).join("");
-  renderInsights(rows); renderTable(rows);
-}
-function renderInsights(rows){
-  const top=(f)=>{ const m={}; rows.forEach(r=>{ const k=f(r); if(k) m[k]=(m[k]||0)+1; }); return Object.entries(m).sort((a,b)=>b[1]-a[1])[0]; };
-  const busyDay=top(r=>r.key), dept=top(r=>r.dept), loc=top(r=>r.location), hr=top(r=>r.start!=null?String(Math.floor(r.start/60)):null);
-  const today=todayKey(); const overdue=rows.filter(r=>isPend(r.status)&&r.key&&r.key<today).length, rs=rows.filter(isResch).length, ad=rows.filter(r=>r.allDay).length;
-  const dRate={}; rows.forEach(r=>{ const k=r.dept||"—"; dRate[k]=dRate[k]||[0,0]; dRate[k][1]++; if(isDone(r.status)) dRate[k][0]++; });
-  const best=Object.entries(dRate).sort((a,b)=>b[1][0]/b[1][1]-a[1][0]/a[1][1])[0];
-  if(!rows.length){ $("#insights").innerHTML=`<div class="kpi-sub">No data for the selected filters.</div>`; return; }
-  const I=[];
-  if(busyDay) I.push(["#22d3ee","cal","Busiest day",`${fmtDate(parseYmd(busyDay[0]))} carried ${busyDay[1]} schedule item${busyDay[1]>1?"s":""}.`]);
-  if(hr) I.push(["#fbbf24","clock","Peak time slot",`Most engagements start around ${fmt12(+hr[0]*60)} (${hr[1]} task${hr[1]>1?"s":""}).`]);
-  if(dept) I.push(["#a855f7","brief","Top focus area",`${title(dept[0])} leads with ${Math.round(dept[1]/rows.length*100)}% of the agenda.`]);
-  if(loc) I.push(["#f472b6","pin","Most visited",`${loc[0]} hosts ${loc[1]} of ${rows.length} engagements.`]);
-  I.push([overdue?"#f87171":"#34d399", overdue?"alert":"star", overdue?"Overdue follow-ups":"Zero backlog", overdue?`${overdue} past item${overdue>1?"s are":" is"} still open — worth a quick review.`:"Every past task in this view is closed. Excellent execution."]);
-  if(rs) I.push(["#a855f7","resch","Rescheduling",`${rs} task${rs>1?"s were":" was"} rescheduled (${Math.round(rs/rows.length*100)}% of the agenda).`]);
-  if(ad) I.push(["#fbbf24","sun","Full / half days",`${ad} full- or half-day engagement${ad>1?"s":""} in this view.`]);
-  if(best && Object.keys(dRate).length>1) I.push(["#34d399","trend","Best execution",`${title(best[0])} has a ${Math.round(best[1][0]/best[1][1]*100)}% completion rate.`]);
-  $("#insights").innerHTML=I.map(([c,i,b,s])=>`<div class="ins" style="--kc:${c}"><span class="ii">${svg(i)}</span><div><b>${b}</b><small>${esc(s)}</small></div></div>`).join("");
-}
-const COLS=[["sl","SI"],["dt","Date"],["sortMin","Time"],["schedule","Schedule"],["status","Status"],["location","Location"],["dept","Department / Company"],["remarks","Remarks"]];
+function regCols(){ return [["sl","SI"],["dt","Date"],["sortMin","Time"],["schedule","Schedule"],["type","Type"],["status","Status"],["dept","Department / Company"],...(S.hasLoc?[["location","Location"]]:[]),["remarks","Remarks"]]; }
 function renderTable(rows){
-  const {k,dir}=S.sort;
+  const {k,dir}=S.sort, COLS=regCols();
   const sorted=[...rows].sort((a,b)=>{ let x=a[k],y=b[k]; if(k==="sl"){x=+x||0;y=+y||0;} if(x==null) x=""; if(y==null) y=""; return (x>y?1:x<y?-1:0)*dir; });
   $("#thead").innerHTML=COLS.map(([c,l])=>`<th data-k="${c}">${l}<span class="sa">${k===c?(dir>0?"▲":"▼"):"↕"}</span></th>`).join("");
-  $$("#thead th").forEach(th=>th.onclick=()=>{ const c=th.dataset.k; S.sort={k:c,dir:S.sort.k===c?-S.sort.dir:1}; renderTable(filtered()); });
-  $("#tbody").innerHTML=sorted.length? sorted.map(r=>`<tr data-id="${esc(r.id)}"><td class="mono">${esc(r.sl)}</td><td class="mono">${r.date?shortDate(r.date)+" "+r.date.getFullYear():esc(r.dRaw)}</td><td class="mono">${esc(timeLabel(r))}</td><td class="wrap"><b>${esc(title(r.schedule))}</b></td><td><span class="status" style="--sc:${statusColor(r.status)}">${esc(r.status)}</span></td><td>${esc(r.location)}</td><td>${esc(r.dept)}</td><td class="wrap" style="color:var(--muted)">${esc(r.remarks)}</td></tr>`).join("")
-    : `<tr><td colspan="8"><div class="empty"><b>No matching records</b>Adjust filters above.</div></td></tr>`;
-  $("#tblCount").textContent=`${sorted.length} record${sorted.length==1?"":"s"}`;
+  $$("#thead th").forEach(th=>th.onclick=()=>{ const c=th.dataset.k; S.sort={k:c,dir:S.sort.k===c?-S.sort.dir:1}; renderTable(regRows()); });
+  const cell={ sl:r=>`<td class="mono">${esc(r.sl)}</td>`, dt:r=>`<td class="mono">${r.date?shortDate(r.date)+" "+r.date.getFullYear():esc(r.dRaw)}</td>`, sortMin:r=>`<td class="mono">${esc(r.allDay||r.start!=null?timeLabel(r):(r.tRaw||"—"))}</td>`,
+    schedule:r=>`<td class="wrap"><b>${esc(title(r.schedule))}</b></td>`, type:r=>`<td>${typeBadge(r)||"—"}</td>`, status:r=>`<td><span class="status" style="--sc:${statusColor(r.status)}">${esc(r.status)}</span></td>`,
+    dept:r=>`<td>${esc(r.dept)}</td>`, location:r=>`<td>${esc(r.location)}</td>`, remarks:r=>`<td class="wrap" style="color:var(--muted)">${esc(r.remarks)}</td>` };
+  $("#tbody").innerHTML=sorted.length? sorted.map(r=>`<tr data-id="${esc(r.id)}">${COLS.map(([c])=>cell[c](r)).join("")}</tr>`).join("")
+    : `<tr><td colspan="${COLS.length}"><div class="empty"><b>No matching records</b>Adjust the filters above.</div></td></tr>`;
+  $("#tblCount").textContent=`${sorted.length} record${sorted.length==1?"":"s"} · sorted by ${COLS.find(c=>c[0]===k)?.[1]||"date"}`;
   $$("#tbody tr[data-id]").forEach(tr=>tr.onclick=()=>openModal(tr.dataset.id));
 }
 
 /* =========================================================
    EXPORTS
    ========================================================= */
-const PAGE_NAME={board:"CEO Board",calendar:"Calendar",overview:"Overview",analytics:"Analytics"};
+const PAGE_NAME={board:"CEO Board",calendar:"Calendar",overview:"Overview"};
 function download(blob, name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
 function exportName(ext){ return S.page==="board" ? `CEO_Board_${S.boardDate}.${ext}` : S.page==="calendar" ? `CEO_Calendar_${S.cal.y}-${pad(S.cal.m+1)}.${ext}` : `CEO_${PAGE_NAME[S.page]}_${todayKey()}.${ext}`; }
 async function exportImage(){
@@ -1785,16 +1750,17 @@ async function exportImage(){
 }
 function exportExcel(){
   if(!window.XLSX){ toast("Export unavailable","Excel library failed to load.","#f87171","alert"); return; }
-  const rowsOut = rs => rs.map(r=>({"SI NO":r.sl,"DATE":r.date?r.date.toLocaleDateString("en-GB"):r.dRaw,"DAY":r.date?DAYS[r.date.getDay()]:"","TIME":timeLabel(r,true),"SCHEDULE":r.schedule,"STATUS":r.status,"LOCATION":r.location,"DEPARTMENT/COMPANY":r.dept,"REMARKS":r.remarks,"RESCHEDULED FROM":r.rfrom||""}));
+  const rowsOut = rs => rs.map(r=>Object.assign({"SI NO":r.sl,"DATE":r.date?r.date.toLocaleDateString("en-GB"):r.dRaw,"DAY":r.date?DAYS[r.date.getDay()]:"","TIME":r.allDay||r.start!=null?timeLabel(r,true):(r.tRaw||""),"SCHEDULE":r.schedule,"TYPE OF SCHEDULE":r.type,"STATUS":r.status},
+    S.hasLoc?{"LOCATION":r.location}:{}, {"DEPARTMENT/COMPANY":r.dept,"REMARKS":r.remarks,"RESCHEDULED FROM":r.rfrom||""}));
   const wb=XLSX.utils.book_new();
-  const fit = ws => { ws["!cols"]=[6,12,6,16,34,13,14,22,40,22].map(w=>({wch:w})); return ws; };
+  const fit = ws => { ws["!cols"]=[6,12,6,16,34,14,13,...(S.hasLoc?[14]:[]),22,40,22].map(w=>({wch:w})); return ws; };
   const add=(rs,name)=>XLSX.utils.book_append_sheet(wb, fit(XLSX.utils.json_to_sheet(rs.length?rowsOut(rs):[{"SI NO":"","SCHEDULE":"(none)"}])), name.slice(0,31));
   const sum=(rs,f,lbl)=>{ const m={}; rs.forEach(r=>{ const k=f(r)||"Unspecified"; m[k]=m[k]||[0,0,0,0]; m[k][0]++; if(isDone(r.status)) m[k][1]++; else if(isPend(r.status)) m[k][2]++; if(isResch(r)) m[k][3]++; }); return [[lbl,"Total","Completed","Pending","Rescheduled","Completion %"],...Object.entries(m).map(([k,v])=>[k,...v,Math.round(v[1]/v[0]*100)+"%"])]; };
   const byDate=(a,b)=>a.dt-b.dt;
   if(S.page==="board"){
     const rs=dayRows(S.boardDate); add(rs,"Day "+S.boardDate);
     const done=rs.filter(r=>isDone(r.status)).length;
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["CEO Board Summary"],["Date",fmtDate(parseYmd(S.boardDate))],["Total",rs.length],["Completed",done],["Pending",rs.filter(r=>isPend(r.status)).length],["Rescheduled",rs.filter(isResch).length],["Completion %",rs.length?Math.round(done/rs.length*100)+"%":"0%"],["Exported",new Date().toLocaleString()]]), "Summary");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["CEO Board Summary"],["Date",fmtDate(parseYmd(S.boardDate))],["Total",rs.length],["Completed",done],["Pending",rs.filter(r=>isPend(r.status)).length],["Rescheduled",rs.filter(isResch).length],...TYPE_KEYS.map(k=>[TYPES[k].p,rs.filter(r=>r.tkey===k).length]),["Completion %",rs.length?Math.round(done/rs.length*100)+"%":"0%"],["Exported",new Date().toLocaleString()]]), "Summary");
   } else if(S.page==="calendar"){
     const ym=S.cal.y+"-"+pad(S.cal.m+1), rs=S.rows.filter(r=>r.key.startsWith(ym)).sort(byDate);
     add(rs, MONTHS_L[S.cal.m]+" "+S.cal.y);
@@ -1803,12 +1769,8 @@ function exportExcel(){
     const B=buckets(ovRows());
     add([...B.overdue].sort(byDate),"Overdue"); add([...B.today].sort(byDate),"Pending Today"); add([...B.upcoming].sort(byDate),"Upcoming"); add([...B.resch].sort(byDate),"Rescheduled");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(B.open,r=>r.dept,"Department/Company")), "Open by Department");
-  } else {
-    const rs=filtered().sort(byDate); add(rs,"Filtered Schedule");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(rs,r=>r.key,"Date")), "Day-wise");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(rs,r=>r.status,"Status")), "Status-wise");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(rs,r=>r.location,"Location")), "Location-wise");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(rs,r=>r.dept,"Department/Company")), "Department-wise");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(ovRows(),r=>r.type?typeInfo(r).p:"Untyped","Type of schedule")), "By Type");
+    add([...regRows()].sort(byDate),"Schedule Register");
   }
   const name=exportName("xlsx"); XLSX.writeFile(wb, name); toast("Excel exported", name, "#34d399", "check");
 }
@@ -1821,7 +1783,8 @@ function voiceBrief(){
   if(speechSynthesis.speaking){ speechSynthesis.cancel(); return; }
   const key=S.boardDate, rs=dayRows(key), h=new Date().getHours(), pend=rs.filter(r=>isPend(r.status)), B=buckets(S.rows);
   let t=`${h<12?"Good morning":h<17?"Good afternoon":"Good evening"}, Nihas. `;
-  t += rs.length? `You have ${rs.length} items on ${key===todayKey()?"today's":"this day's"} schedule. ${rs.filter(r=>isDone(r.status)).length} completed and ${pend.length} pending. ` : "Your calendar is clear for this day. ";
+  const tc=TYPE_KEYS.map(k=>{ const n=rs.filter(r=>r.tkey===k).length; return n? n+" "+(n>1?TYPES[k].p:TYPES[k].l).toLowerCase() : ""; }).filter(Boolean);
+  t += rs.length? `You have ${rs.length} items on ${key===todayKey()?"today's":"this day's"} schedule${tc.length?": "+tc.join(", "):""}. ${rs.filter(r=>isDone(r.status)).length} completed and ${pend.length} pending. ` : "Your calendar is clear for this day. ";
   pend.slice(0,6).forEach(r=>{ t+= r.allDay? `${adInfo(r.allDay).l}: ${title(r.schedule)}. ` : `At ${timeLabel(r).replace(/^0/,"")}, ${title(r.schedule)}${r.location?", at "+r.location:""}. `; });
   if(B.overdue.length) t+=`${B.overdue.length} overdue item${B.overdue.length>1?"s need":" needs"} attention. `;
   t += "Remember, stress begins when passion fades. Have a great day.";
@@ -1839,8 +1802,8 @@ function toast(h, s, c="#22d3ee", i="check"){
 }
 function save(k,v){ try{ if(v==="") localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){} }
 function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
-function setTheme(t){ document.documentElement.dataset.theme=t; save("ceo_theme",t); document.querySelector('meta[name=theme-color]').content = t==="dark"?"#070a14":"#eef1fb"; if(S.page==="analytics") renderAnalytics(); }
-const RENDER={board:()=>renderBoard(), calendar:()=>renderCalendar(), overview:()=>renderOverview(), analytics:()=>renderAnalytics()};
+function setTheme(t){ document.documentElement.dataset.theme=t; save("ceo_theme",t); document.querySelector('meta[name=theme-color]').content = t==="dark"?"#070a14":"#eef1fb"; }
+const RENDER={board:()=>renderBoard(), calendar:()=>renderCalendar(), overview:()=>renderOverview()};
 function go(p){ if(!RENDER[p]) p="board"; S.page=p; $$(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+p)); $$("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===p)); window.scrollTo({top:0,behavior:"smooth"}); RENDER[p](); try{ history.replaceState(null,"","#"+p); }catch(e){} }
 function renderAll(){ fillFilters(); RENDER[S.page](); tickClock(); }
 function addFor(){ return S.page==="calendar" ? S.cal.sel : S.page==="board" ? S.boardDate : todayKey(); }
@@ -1865,26 +1828,15 @@ const shiftMonth=n=>{ const d=new Date(S.cal.y,S.cal.m+n,1); S.cal.y=d.getFullYe
 $("#cPrev").onclick=()=>shiftMonth(-1); $("#cNext").onclick=()=>shiftMonth(1);
 $("#cThis").onclick=()=>{ const n=new Date(); S.cal.y=n.getFullYear(); S.cal.m=n.getMonth(); S.cal.sel=todayKey(); renderCalendar(); };
 $("#calYear").onchange=e=>{ S.cal.y=+e.target.value; S.cal.sel=S.cal.y+"-"+pad(S.cal.m+1)+"-01"; renderCalendar(); };
-["#oMonth","#oDept","#oLoc"].forEach(id=>$(id).onchange=()=>renderOverview());
+["#oMonth","#oDept","#oType"].forEach(id=>$(id).onchange=()=>renderOverview());
 // swipe days (board) / months (calendar) on mobile
 function swipe(el, fn){ let x0=null,y0=null; el.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true}); el.addEventListener("touchend",e=>{ if(x0==null) return; const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0; if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5) fn(dx<0?1:-1); x0=null; },{passive:true}); }
 swipe($("#timelineCard"), shiftDay); swipe($("#calGrid"), shiftMonth);
-["#fMonth","#fFrom","#fTo","#fStatus","#fLoc","#fDept"].forEach(id=>$(id).onchange=()=>{ if(id==="#fMonth"&&$(id).value){ $("#fFrom").value=""; $("#fTo").value=""; } if(id==="#fFrom"||id==="#fTo") $("#fMonth").value=""; $$("#quick button").forEach(b=>b.classList.remove("active")); renderAnalytics(); });
-let stt; $("#tSearch").oninput=()=>{ clearTimeout(stt); stt=setTimeout(()=>renderTable(filtered()),180); };
-$("#fReset").onclick=()=>{ ["#fMonth","#fFrom","#fTo","#fStatus","#fLoc","#fDept","#tSearch"].forEach(id=>$(id).value=""); $$("#quick button").forEach(b=>b.classList.toggle("active",b.dataset.q==="all")); renderAnalytics(); };
-$$("#quick button").forEach(b=>b.onclick=()=>{
-  $$("#quick button").forEach(x=>x.classList.remove("active")); b.classList.add("active");
-  const n=new Date(); let f="",t=""; $("#fMonth").value="";
-  if(b.dataset.q==="today"){ f=t=ymd(n); }
-  if(b.dataset.q==="week"){ const d=new Date(n); d.setDate(d.getDate()-((d.getDay()+6)%7)); f=ymd(d); t=addDays(f,6); }
-  if(b.dataset.q==="month"){ $("#fMonth").value=ymd(n).slice(0,7); }
-  if(b.dataset.q==="last30"){ t=ymd(n); f=addDays(t,-29); }
-  $("#fFrom").value=f; $("#fTo").value=t; renderAnalytics();
-});
-// keyboard: 1-4 pages, N new task, R refresh, T theme, ←/→ day or month
+let stt; $("#tSearch").oninput=()=>{ clearTimeout(stt); stt=setTimeout(()=>renderTable(regRows()),180); };
+// keyboard: 1-3 pages, N new task, R refresh, T theme, ←/→ day or month
 document.addEventListener("keydown",e=>{ if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.metaKey||e.ctrlKey||e.altKey||$("#modal").classList.contains("open")) return;
-  const k=e.key.toLowerCase(), pages=["board","calendar","overview","analytics"];
-  if(k>="1"&&k<="4") go(pages[+k-1]); if(k==="r") act("refresh"); if(k==="t") act("theme"); if(k==="n") openForm(null, addFor());
+  const k=e.key.toLowerCase(), pages=["board","calendar","overview"];
+  if(k>="1"&&k<="3") go(pages[+k-1]); if(k==="r") act("refresh"); if(k==="t") act("theme"); if(k==="n") openForm(null, addFor());
   if(e.key==="ArrowLeft"){ if(S.page==="board") shiftDay(-1); if(S.page==="calendar") shiftMonth(-1); }
   if(e.key==="ArrowRight"){ if(S.page==="board") shiftDay(1); if(S.page==="calendar") shiftMonth(1); } });
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.lastSync && Date.now()-S.lastSync>20000) fetchData(false); });
@@ -1894,7 +1846,6 @@ let rz; window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout((
 (function init(){
   setTheme(load("ceo_theme") || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
   S.notify = load("ceo_notify")==="1" && (!("Notification" in window) || Notification.permission!=="denied"); updNotifyBtn(); updConnBtn();
-  if(window.Chart){ Chart.defaults.font.family="Sora"; }
   loadCache();
   const hp=location.hash.replace("#",""); if(RENDER[hp] && hp!=="board") go(hp);
   tickClock(); setInterval(tickClock,1000);
