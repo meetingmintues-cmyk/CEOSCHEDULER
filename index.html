@@ -695,7 +695,6 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
       <div class="seg" id="boardSeg"></div>
       <div class="timeline" id="timeline"></div>
       <div class="any" id="anytime"></div>
-      <div class="any" id="nodate"></div>
     </div>
 
     <aside class="side">
@@ -765,6 +764,10 @@ td .sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
       <div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>Upcoming</h3><small id="ovUpSub"></small></div>
       <div class="card-b"><div class="olist" id="ovUpcoming"></div></div>
     </div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M10 15h4"/></svg></span>No Date Set</h3><small id="ovNdSub"></small></div>
+    <div class="card-b"><div class="any-grid" id="ovNodate"></div></div>
   </div>
   <div class="card" style="margin-bottom:18px">
     <div class="card-h"><h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></span>Rescheduled Tracker</h3><small id="ovRsSub"></small></div>
@@ -1217,7 +1220,7 @@ function nowMin(){ const d=new Date(); return d.getHours()*60+d.getMinutes(); }
 function stateOf(r, key, nm){ const t=todayKey(); if(key!==t) return key<t?"past":"future"; if(r.ws==null||r.endC==null) return "future"; if(nm>=r.ws && nm<r.endC) return "now"; if(nm>=r.endC) return "past"; return "future"; }
 function buckets(rows){
   const t=todayKey(), open=rows.filter(r=>isPend(r.status) && (r.key || r.schedule));
-  return { open, pending:open.filter(r=>!r.key || r.key<=t), nodate:open.filter(r=>!r.key), overdue:open.filter(r=>r.key && r.key<t), today:open.filter(r=>r.key===t),
+  return { open, pending:open.filter(r=>r.key && r.key<=t), nodate:open.filter(r=>!r.key), overdue:open.filter(r=>r.key && r.key<t), today:open.filter(r=>r.key===t),
     upcoming:open.filter(r=>r.key>t), up7:open.filter(r=>r.key>t && r.key<=addDays(t,CONFIG.UPCOMING_DAYS)),
     resch:rows.filter(isResch), done:rows.filter(r=>isDone(r.status)) };
 }
@@ -1256,11 +1259,11 @@ function renderBoard(){
   $("#boardSub").textContent = fmtDate(d);
   const all = withEnds(dayRows(key)), ty=S.boardType||"";
   const done=all.filter(r=>isDone(r.status)).length, pct = all.length? Math.round(done/all.length*100) : 0;
-  const R=S.rows, rDone=R.filter(r=>isDone(r.status)).length, rPct=R.length? Math.round(rDone/R.length*100) : 0;
+  const R=S.rows.filter(isSched), rDone=R.filter(r=>isDone(r.status)).length, rPct=R.length? Math.round(rDone/R.length*100) : 0;
   const stat=arr=>{ const dn=arr.filter(r=>isDone(r.status)).length, op=arr.filter(r=>isPend(r.status)).length, td=arr.filter(r=>r.key===today).length; return `${op} open · ${dn} done`+(td?` · ${td} today`:""); };
   $("#boardKpis").innerHTML = kpiHTML([
     {l:"Total Schedule", v:R.length, s:stat(R), c:"#6366f1", ring:rPct, f:"ALL"},
-    ...TYPE_KEYS.map(k=>{ const l=R.filter(r=>r.tkey===k), T=TYPES[k]; return {l:T.p, v:l.length, s:l.length? stat(l) : "none yet", c:T.c, i:T.i, f:k}; })
+    ...TYPE_KEYS.map(k=>{ const l=S.rows.filter(r=>r.tkey===k), T=TYPES[k]; return {l:T.p, v:l.length, s:l.length? stat(l) : "none yet", c:T.c, i:T.i, f:k}; })
   ], "", true);
   animateKpis($("#boardKpis"));
   $$("#boardKpis [data-f]").forEach(el=>{ el.title="Tap to see all"; el.onclick=()=>openKpiList(el.dataset.f); });
@@ -1305,11 +1308,6 @@ function renderBoard(){
     <div class="any-grid">${anySorted.map(anyItem).join("")}</div>` : "";
   bindOpen("#anytime");
 
-  // rows with no date → backlog list (always visible)
-  const nd=S.rows.filter(r=>!r.key && r.schedule), ndOpen=nd.filter(r=>isPend(r.status)), ndDone=nd.filter(r=>isDone(r.status)).length;
-  $("#nodate").innerHTML = ndOpen.length ? `<div class="any-h nd">${svg("cal")}<b>No date set</b><span>${ndOpen.length}</span><em>${ndDone? ndDone+" completed · ":""}tap an item → Set date</em></div>
-    <div class="any-grid">${ndOpen.map(anyItem).join("")}</div>` : "";
-  bindOpen("#nodate");
 
   $("#deptBars").innerHTML = barsHTML(countBy(all,r=>r.dept), "No tasks for this day."); growBars("#deptBars");
   const up = S.rows.filter(r=>r.key>key && isPend(r.status)).sort((a,b)=>a.key.localeCompare(b.key) || a.sortMin-b.sortMin).slice(0,6);
@@ -1317,15 +1315,16 @@ function renderBoard(){
   $("#upList").innerHTML = up.length? up.map(r=>miniHTML(r, relDay(r.key)+(r.type?" · "+typeInfo(r).l:"")+(r.dept?" · "+r.dept:""))).join("") : `<div class="kpi-sub">Nothing scheduled ahead yet.</div>`;
   bindOpen("#upList");
 }
+const isSched = r => !!r.key && r.tkey!=="TASK" && r.tkey!=="REMINDER";   // dated schedule items only
 function openKpiList(f){
-  const rows = f==="ALL" ? S.rows : S.rows.filter(r=>r.tkey===f);
-  const T = f==="ALL" ? {p:"All Schedules", c:"#6366f1"} : TYPES[f], t=todayKey();
+  const rows = f==="ALL" ? S.rows.filter(isSched) : S.rows.filter(r=>r.tkey===f);
+  const T = f==="ALL" ? {p:"Total Schedule", l:"schedule", c:"#6366f1"} : TYPES[f], t=todayKey();
   const srt=a=>[...a].sort((x,y)=>(x.key||"").localeCompare(y.key||"") || x.sortMin-y.sortMin);
   const open=rows.filter(r=>isPend(r.status));
   const groups=[["Today",srt(open.filter(r=>r.key===t)),"#22d3ee"],["Overdue",srt(open.filter(r=>r.key && r.key<t)),"#f87171"],["No date set",srt(open.filter(r=>!r.key)),"#fbbf24"],
     ["Upcoming",srt(open.filter(r=>r.key>t)),"#a855f7"],["Completed",srt(rows.filter(r=>isDone(r.status))).reverse(),"#34d399"],["Cancelled",srt(rows.filter(r=>isCancel(r.status))),"#8e98c2"]];
   const body=groups.filter(g=>g[1].length).map(([l,list,c])=>`<div class="ogh" style="--gc:${c}">${l} <span>${list.length}</span></div>`+list.map(r=>oItem(r, l==="Overdue"?`<span class="odue">${dayDiff(r.key,t)}d overdue</span>`:"")).join("")).join("");
-  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${esc(T.p)} <span class="mono" style="color:${T.c}">${rows.length}</span></h2><p>${open.length} open · ${rows.filter(r=>isDone(r.status)).length} completed · all dates</p></div>
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${esc(T.p)} <span class="mono" style="color:${T.c}">${rows.length}</span></h2><p>${open.length} open · ${rows.filter(r=>isDone(r.status)).length} completed · ${f==="ALL"?"dated items only · tasks &amp; reminders have their own cards":"all dates"}</p></div>
     <div class="olist klist" id="kList">${body || `<div class="empty"><b>Nothing here yet</b>Add one with the + button.</div>`}</div>
     <div class="mfoot"><button class="btn" id="kReg">${svg("sheet")}Open in Overview register</button><button class="btn pri" id="kAdd">${svg("plus")}Add ${f==="ALL"?"task":esc(T.l.toLowerCase())}</button></div>`, T.c);
   bindOpen("#kList");
@@ -1659,7 +1658,7 @@ function oItem(r, extra, acts=true){
   return `<div class="oitem" data-id="${esc(r.id)}" style="--sc:${statusColor(r.status)}">
     <div class="od"><b>${esc(shortTime(r))}</b><small>${r.date?esc(shortDate(r.date)):"No date"}</small></div>
     <div class="ox"><b>${esc(title(r.schedule))}</b><small>${extra||""}${typeBadge(r)}${r.dept?`<span>${esc(r.dept)}</span>`:""}${r.location?`<span>· ${esc(r.location)}</span>`:""}</small></div>
-    ${acts&&isPend(r.status)?`<div class="acts" data-act-id="1"><button class="a-ok" title="Mark complete" onclick="event.stopPropagation();markStatus('${qid}','COMPLETED')">${svg("check")}</button><button class="a-rs" title="Reschedule" onclick="event.stopPropagation();openReschedule('${qid}')">${svg("resch")}</button></div>`:""}
+    ${acts&&isPend(r.status)?`<div class="acts" data-act-id="1"><button class="a-ok" title="Mark complete" onclick="event.stopPropagation();markStatus('${qid}','COMPLETED')">${svg("check")}</button><button class="a-rs" title="${r.key?"Reschedule":"Set date"}" onclick="event.stopPropagation();openReschedule('${qid}')">${svg(r.key?"resch":"cal")}</button></div>`:""}
   </div>`;
 }
 function renderOverview(){
@@ -1667,7 +1666,7 @@ function renderOverview(){
   const pct=rows.length?Math.round(B.done.length/rows.length*100):0;
   $("#ovKpis").innerHTML=kpiHTML([
     {l:"Completion", v:pct+"%", s:`${B.done.length} of ${rows.length} done`, c:"#6366f1", ring:pct},
-    {l:"Pending now", v:B.pending.length, s:`${B.today.length} today`+(B.nodate.length?` · ${B.nodate.length} no date`:""), c:"#fbbf24", i:"clock"},
+    {l:"Pending now", v:B.pending.length, s:`${B.today.length} today · up to today`, c:"#fbbf24", i:"clock"},
     {l:"Overdue", v:B.overdue.length, s:"date passed, still open", c:"#f87171", i:"alert"},
     {l:"Upcoming", v:B.upcoming.length, s:"future open tasks", c:"#22d3ee", i:"up"},
     {l:"Rescheduled", v:B.resch.length, s:`${B.resch.filter(r=>isPend(r.status)).length} still open`, c:"#a855f7", i:"resch"}
@@ -1677,10 +1676,13 @@ function renderOverview(){
   $("#ovPendSub").textContent=`${B.pending.length} open`;
   $("#ovPending").innerHTML = B.pending.length ?
     (od.length?`<div class="ogh" style="--gc:#f87171">Overdue <span>${od.length}</span></div>`+od.map(r=>oItem(r,`<span class="odue">${dayDiff(r.key,t)}d overdue</span>`)).join(""):"")+
-    (td.length?`<div class="ogh" style="--gc:#fbbf24">Today <span>${td.length}</span></div>`+td.map(r=>oItem(r, isResch(r)?`<span class="rsb" style="padding:1px 6px">↻</span>`:"")).join(""):"")+
-    (B.nodate.length?`<div class="ogh" style="--gc:#fb923c">No date set <span>${B.nodate.length}</span></div>`+B.nodate.map(r=>oItem(r,"")).join(""):"")
+    (td.length?`<div class="ogh" style="--gc:#fbbf24">Today <span>${td.length}</span></div>`+td.map(r=>oItem(r, isResch(r)?`<span class="rsb" style="padding:1px 6px">↻</span>`:"")).join(""):"")
     : `<div class="empty" style="padding:30px 10px"><div class="em">${svg("star")}</div><b>Nothing pending</b>Everything up to today is closed. 🎯</div>`;
 
+  const ndAll=rows.filter(r=>!r.key && r.schedule), ndDone=ndAll.filter(r=>isDone(r.status)).length;
+  $("#ovNdSub").textContent = `${B.nodate.length} open`+(ndDone?` · ${ndDone} completed`:"")+" · tap → Set date";
+  $("#ovNodate").innerHTML = B.nodate.length ? B.nodate.map(anyItem).join("") : `<div class="kpi-sub">Every open item has a date. ✓</div>`;
+  bindOpen("#ovNodate");
   const up=[...B.upcoming].sort((a,b)=>a.key.localeCompare(b.key)||a.sortMin-b.sortMin);
   $("#ovUpSub").textContent=`${up.length} ahead`;
   let uh="", last="";
@@ -1789,7 +1791,6 @@ function exportExcel(){
   const byDate=(a,b)=>a.dt-b.dt;
   if(S.page==="board"){
     const rs=dayRows(S.boardDate); add(rs,"Day "+S.boardDate);
-    add(S.rows.filter(r=>!r.key && r.schedule),"No Date Set");
     const done=rs.filter(r=>isDone(r.status)).length;
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["CEO Board Summary"],["Date",fmtDate(parseYmd(S.boardDate))],["Total",rs.length],["Completed",done],["Pending",rs.filter(r=>isPend(r.status)).length],["Rescheduled",rs.filter(isResch).length],...TYPE_KEYS.map(k=>[TYPES[k].p,rs.filter(r=>r.tkey===k).length]),["Completion %",rs.length?Math.round(done/rs.length*100)+"%":"0%"],["Exported",new Date().toLocaleString()]]), "Summary");
   } else if(S.page==="calendar"){
@@ -1798,6 +1799,7 @@ function exportExcel(){
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(rs,r=>r.key,"Date")), "Day-wise");
   } else if(S.page==="overview"){
     const B=buckets(ovRows());
+    add(ovRows().filter(r=>!r.key && r.schedule && isPend(r.status)),"No Date Set");
     add([...B.overdue].sort(byDate),"Overdue"); add([...B.today].sort(byDate),"Pending Today"); add([...B.upcoming].sort(byDate),"Upcoming"); add([...B.resch].sort(byDate),"Rescheduled");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(B.open,r=>r.dept,"Department/Company")), "Open by Department");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(ovRows(),r=>r.type?typeInfo(r).p:"Untyped","Type of schedule")), "By Type");
