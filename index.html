@@ -845,6 +845,37 @@ body.locked>header,body.locked>main,body.locked>.bnav,body.locked>.fab-add,body.
 .auth-brand h1 #tw1{background:none;-webkit-text-fill-color:#fff;color:#fff}
 .ui-badge{top:-1px;right:16px;border-radius:0 0 9px 9px;padding:3px 9px 4px}
 .bnav-in{grid-template-columns:repeat(auto-fit,minmax(0,1fr))!important}
+/* =================== v9: roles & permissions =================== */
+body:not(.can-add) #fabAdd,body:not(.can-add) #bAdd,body:not(.can-add) #cAdd,body:not(.can-add) #cDayAdd,body:not(.can-add) #oAdd{display:none!important}
+.qa-none{margin:0 24px 12px;padding:12px 14px;border-radius:12px;border:1px dashed var(--line2);font-size:12.5px;color:var(--muted);text-align:center}
+.any-chk.locked{opacity:.35;cursor:not-allowed}
+.rp{padding:6px 24px 4px}
+.rp-scroll{overflow:auto;border:1px solid var(--line);border-radius:14px}
+.rp-t{width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px}
+.rp-t th{position:sticky;top:0;background:var(--panel-solid);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 6px;text-align:center;white-space:nowrap;cursor:default;border-bottom:1px solid var(--line)}
+.rp-t th:first-child{text-align:left;padding-left:14px}
+.rp-t td{padding:10px 6px;text-align:center;border-bottom:1px solid var(--line)}
+.rp-t tr:last-child td{border-bottom:0}
+.rp-t td:first-child{text-align:left;padding-left:14px;white-space:nowrap}
+.rp-t td:first-child small{display:block;font-size:10.5px;color:var(--muted);margin-top:4px}
+.rp-t tbody tr{transition:background .2s}.rp-t tbody tr:hover{background:var(--panel2)}
+.tg.lock{opacity:.55;cursor:not-allowed}
+.rp-note{font-size:11.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5}
+.rp-save{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:10px}
+.rp-save span{font-size:11.5px;color:var(--amber);font-weight:600}
+.rolepick{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.rp-new{padding:12px 8px;border-radius:12px;border:1px dashed var(--line2);background:none;display:flex;flex-direction:column;gap:3px;text-align:left;color:var(--muted)}
+.rp-new svg{width:14px;height:14px}.rp-new b{font-size:12.5px;color:var(--text)}.rp-new small{font-size:10.5px}
+.rp-new:hover{border-color:var(--cyan);color:var(--cyan)}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatches button{width:30px;height:30px;border-radius:50%;background:var(--c);border:3px solid transparent;box-shadow:0 0 0 1px var(--line2);transition:.2s}
+.swatches button.active{border-color:var(--panel-solid);box-shadow:0 0 0 2px var(--c);transform:scale(1.12)}
+.permpick{display:flex;flex-wrap:wrap;gap:8px}
+.pp{cursor:pointer}.pp input{display:none}
+.pp span{display:inline-block;padding:8px 13px;border-radius:999px;border:1px solid var(--line2);font-size:12.5px;font-weight:600;color:var(--muted);transition:.2s}
+.pp input:checked+span{color:#fff;background:var(--grad);border-color:transparent;box-shadow:var(--glow)}
+.cz-head b{font-size:9.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){ .rp{padding:6px 14px 4px} .rp-t{min-width:520px} }
 </style>
 </head>
 <body class="locked">
@@ -1152,12 +1183,17 @@ const DEFAULT_USERS = {
   ceo:    { pass: &quot;ceo123&quot;,    role: &quot;CEO&quot;,    name: &quot;Nihas KM&quot; },
   pmo:    { pass: &quot;pmo123&quot;,    role: &quot;PMO&quot;,    name: &quot;PMO Office&quot; }
 };
-// What each role may do
+// Starting roles &amp; permissions. After first run, Master edits roles and permissions
+// from the dashboard (👤 → Manage logins → Roles &amp; permissions); they&#x27;re stored in Script Properties.
+// Permissions: read · add · edit · complete · reschedule · delete · log · users (users = manage logins, roles &amp; layout; MASTER only)
+const ALL_PERMS = [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;delete&quot;, &quot;log&quot;, &quot;users&quot;];
 const ROLE_CAN = {
-  MASTER: [&quot;read&quot;, &quot;add&quot;, &quot;update&quot;, &quot;delete&quot;, &quot;log&quot;, &quot;users&quot;],
-  CEO:    [&quot;read&quot;, &quot;add&quot;, &quot;update&quot;, &quot;delete&quot;, &quot;log&quot;],
-  PMO:    [&quot;read&quot;, &quot;add&quot;, &quot;update&quot;]
+  MASTER: ALL_PERMS,
+  CEO:    [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;delete&quot;, &quot;log&quot;],
+  PMO:    [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;]
 };
+const ROLE_COLORS = { MASTER: &quot;#a855f7&quot;, CEO: &quot;#22d3ee&quot;, PMO: &quot;#fbbf24&quot; };
+const PALETTE = [&quot;#34d399&quot;, &quot;#f472b6&quot;, &quot;#60a5fa&quot;, &quot;#fb923c&quot;, &quot;#2dd4bf&quot;, &quot;#e879f9&quot;, &quot;#facc15&quot;, &quot;#818cf8&quot;, &quot;#f87171&quot;, &quot;#a3e635&quot;];
 const SESSION_HOURS = 12;         // normal sign-in
 const REMEMBER_DAYS = 30;         // &quot;keep me signed in&quot;
 const MAX_FAILS = 5;              // wrong passwords before a 10-minute lock
@@ -1189,12 +1225,12 @@ function handle_(p) {
     const action = String(p.action || &quot;&quot;);
     const data = typeof p.data === &quot;string&quot; ? JSON.parse(p.data || &quot;{}&quot;) : (p.data || {});
     if (action === &quot;login&quot;) out = login_(data);
-    else if (action === &quot;ping&quot;) out = { ok: true, msg: &quot;Backend reachable&quot;, version: 4 };
+    else if (action === &quot;ping&quot;) out = { ok: true, msg: &quot;Backend reachable&quot;, version: 5 };
     else if (action === &quot;public&quot;) out = { ok: true, profile: (getConfig_().profile || {}) };
     else {
       const user = verify_(String(p.token || &quot;&quot;));
       if (action === &quot;me&quot;)        out = { ok: true, user: publicUser_(user) };
-      else if (action === &quot;read&quot;) { need_(user, &quot;read&quot;); out = read_(); }
+      else if (action === &quot;read&quot;) { need_(user, &quot;read&quot;); out = read_(); out.user = publicUser_(user); }
       else if (action === &quot;log&quot;)  { need_(user, &quot;log&quot;);  out = readLog_(Number(data.limit) || 150); }
       else if (action === &quot;users&quot;){ need_(user, &quot;users&quot;); out = listUsers_(); }
       else if (action === &quot;useradd&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; userAdd_(user, data)); }
@@ -1204,7 +1240,10 @@ function handle_(p) {
       else if (action === &quot;setconfig&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; setConfig_(user, data)); }
       else if (action === &quot;setpass&quot;) out = withLock_(() =&gt; setPass_(user, data));
       else if (action === &quot;add&quot;)    { need_(user, &quot;add&quot;);    out = withLock_(() =&gt; add_(user, data)); }
-      else if (action === &quot;update&quot;) { need_(user, &quot;update&quot;); out = withLock_(() =&gt; update_(user, data)); }
+      else if (action === &quot;update&quot;) out = withLock_(() =&gt; update_(user, data));          // edit / complete / reschedule checked inside
+      else if (action === &quot;roles&quot;){ need_(user, &quot;users&quot;); out = listRoles_(); }
+      else if (action === &quot;rolesave&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; roleSave_(user, data)); }
+      else if (action === &quot;roledel&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; roleDel_(user, data)); }
       else if (action === &quot;delete&quot;) { need_(user, &quot;delete&quot;); out = withLock_(() =&gt; del_(user, data)); }
       else throw new Error(&quot;Unknown action: &quot; + action);
     }
@@ -1251,7 +1290,55 @@ function saveUsers_(st) {
   const clean = {}; Object.keys(st).forEach(u =&gt; { const x = st[u]; clean[u] = { name: x.name, role: x.role, hash: x.hash, def: !!x.def, ver: x.ver || 1 }; });
   props_().setProperty(&quot;USERS&quot;, JSON.stringify(clean));
 }
-function publicUser_(x) { return { u: x.u, name: x.name, role: x.role, can: ROLE_CAN[x.role] || [] }; }
+/* ---- role store (Script Properties &quot;ROLES&quot;: {ROLE:{perms,color}}) ---- */
+function roles_() {
+  const raw = props_().getProperty(&quot;ROLES&quot;);
+  if (raw) return JSON.parse(raw);
+  const st = {};
+  Object.keys(ROLE_CAN).forEach(r =&gt; st[r] = { perms: ROLE_CAN[r].slice(), color: ROLE_COLORS[r] || PALETTE[0] });
+  props_().setProperty(&quot;ROLES&quot;, JSON.stringify(st));
+  return st;
+}
+function perms_(role) {
+  if (role === &quot;MASTER&quot;) return ALL_PERMS.slice();                     // master can never be locked out
+  const r = roles_()[role]; if (!r) return [];
+  let p = r.perms || [];
+  if (p.indexOf(&quot;update&quot;) &gt;= 0) p = p.filter(x =&gt; x !== &quot;update&quot;).concat([&quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;]);
+  return p.filter(x =&gt; x !== &quot;users&quot;);
+}
+function roleColor_(role) { const r = roles_()[role]; return (r &amp;&amp; r.color) || &quot;#8e98c2&quot;; }
+function publicUser_(x) { return { u: x.u, name: x.name, role: x.role, can: perms_(x.role), color: roleColor_(x.role) }; }
+function listRoles_() {
+  const R = roles_(), U = users_();
+  return { ok: true, perms: ALL_PERMS.filter(p =&gt; p !== &quot;users&quot; &amp;&amp; p !== &quot;read&quot;),
+    roles: Object.keys(R).map(r =&gt; ({ role: r, perms: perms_(r), color: R[r].color, locked: r === &quot;MASTER&quot;,
+      count: Object.keys(U).filter(u =&gt; U[u].role === r).length })) };
+}
+function roleSave_(user, d) {
+  const R = roles_(), role = String(d.role || &quot;&quot;).trim().toUpperCase().replace(/\s+/g, &quot; &quot;);
+  if (!/^[A-Z0-9][A-Z0-9 &amp;._-]{1,19}$/.test(role)) throw new Error(&quot;Role name: 2–20 characters (letters, numbers, space . _ - &amp;).&quot;);
+  if (role === &quot;MASTER&quot;) throw new Error(&quot;MASTER always has every permission.&quot;);
+  const isNew = !R[role];
+  if (isNew &amp;&amp; d.isNew === false) throw new Error(&quot;Unknown role.&quot;);
+  if (!isNew &amp;&amp; d.isNew) throw new Error(&quot;Role &quot; + role + &quot; already exists.&quot;);
+  const perms = [&quot;read&quot;].concat((d.perms || []).filter(p =&gt; ALL_PERMS.indexOf(p) &gt;= 0 &amp;&amp; p !== &quot;users&quot; &amp;&amp; p !== &quot;read&quot;));
+  const before = isNew ? [] : perms_(role);
+  R[role] = { perms, color: /^#[0-9a-f]{6}$/i.test(d.color || &quot;&quot;) ? d.color : (R[role] &amp;&amp; R[role].color) || PALETTE[Object.keys(R).length % PALETTE.length] };
+  props_().setProperty(&quot;ROLES&quot;, JSON.stringify(R));
+  const on = perms.filter(p =&gt; before.indexOf(p) &lt; 0 &amp;&amp; p !== &quot;read&quot;), off = before.filter(p =&gt; perms.indexOf(p) &lt; 0);
+  log_(user, &quot;ROLE&quot;, &quot;&quot;, &quot;&quot;, (isNew ? &quot;Created role &quot; : &quot;Updated role &quot;) + role + (on.length ? &quot; · +&quot; + on.join(&quot;, +&quot;) : &quot;&quot;) + (off.length ? &quot; · −&quot; + off.join(&quot;, −&quot;) : &quot;&quot;));
+  return listRoles_();
+}
+function roleDel_(user, d) {
+  const R = roles_(), role = String(d.role || &quot;&quot;).toUpperCase(), U = users_();
+  if (!R[role]) throw new Error(&quot;Unknown role.&quot;);
+  if (role === &quot;MASTER&quot;) throw new Error(&quot;MASTER can&#x27;t be deleted.&quot;);
+  const n = Object.keys(U).filter(u =&gt; U[u].role === role).length;
+  if (n) throw new Error(n + &quot; login(s) still use &quot; + role + &quot;. Move them to another role first.&quot;);
+  delete R[role]; props_().setProperty(&quot;ROLES&quot;, JSON.stringify(R));
+  log_(user, &quot;ROLE&quot;, &quot;&quot;, &quot;&quot;, &quot;Deleted role &quot; + role);
+  return listRoles_();
+}
 function checkPass_(rec, pass) { return rec.hash === hash_(rec.u, pass); }
 function sign_(payload) {
   const body = b64_(JSON.stringify(payload));
@@ -1287,17 +1374,17 @@ function verify_(token) {
   if (rec.ver !== p.v) throw authErr_(&quot;Your login was updated. Please sign in again.&quot;);
   return rec;
 }
-function need_(user, what) { if ((ROLE_CAN[user.role] || []).indexOf(what) &lt; 0) throw new Error(&quot;Your role (&quot; + user.role + &quot;) cannot &quot; + what + &quot;.&quot;); }
+function need_(user, what) { if (what === &quot;users&quot; ? user.role !== &quot;MASTER&quot; : perms_(user.role).indexOf(what) &lt; 0) throw new Error(&quot;Your role (&quot; + user.role + &quot;) is not allowed to &quot; + what + &quot;. Ask the master admin.&quot;); }
 function listUsers_() {
   const U = users_();
-  return { ok: true, roles: Object.keys(ROLE_CAN), users: Object.keys(U).map(k =&gt; Object.assign(publicUser_(U[k]), { custom: !U[k].def })) };
+  return { ok: true, roles: listRoles_().roles, users: Object.keys(U).map(k =&gt; Object.assign(publicUser_(U[k]), { custom: !U[k].def })) };
 }
 function masters_(U) { return Object.keys(U).filter(k =&gt; U[k].role === &quot;MASTER&quot;); }
 function userAdd_(user, d) {
   const U = users_(), u = String(d.u || &quot;&quot;).trim().toLowerCase(), role = String(d.role || &quot;&quot;).toUpperCase(), name = String(d.name || &quot;&quot;).trim();
   if (!/^[a-z0-9._-]{3,20}$/.test(u)) throw new Error(&quot;Username: 3–20 characters, letters/numbers/._- only.&quot;);
   if (U[u]) throw new Error(&quot;Username “&quot; + u + &quot;” already exists.&quot;);
-  if (!ROLE_CAN[role]) throw new Error(&quot;Choose a role.&quot;);
+  if (!roles_()[role]) throw new Error(&quot;Choose a role.&quot;);
   if (!name) throw new Error(&quot;Enter a display name.&quot;);
   if (String(d.pass || &quot;&quot;).length &lt; 6) throw new Error(&quot;Password must be at least 6 characters.&quot;);
   U[u] = { name: name.slice(0, 40), role, hash: hash_(u, String(d.pass)), def: false, ver: 1 };
@@ -1312,7 +1399,7 @@ function userUpdate_(user, d) {
   if (d.name !== undefined &amp;&amp; String(d.name).trim() &amp;&amp; String(d.name).trim() !== rec.name) { changes.push(&quot;name → &quot; + String(d.name).trim()); rec.name = String(d.name).trim().slice(0, 40); }
   if (d.role !== undefined &amp;&amp; String(d.role).toUpperCase() !== rec.role) {
     const role = String(d.role).toUpperCase();
-    if (!ROLE_CAN[role]) throw new Error(&quot;Unknown role.&quot;);
+    if (!roles_()[role]) throw new Error(&quot;Unknown role.&quot;);
     if (rec.role === &quot;MASTER&quot; &amp;&amp; masters_(U).length &lt;= 1) throw new Error(&quot;Keep at least one MASTER login.&quot;);
     changes.push(&quot;role &quot; + rec.role + &quot; → &quot; + role); rec.role = role; rec.ver = (rec.ver || 1) + 1;   // re-login with new rights
   }
@@ -1332,7 +1419,7 @@ function userDel_(user, d) {
 function setPass_(user, d) {
   const target = String(d.user || user.u).toLowerCase(), U = users_(), rec = U[target];
   if (!rec) throw new Error(&quot;Unknown user.&quot;);
-  const isMaster = (ROLE_CAN[user.role] || []).indexOf(&quot;users&quot;) &gt;= 0;
+  const isMaster = user.role === &quot;MASTER&quot;;
   if (target !== user.u &amp;&amp; !isMaster) throw new Error(&quot;Only master can change other users&#x27; passwords.&quot;);
   if (target === user.u &amp;&amp; !isMaster &amp;&amp; !checkPass_(rec, String(d.old || &quot;&quot;))) throw new Error(&quot;Current password is wrong.&quot;);
   const np = String(d.pass || &quot;&quot;);
@@ -1455,7 +1542,12 @@ function add_(user, d) {
   return { ok: true, sl: String(sl), row };
 }
 function update_(user, d) {
-  const s = sheet_(); const h = d.set &amp;&amp; d.set.rfrom ? ensureRfromCol_(s) : headers_(s);
+  const set = d.set || {}, keys = Object.keys(set);
+  const perm = keys.some(k =&gt; [&quot;schedule&quot;, &quot;type&quot;, &quot;dept&quot;, &quot;location&quot;].indexOf(k) &gt;= 0) ? &quot;edit&quot;
+             : keys.indexOf(&quot;date&quot;) &gt;= 0 ? &quot;reschedule&quot;
+             : (keys.length === 1 &amp;&amp; keys[0] === &quot;status&quot;) ? &quot;complete&quot; : &quot;edit&quot;;
+  need_(user, perm);                                   // checked before anything is written
+  const s = sheet_(); const h = set.rfrom ? ensureRfromCol_(s) : headers_(s);
   const row = findRow_(s, h, d), changes = [];
   const name = getField_(s, row, h, &quot;schedule&quot;);
   WRITE_KEYS.forEach(k =&gt; {
@@ -1479,7 +1571,7 @@ function del_(user, d) {
 
 /* ================= one-time setup ================= */
 function setup() {
-  secret_(); logSheet_(); users_();
+  secret_(); logSheet_(); users_(); roles_();
   Logger.log(&quot;Setup done. Schedule tab: &quot; + sheet_().getName() + &quot;. Users: &quot; + Object.keys(DEFAULT_USERS).join(&quot;, &quot;));
 }
 /* Emergency: run this from the editor to reset ALL logins back to DEFAULT_USERS above (removes added logins). */
@@ -1501,7 +1593,7 @@ const CONFIG = {
   SHEET_ID: "1Ur0wLnNLcJPDspRhPORTH5eGRdBVBgWML4_krHdi3oQ",
   SHEET_URL: "https://docs.google.com/spreadsheets/d/1Ur0wLnNLcJPDspRhPORTH5eGRdBVBgWML4_krHdi3oQ/edit?usp=sharing",
   CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTbbsseGN93r6SAQJKzhaPAJgw45TH9Avj3KUMU-Vif4nU8HDrzYPLw-LsB51awbMMqH7N8P4zzYo-/pub?output=csv",
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzkbarzKw7HXqmWktmS5yGhH6EKiZJnp_ErHIxk1q9Bz_Giq9zqZoFzGiukToPSwmOvvA/exec",               // ← REQUIRED: paste your Apps Script Web-app URL (…/exec) here before deploying
+  SCRIPT_URL: "",               // ← REQUIRED: paste your Apps Script Web-app URL (…/exec) here before deploying
   REFRESH_SECONDS: 60,          // live auto-sync interval
   REMIND_BEFORE_MIN: 10,        // reminder N minutes before a task
   DEFAULT_DURATION_MIN: 30,     // assumed length when no end time / next task
@@ -1681,7 +1773,7 @@ function gvizJSONP(){
   });
 }
 async function csvFetch(u){ const r=await fetch(u,{cache:"no-store"}); if(!r.ok) throw new Error("HTTP "+r.status); const t=await r.text(); if(!t||/^\s*</.test(t)) throw new Error("not csv"); return {table:parseCSV(t)}; }
-async function scriptRead(){ const r=await api("read",{},15000); setConfig(r.config); return {table:[r.headers,...r.rows], rowNums:r.rowNums, src:"script"}; }
+async function scriptRead(){ const r=await api("read",{},15000); setConfig(r.config); refreshMe(r.user); return {table:[r.headers,...r.rows], rowNums:r.rowNums, src:"script"}; }
 
 async function fetchData(manual){
   if(!S.user || S.fetching) return; S.fetching=true;
@@ -1722,9 +1814,10 @@ async function doWrite(action, data, apply, okMsg){
   }
 }
 const rowRef = r => ({ sl:r.sl, row:r.row });
-function needConn(perm){ if(!S.user){ showLogin(); return true; } if(perm && !can(perm)){ toast("Not allowed", `Your role (${S.user.role}) can't ${perm} tasks.`, "#f87171", "alert"); return true; } return false; }
+const PERM_LABEL={add:"Add",edit:"Edit",complete:"Complete",reschedule:"Reschedule",delete:"Delete",log:"Activity log"};
+function needConn(perm){ if(!S.user){ showLogin(); return true; } if(perm && !can(perm)){ toast("Not allowed", `${S.user.role} doesn't have “${PERM_LABEL[perm]||perm}” permission. Ask the master admin.`, "#f87171", "alert"); return true; } return false; }
 function markStatus(id, status){
-  const r=S.rows.find(x=>x.id===id); if(!r || needConn("update")) return;
+  const r=S.rows.find(x=>x.id===id); if(!r || needConn("complete")) return;
   closeModal();
   doWrite("update", {...rowRef(r), set:{status}}, ()=>{ r.status=status; }, `${title(r.schedule)} → ${status}`);
 }
@@ -1878,15 +1971,15 @@ function openKpiList(f){
   const body=groups.filter(g=>g[1].length).map(([l,list,c])=>`<div class="ogh" style="--gc:${c}">${l} <span>${list.length}</span></div>`+list.map(r=>oItem(r, l==="Overdue"?`<span class="odue">${dayDiff(r.key,t)}d overdue</span>`:"")).join("")).join("");
   openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${esc(T.p)} <span class="mono" style="color:${T.c}">${rows.length}</span></h2><p>${open.length} open · ${rows.filter(r=>isDone(r.status)).length} completed · ${f==="ALL"?"dated items only · tasks &amp; reminders have their own cards":"all dates"}</p></div>
     <div class="olist klist" id="kList">${body || `<div class="empty"><b>Nothing here yet</b>Add one with the + button.</div>`}</div>
-    <div class="mfoot"><button class="btn" id="kReg">${svg("sheet")}Open in Overview register</button><button class="btn pri" id="kAdd">${svg("plus")}Add ${f==="ALL"?"task":esc(T.l.toLowerCase())}</button></div>`, T.c);
+    <div class="mfoot"><button class="btn" id="kReg">${svg("sheet")}Open in Overview register</button>${can("add")?`<button class="btn pri" id="kAdd">${svg("plus")}Add ${f==="ALL"?"task":esc(T.l.toLowerCase())}</button>`:""}</div>`, T.c);
   bindOpen("#kList");
   $("#kReg").onclick=()=>{ closeModal(); go("overview"); $("#oType").value = f==="ALL"?"":f; renderOverview(); setTimeout(()=>$("#tSearch").closest(".card").scrollIntoView({behavior:"smooth"}),150); };
-  $("#kAdd").onclick=()=>{ S.addType = f==="ALL"? "" : f; openForm(null, todayKey()); };
+  if($("#kAdd")) $("#kAdd").onclick=()=>{ S.addType = f==="ALL"? "" : f; openForm(null, todayKey()); };
 }
 function anyItem(r){
   const T=typeInfo(r), done=isDone(r.status), qid=esc(r.id).replace(/'/g,"\\'");
   return `<div class="any-item ${done?"done":""}" data-id="${esc(r.id)}" style="--tc:${T.c}">
-    <button class="any-chk" data-act-id="1" title="${done?"Reopen":"Mark complete"}" onclick="event.stopPropagation();markStatus('${qid}','${done?"PENDING":"COMPLETED"}')">${svg("check")}</button>
+    <button class="any-chk ${can("complete")?"":"locked"}" data-act-id="1" title="${can("complete")?(done?"Reopen":"Mark complete"):"No permission to complete"}" ${can("complete")?`onclick="event.stopPropagation();markStatus('${qid}','${done?"PENDING":"COMPLETED"}')"`:`onclick="event.stopPropagation()" disabled`}>${svg("check")}</button>
     <div class="ax"><b>${esc(title(r.schedule))}</b><small>${typeBadge(r)}${r.dept?`<span>${esc(r.dept)}</span>`:""}${r.tRaw?`<span>· ${esc(r.tRaw)}</span>`:""}</small></div>
     <span class="status" style="--sc:${statusColor(r.status)}">${esc(r.status)}</span></div>`;
 }
@@ -1969,12 +2062,12 @@ function openModal(id){
       <div class="mf"><small>SI No</small><b class="mono">#${esc(r.sl||"—")}</b></div>
       <div class="mf"><small>Countdown</small><b class="mono">${countdown(r, rr)}</b></div>
     </div>
-    <div class="qa" style="grid-template-columns:repeat(${can("delete")?4:3},1fr)">
-      ${done? `<button class="q-ok" onclick="markStatus('${qid}','PENDING')">${svg("undo")}Reopen</button>` : `<button class="q-ok" onclick="markStatus('${qid}','COMPLETED')">${svg("check")}Complete</button>`}
-      <button class="q-rs" onclick="openReschedule('${qid}')">${svg(r.key?"resch":"cal")}${r.key?"Reschedule":"Set date"}</button>
-      <button class="q-ed" onclick="openForm('${qid}')">${svg("edit")}Edit</button>
-      ${can("delete")?`<button class="q-del" onclick="deleteTask('${qid}')">${svg("trash")}Delete</button>`:""}
-    </div>
+    ${(()=>{ const qa=[
+      can("complete") && (done? `<button class="q-ok" onclick="markStatus('${qid}','PENDING')">${svg("undo")}Reopen</button>` : `<button class="q-ok" onclick="markStatus('${qid}','COMPLETED')">${svg("check")}Complete</button>`),
+      can("reschedule") && `<button class="q-rs" onclick="openReschedule('${qid}')">${svg(r.key?"resch":"cal")}${r.key?"Reschedule":"Set date"}</button>`,
+      can("edit") && `<button class="q-ed" onclick="openForm('${qid}')">${svg("edit")}Edit</button>`,
+      can("delete") && `<button class="q-del" onclick="deleteTask('${qid}')">${svg("trash")}Delete</button>`].filter(Boolean);
+      return qa.length? `<div class="qa" style="grid-template-columns:repeat(${qa.length},1fr)">${qa.join("")}</div>` : `<div class="qa-none">View only — your role can't change this task.</div>`; })()}
     <div class="mfoot">
       <button class="btn" onclick="addToCal('${qid}')">${svg("cal")}Add to calendar</button>
       <button class="btn" onclick="shareTask('${qid}')">${svg("share")}Share</button>
@@ -2020,7 +2113,7 @@ function readTime(pref){
 }
 function ttInit(r){ if(r && r.allDay) return r.allDay==="HALF"?"AM":r.allDay; if(r && r.start==null) return "NONE"; return "TIME"; }
 function openForm(id, presetKey){
-  if(needConn(id?"update":"add")) return;
+  if(needConn(id?"edit":"add")) return;
   const r = id ? S.rows.find(x=>x.id===id) : null;
   const key = r ? (r.key||todayKey()) : (presetKey||todayKey());
   const opts = [...new Set([...STATUS_OPTIONS, ...S.rows.map(x=>x.status)])].filter(Boolean);
@@ -2065,7 +2158,7 @@ function openForm(id, presetKey){
   setTimeout(()=>{ if(!r && matchMedia("(pointer:fine)").matches) $("#fSched").focus(); },100);
 }
 function openReschedule(id, newKey){
-  const r=S.rows.find(x=>x.id===id); if(!r || needConn("update")) return;
+  const r=S.rows.find(x=>x.id===id); if(!r || needConn("reschedule")) return;
   const undated=!r.key;
   const nk = newKey || (undated? todayKey() : addDays(r.key,1));
   openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${undated?"Set date":"Reschedule"}</h2><p>${esc(title(r.schedule))}</p></div>
@@ -2095,7 +2188,9 @@ function openReschedule(id, newKey){
 /* =========================================================
    LOGIN · ACCOUNT · USERS · ACTIVITY
    ========================================================= */
-const ROLE_COL = { MASTER:"#a855f7", CEO:"#22d3ee", PMO:"#fbbf24" };
+const ROLE_BASE = { MASTER:"#a855f7", CEO:"#22d3ee", PMO:"#fbbf24" };
+const ROLE_COL = new Proxy({}, { get:(_,r)=> (S.roleCols&&S.roleCols[r]) || ROLE_BASE[r] || colorOf(String(r)) });
+function learnRoles(list){ S.roleCols=S.roleCols||{}; (list||[]).forEach(x=>{ if(x.role&&x.color) S.roleCols[x.role]=x.color; }); S._roles=list||S._roles; }
 function showLogin(msg){
   document.body.classList.add("locked");
   const a=$("#auth"); a.hidden=false; requestAnimationFrame(()=>a.classList.add("show"));
@@ -2124,9 +2219,18 @@ async function runTypewriter(){
 }
 function hideLogin(){ const a=$("#auth"); a.classList.remove("show"); a.classList.add("leave"); document.body.classList.remove("locked"); setTimeout(()=>{ a.hidden=true; a.classList.remove("leave"); },650); }
 function lgErr(m){ const e=$("#lgErr"); e.textContent=m; e.classList.toggle("on",!!m); if(m){ const c=$(".auth-card"); c.classList.remove("shake"); void c.offsetWidth; c.classList.add("shake"); } }
+function refreshMe(me){
+  if(!me || !S.user) return;
+  const was=JSON.stringify([S.user.can,S.user.role,S.user.name,S.user.color]), now=JSON.stringify([me.can,me.role,me.name,me.color]);
+  if(was===now) return;
+  const first=!S.user.can; S.user=Object.assign({},S.user,me);
+  try{ const st=localStorage.getItem("ceo_token")?localStorage:sessionStorage; st.setItem("ceo_user",JSON.stringify(S.user)); }catch(e){}
+  applyUser(); if(!first) toast("Permissions updated", "The master admin changed what "+S.user.role+" can do.", ROLE_COL[S.user.role], "check");
+}
 function applyUser(){
   const u=S.user; document.body.dataset.role = u? u.role : "";
-  document.body.classList.toggle("can-delete", can("delete")); document.body.classList.toggle("can-users", can("users")); document.body.classList.toggle("can-log", can("log"));
+  ["add","edit","complete","reschedule","delete","users","log"].forEach(p=>document.body.classList.toggle("can-"+p, can(p)));
+  if(u && u.color){ S.roleCols=S.roleCols||{}; S.roleCols[u.role]=u.color; }
   if(!u) return;
   const ini=(u.name||u.u).split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase(), col=ROLE_COL[u.role]||"#6366f1";
   ["#uAv","#uAv2"].forEach(id=>{ $(id).textContent=ini; $(id).style.setProperty("--rc",col); });
@@ -2184,17 +2288,53 @@ function openChangePass(target){
   };
   $("#pwGo").onclick=go; $("#pwForm").onsubmit=e=>{ e.preventDefault(); go(); };
 }
-async function openUsers(){
+async function openUsers(tab){
   if(!can("users")) return;
-  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Manage logins</h2><p>Add people, change their role or password, or remove access. Changes apply instantly on every device.</p></div>
-    <div class="ulist" id="uList"><div class="skel" style="height:64px"></div><div class="skel" style="height:64px"></div><div class="skel" style="height:64px"></div></div>
-    <div class="roles-tbl"><b>Role permissions</b><table><tr><th></th><th>View</th><th>Add·Edit</th><th>Done·Resched.</th><th>Delete</th><th>Log</th><th>Users</th></tr>
-    <tr><td><span class="rtag" style="--rc:#a855f7">MASTER</span></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
-    <tr><td><span class="rtag" style="--rc:#22d3ee">CEO</span></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>—</td></tr>
-    <tr><td><span class="rtag" style="--rc:#fbbf24">PMO</span></td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr></table></div>
-    <div class="mfoot"><button class="btn" onclick="closeModal()">Close</button><button class="btn pri" id="uAdd">${svg("plus")}Add login</button></div>`, "#a855f7");
-  $("#uAdd").onclick=()=>openUserForm();
-  try{ drawUsers(await api("users")); }catch(e){ if(!e.auth) $("#uList").innerHTML=`<div class="ferr" style="display:block">${esc(e.message)}</div>`; }
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Manage logins</h2><p>People, roles and what each role is allowed to do. Changes apply on every device within a minute.</p></div>
+    <div class="cz" style="padding-bottom:0"><div class="cz-tabs"><button data-t="lg" class="${tab!=="roles"?"active":""}">Logins</button><button data-t="roles" class="${tab==="roles"?"active":""}">Roles &amp; permissions</button></div></div>
+    <div id="umLg" ${tab==="roles"?"hidden":""}><div class="ulist" id="uList"><div class="skel" style="height:64px"></div><div class="skel" style="height:64px"></div><div class="skel" style="height:64px"></div></div></div>
+    <div id="umRoles" ${tab==="roles"?"":"hidden"}><div class="rp" id="rpBox"><div class="skel" style="height:180px"></div></div></div>
+    <div class="mfoot"><button class="btn" onclick="closeModal()">Close</button><button class="btn pri" id="uAdd">${svg("plus")}${tab==="roles"?"New role":"Add login"}</button></div>`, "#a855f7");
+  const setTab=t=>{ $$(".cz-tabs button").forEach(x=>x.classList.toggle("active",x.dataset.t===t)); $("#umLg").hidden=t!=="lg"; $("#umRoles").hidden=t!=="roles"; $("#uAdd").innerHTML=svg("plus")+(t==="roles"?"New role":"Add login"); $("#uAdd").onclick=t==="roles"?()=>openRoleForm():()=>openUserForm(); };
+  $$(".cz-tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.t)); setTab(tab==="roles"?"roles":"lg");
+  try{ const [u,r]=await Promise.all([api("users"),api("roles")]); learnRoles(r.roles); S._perms=r.perms; drawUsers(u); drawRoles(r); }
+  catch(e){ if(!e.auth){ const m=`<div class="ferr" style="display:block;margin:10px 24px">${esc(e.message)}</div>`; $("#uList").innerHTML=m; $("#rpBox").innerHTML=m; } }
+}
+function drawRoles(r){
+  const P=r.perms, draft={}; r.roles.forEach(x=>draft[x.role]=new Set(x.perms));
+  $("#rpBox").innerHTML=`<div class="rp-scroll"><table class="rp-t"><thead><tr><th>Role</th>${P.map(p=>`<th>${p==="log"?"Log":(PERM_LABEL[p]||p)}</th>`).join("")}<th></th></tr></thead><tbody>
+    ${r.roles.map(x=>`<tr style="--rc:${x.color}"><td><span class="rtag" style="--rc:${x.color}">${esc(x.role)}</span><small>${x.count} login${x.count==1?"":"s"}</small></td>
+      ${P.map(p=>`<td><label class="tg ${x.locked?"lock":""}" style="--rc:${x.color}" title="${x.locked?"MASTER always has every permission":PERM_LABEL[p]}"><input type="checkbox" data-role="${esc(x.role)}" data-p="${p}" ${x.perms.includes(p)?"checked":""} ${x.locked?"disabled":""}><span></span></label></td>`).join("")}
+      <td>${x.locked||x.count?"":`<button class="ib del" title="Delete role" data-rdel="${esc(x.role)}">${svg("trash")}</button>`}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="rp-note">Every role can always <b>view</b> the dashboard. Only MASTER can manage logins, roles and layout. The server enforces these switches — a hidden button can't be bypassed.</p>
+    <div class="rp-save"><span id="rpDirty"></span><button class="btn pri" id="rpSave" disabled>${svg("check")}Save permissions</button></div>`;
+  const dirty=new Set();
+  $$("#rpBox input[data-role]").forEach(c=>c.onchange=()=>{ const set=draft[c.dataset.role]; c.checked? set.add(c.dataset.p) : set.delete(c.dataset.p); dirty.add(c.dataset.role); $("#rpSave").disabled=false; $("#rpDirty").textContent=`Unsaved: ${[...dirty].join(", ")}`; });
+  $("#rpSave").onclick=async()=>{ const b=$("#rpSave"); b.disabled=true; b.innerHTML='<span class="spn"></span>Saving…';
+    try{ let last; for(const role of dirty){ last=await api("rolesave",{role, perms:[...draft[role]], isNew:false}); }
+      learnRoles(last.roles); toast("Permissions saved ✓", [...dirty].join(", ")+" updated — applies on every device.", "#a855f7", "check"); drawRoles(last); }
+    catch(e){ b.disabled=false; b.innerHTML=svg("check")+"Save permissions"; if(!e.auth) toast("Couldn't save",e.message,"#f87171","alert"); } };
+  $$("#rpBox [data-rdel]").forEach(b=>b.onclick=async()=>{ try{ const res=await api("roledel",{role:b.dataset.rdel}); learnRoles(res.roles); toast("Role deleted", b.dataset.rdel, "#f87171", "trash"); drawRoles(res); }catch(e){ if(!e.auth) toast("Couldn't delete role",e.message,"#f87171","alert"); } });
+}
+function openRoleForm(){
+  const P=S._perms||["add","edit","complete","reschedule","delete","log"], cols=["#34d399","#f472b6","#60a5fa","#fb923c","#2dd4bf","#e879f9","#facc15","#818cf8","#f87171","#a3e635"];
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>New role</h2><p>For example: SECRETARY, MANAGER, ACCOUNTS, DRIVER. Pick what it may do — you can change it any time.</p></div>
+    <form class="form" id="rfForm" autocomplete="off">
+      <div class="fld full"><label>Role name</label><input class="inp" id="rfN" maxlength="20" placeholder="e.g. SECRETARY" style="text-transform:uppercase" required></div>
+      <div class="fld full"><label>Colour</label><div class="swatches" id="rfC">${cols.map((c,i)=>`<button type="button" data-c="${c}" style="--c:${c}" class="${i?"":"active"}"></button>`).join("")}</div></div>
+      <div class="fld full"><label>Permissions <small style="text-transform:none;letter-spacing:0;font-weight:500">(view is always on)</small></label><div class="permpick" id="rfP">${P.map(p=>`<label class="pp"><input type="checkbox" value="${p}" ${["add","complete"].includes(p)?"checked":""}><span>${PERM_LABEL[p]||p}</span></label>`).join("")}</div></div>
+      <div class="ferr" id="rfErr"></div>
+    </form>
+    <div class="mfoot"><button class="btn" id="rfBack">Back</button><button class="btn pri" id="rfGo">${svg("plus")}Create role</button></div>`, "#a855f7");
+  let color=cols[0];
+  $$("#rfC button").forEach(b=>b.onclick=()=>{ color=b.dataset.c; $$("#rfC button").forEach(x=>x.classList.toggle("active",x===b)); });
+  $("#rfBack").onclick=()=>openUsers("roles");
+  const go=async()=>{ const role=$("#rfN").value.trim().toUpperCase(), err=m=>{ $("#rfErr").textContent=m; $("#rfErr").style.display="block"; };
+    if(!/^[A-Z0-9][A-Z0-9 &._-]{1,19}$/.test(role)) return err("Role name: 2–20 characters (letters, numbers, space . _ - &).");
+    try{ const r=await api("rolesave",{role, color, perms:[...$$("#rfP input:checked")].map(x=>x.value), isNew:true}); learnRoles(r.roles); toast("Role created ✓", role+" — now assign it to a login.", color, "check"); openUsers("roles"); }
+    catch(e){ if(!e.auth) err(e.message); } };
+  $("#rfGo").onclick=go; $("#rfForm").onsubmit=e=>{ e.preventDefault(); go(); };
 }
 const initials=n=>String(n||"?").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
 function drawUsers(r){
@@ -2211,19 +2351,22 @@ function drawUsers(r){
     $("#dlGo").onclick=async()=>{ try{ await api("userdel",{u}); toast("Login deleted","@"+u+" can no longer sign in.","#f87171","trash"); openUsers(); }catch(e){ if(!e.auth) toast("Couldn't delete",e.message,"#f87171","alert"); } };
   });
 }
+const roleList=()=> (S._roles&&S._roles.length? S._roles : [{role:"MASTER",color:"#a855f7",perms:[],locked:true},{role:"CEO",color:"#22d3ee",perms:["add","edit","complete","reschedule","delete","log"]},{role:"PMO",color:"#fbbf24",perms:["add","edit","complete","reschedule"]}]);
+const defRole=()=> (roleList().find(x=>x.role==="PMO")||roleList().find(x=>!x.locked)||roleList()[0]).role;
 function openUserForm(u){
   const edit=!!u;
   openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${edit?"Edit login · @"+esc(u.u):"Add a login"}</h2><p>${edit?"Changing the role signs this person out so the new rights apply.":"They can sign in right away with this username and password."}</p></div>
     <form class="form" id="ufForm" autocomplete="off">
       ${edit?"":`<div class="fld"><label>Username</label><input class="inp" id="ufU" placeholder="e.g. anil" autocapitalize="none" spellcheck="false" maxlength="20" required></div>`}
       <div class="fld ${edit?"full":""}"><label>Display name</label><input class="inp" id="ufN" maxlength="40" placeholder="e.g. Anil Kumar" value="${esc(edit?u.name:"")}" required></div>
-      <div class="fld full"><label>Role</label><div class="rolepick" id="ufR">${["CEO","PMO","MASTER"].map(r=>`<button type="button" data-r="${r}" style="--rc:${ROLE_COL[r]}" class="${(edit?u.role:"PMO")===r?"active":""}"><b>${r}</b><small>${r==="MASTER"?"Everything + logins + layout":r==="CEO"?"Add · edit · delete · log":"Add · edit · complete"}</small></button>`).join("")}</div></div>
+      <div class="fld full"><label>Role</label><div class="rolepick" id="ufR">${roleList().map(x=>`<button type="button" data-r="${esc(x.role)}" style="--rc:${x.color}" class="${(edit?u.role:defRole())===x.role?"active":""}"><b>${esc(x.role)}</b><small>${x.locked?"Everything + logins + layout":(x.perms.filter(p=>p!=="read").map(p=>PERM_LABEL[p]||p).join(" · ")||"View only")}</small></button>`).join("")}<button type="button" class="rp-new" id="ufNewRole">${svg("plus")}<b>New role…</b><small>Create a custom role</small></button></div></div>
       ${edit?"":`<div class="fld"><label>Password</label><input type="password" class="inp" id="ufP" minlength="6" autocomplete="new-password" required></div><div class="fld"><label>Confirm</label><input type="password" class="inp" id="ufP2" minlength="6" autocomplete="new-password" required></div>`}
       <div class="ferr" id="ufErr"></div>
     </form>
     <div class="mfoot"><button class="btn" id="ufBack">Back</button><button class="btn pri" id="ufGo">${svg(edit?"check":"plus")}${edit?"Save":"Create login"}</button></div>`, "#a855f7");
-  let role=edit?u.role:"PMO";
-  $$("#ufR button").forEach(b=>b.onclick=()=>{ role=b.dataset.r; $$("#ufR button").forEach(x=>x.classList.toggle("active",x===b)); });
+  let role=edit?u.role:defRole();
+  $$("#ufR button[data-r]").forEach(b=>b.onclick=()=>{ role=b.dataset.r; $$("#ufR button").forEach(x=>x.classList.toggle("active",x===b)); });
+  $("#ufNewRole").onclick=openRoleForm;
   $("#ufBack").onclick=openUsers;
   const go=async()=>{ const err=m=>{ $("#ufErr").textContent=m; $("#ufErr").style.display="block"; };
     const name=$("#ufN").value.trim(); if(!name) return err("Enter a display name.");
@@ -2238,7 +2381,7 @@ function openUserForm(u){
   };
   $("#ufGo").onclick=go; $("#ufForm").onsubmit=e=>{ e.preventDefault(); go(); };
 }
-const ACT_COL={LOGIN:"#60a5fa",ADD:"#34d399",EDIT:"#22d3ee",STATUS:"#2dd4bf",RESCHEDULE:"#a855f7",DELETE:"#f87171",PASSWORD:"#fbbf24",USER:"#e879f9",SETTINGS:"#818cf8"};
+const ACT_COL={LOGIN:"#60a5fa",ADD:"#34d399",EDIT:"#22d3ee",STATUS:"#2dd4bf",RESCHEDULE:"#a855f7",DELETE:"#f87171",PASSWORD:"#fbbf24",USER:"#e879f9",SETTINGS:"#818cf8",ROLE:"#c084fc"};
 async function openActivity(){
   if(!can("log")) return;
   openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Activity log</h2><p>Every sign-in and change — who, what and when. Also saved in the “ACTIVITY LOG” tab of the sheet.</p></div>
@@ -2311,16 +2454,18 @@ function applyProfile(){
   $(".quote").innerHTML=`<div>${esc(P.quote)}<small>— ${esc(P.quoteBy.toUpperCase())}</small></div>`;
   $(".avatar img").alt=$(".ab-av img").alt=(P.first+" "+P.last).trim();
 }
-function openCustomize(){
+async function openCustomize(){
   if(!(S.user&&S.user.role==="MASTER")) return;
+  try{ const r=await api("roles"); learnRoles(r.roles); }catch(e){ if(e.auth) return; }
+  const RL=roleList().filter(x=>!x.locked).map(x=>x.role), gcols=`grid-template-columns:minmax(0,1fr) repeat(${RL.length},64px)`;
   const draft=JSON.parse(JSON.stringify(S.ui||{})); draft.hide=draft.hide||{}; const P=profile();
   const sw=(k,r)=>{ const on=!(draft.hide[k]||[]).includes(r); return `<label class="tg" style="--rc:${ROLE_COL[r]}"><input type="checkbox" data-k="${k}" data-r="${r}" ${on?"checked":""}><span></span></label>`; };
-  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Customize dashboard</h2><p>Switch any page, card or button on or off per role, and edit the profile text. Saved once — applied to every login on every device. You (Master) always see everything; hidden items show a dashed outline.</p></div>
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Customize dashboard</h2><p>Switch any page, card or button on or off per role, and edit the profile text. (What a role may <i>do</i> — add, edit, delete… — is set in Manage logins → Roles &amp; permissions.) Saved once — applied to every login on every device. You (Master) always see everything; hidden items show a dashed outline.</p></div>
     <div class="cz">
       <div class="cz-tabs"><button class="active" data-t="lay">Layout &amp; visibility</button><button data-t="pro">Profile text</button></div>
       <div class="cz-pane" id="czLay">
-        <div class="cz-head"><span></span><b style="color:${ROLE_COL.CEO}">CEO</b><b style="color:${ROLE_COL.PMO}">PMO</b></div>
-        ${UI_GROUPS.map(g=>`<div class="cz-g">${g.g}</div>`+g.items.map(([k,l])=>`<div class="cz-row"><span>${esc(l)}</span>${sw(k,"CEO")}${sw(k,"PMO")}</div>`).join("")).join("")}
+        <div class="cz-head" style="${gcols}"><span></span>${RL.map(r=>`<b style="color:${ROLE_COL[r]}" title="${esc(r)}">${esc(r)}</b>`).join("")}</div>
+        ${UI_GROUPS.map(g=>`<div class="cz-g">${g.g}</div>`+g.items.map(([k,l])=>`<div class="cz-row" style="${gcols}"><span>${esc(l)}</span>${RL.map(r=>sw(k,r)).join("")}</div>`).join("")).join("")}
       </div>
       <div class="cz-pane" id="czPro" hidden>
         <form class="form" style="padding:4px 0" onsubmit="return false">
@@ -2416,7 +2561,7 @@ function renderCalendar(){
     const show=list.slice(0,3);
     html+=`<div class="cal-cell ${out?"out":""} ${wk?"wk":""} ${k===today?"today":""} ${k===C.sel?"sel":""}" data-k="${k}">
       <div class="cal-top"><span class="cal-num">${d.getDate()}</span>${list.length?`<span class="cal-cnt">${list.length}</span>`:""}</div>
-      ${show.map(r=>`<div class="cal-pill ${isDone(r.status)?"dn":""}" draggable="${!mobile}" data-pid="${esc(r.id)}" style="--sc:${statusColor(r.status)}" title="${esc(timeLabel(r)+" · "+title(r.schedule)+(r.type?" · "+typeInfo(r).l:"")+" · "+r.status)}"><i>${esc(shortTime(r))}</i>${esc(title(r.schedule))}</div>`).join("")}
+      ${show.map(r=>`<div class="cal-pill ${isDone(r.status)?"dn":""}" draggable="${!mobile && can("reschedule")}" data-pid="${esc(r.id)}" style="--sc:${statusColor(r.status)}" title="${esc(timeLabel(r)+" · "+title(r.schedule)+(r.type?" · "+typeInfo(r).l:"")+" · "+r.status)}"><i>${esc(shortTime(r))}</i>${esc(title(r.schedule))}</div>`).join("")}
       ${list.length>3?`<div class="cal-more">+${list.length-3} more</div>`:""}
       <div class="cal-dots">${list.slice(0,4).map(r=>`<i style="--sc:${statusColor(r.status)}"></i>`).join("")}</div>
     </div>`;
@@ -2451,7 +2596,7 @@ function oItem(r, extra, acts=true){
   return `<div class="oitem" data-id="${esc(r.id)}" style="--sc:${statusColor(r.status)}">
     <div class="od"><b>${esc(shortTime(r))}</b><small>${r.date?esc(shortDate(r.date)):"No date"}</small></div>
     <div class="ox"><b>${esc(title(r.schedule))}</b><small>${extra||""}${typeBadge(r)}${r.dept?`<span>${esc(r.dept)}</span>`:""}${r.location?`<span>· ${esc(r.location)}</span>`:""}</small></div>
-    ${acts&&isPend(r.status)?`<div class="acts" data-act-id="1"><button class="a-ok" title="Mark complete" onclick="event.stopPropagation();markStatus('${qid}','COMPLETED')">${svg("check")}</button><button class="a-rs" title="${r.key?"Reschedule":"Set date"}" onclick="event.stopPropagation();openReschedule('${qid}')">${svg(r.key?"resch":"cal")}</button></div>`:""}
+    ${acts&&isPend(r.status)&&(can("complete")||can("reschedule"))?`<div class="acts" data-act-id="1">${can("complete")?`<button class="a-ok" title="Mark complete" onclick="event.stopPropagation();markStatus('${qid}','COMPLETED')">${svg("check")}</button>`:""}${can("reschedule")?`<button class="a-rs" title="${r.key?"Reschedule":"Set date"}" onclick="event.stopPropagation();openReschedule('${qid}')">${svg(r.key?"resch":"cal")}</button>`:""}</div>`:""}
   </div>`;
 }
 function renderOverview(){
