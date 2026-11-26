@@ -1803,7 +1803,6 @@ function aptSubmit_(d) {
   if (name.length &lt; 2) throw new Error("Please enter your name.");
   if (phone.replace(/\D/g, "").length &lt; 7) throw new Error("Please enter a valid phone number.");
   if (purpose.length &lt; 3) throw new Error("Please tell us the purpose of the meeting.");
-  if (!prefDate) throw new Error("Please choose a preferred date.");
   const pk0 = phoneKey_(phone);
   const cache = CacheService.getScriptCache(), pk = "aptp_" + phone, gk = "apt_glob";
   const per = Number(cache.get(pk) || 0), glob = Number(cache.get(gk) || 0);
@@ -1813,7 +1812,7 @@ function aptSubmit_(d) {
   const ref = aptNewRef_();
   const key = Utilities.getUuid().replace(/-/g, "").slice(0, 24);
   const rec = { ref, submitted: aptNow_(), manager: name, phone, dept: cleanTxt_(d.dept, 60), purpose, details: cleanTxt_(d.details, 1000),
-    prefDate, prefTime: cleanTxt_(d.prefTime, 30) || "Flexible", duration: cleanTxt_(d.duration, 20) || "30 min", mode: cleanTxt_(d.mode, 30) || "In person",
+    prefDate, prefTime: cleanTxt_(d.prefTime, 30) || (prefDate ? "Flexible" : ""), duration: cleanTxt_(d.duration, 20) || "30 min", mode: cleanTxt_(d.mode, 30) || "In person",
     priority: cleanTxt_(d.priority, 20) || "Normal", status: "PENDING", schDate: "", schTime: "", venue: "", note: "", handledBy: "", updated: aptNow_(), schSl: "", key };
   aptAppend_(rec, "Requested");
   mgrRefresh_(phone);
@@ -1827,7 +1826,7 @@ function aptNewRef_() {
 function aptAppend_(rec, how) {
   const s = aptSheet_(), row = Math.max(s.getLastRow(), 1) + 1;
   s.getRange(row, 1, 1, APT_KEYS.length).setNumberFormat("@").setValues([APT_KEYS.map(k =&gt; rec[k] == null ? "" : rec[k])]);
-  log_({ name: rec.manager, u: "manager", role: "MANAGER" }, "APPOINTMENT", rec.ref, rec.purpose, how + " for " + rec.prefDate + " " + rec.prefTime + " · " + rec.mode);
+  log_({ name: rec.manager, u: "manager", role: "MANAGER" }, "APPOINTMENT", rec.ref, rec.purpose, how + (rec.prefDate ? " for " + rec.prefDate + " " + rec.prefTime : "") + " · " + rec.mode);
 }
 
 /* ---------- OPTIONAL: Google Form intake ----------
@@ -3134,7 +3133,7 @@ function aptCard(a,i){
       <div class="apt-who"><b>${esc(a.manager)}</b><small>${esc(a.dept||"—")}</small></div><span class="status" style="--sc:${c}">${esc(a.status)}</span></div>
     <div class="apt-purpose">${esc(a.purpose)}</div>
     ${a.details?`<p class="apt-det">${esc(a.details)}</p>`:""}
-    <div class="apt-chips"><span title="Preferred">🗓 ${pd?esc(DAYS[pd.getDay()]+", "+shortDate(pd)):esc(a.prefDate)} · ${esc(a.prefTime)}</span><span>${mi} ${esc(a.mode)}</span><span>⏱ ${esc(a.duration)}</span></div>
+    <div class="apt-chips">${a.prefDate?`<span title="Preferred">🗓 ${pd?esc(DAYS[pd.getDay()]+", "+shortDate(pd)):esc(a.prefDate)} · ${esc(a.prefTime)}</span>`:""}<span>${mi} ${esc(a.mode)}</span><span>⏱ ${esc(a.duration)}</span></div>
     ${sch?`<div class="apt-sch"><b>${a.status==="COMPLETED"?"✓ Met on":"📅 Confirmed"} ${sd?esc(DAYS[sd.getDay()]+", "+shortDate(sd)+" "+sd.getFullYear()):esc(a.schDate)} · ${esc(a.schTime)}</b>${a.venue?`<small>📍 ${esc(a.venue)}</small>`:""}${a.note?`<small>📝 ${esc(a.note)}</small>`:""}${a.schSl?`<small>On CEO schedule · #${esc(a.schSl)}</small>`:""}</div>`:""}
     ${/DECLINED|CANCELLED/.test(a.status)&&a.note?`<div class="apt-sch"><small>📝 ${esc(a.note)}</small></div>`:""}
     <div class="apt-foot"><small><span class="mono">${esc(a.ref)}</span> · ${esc(a.submitted)}${a.handledBy?` · ${esc(a.handledBy)}`:""} · <a href="tel:${esc(a.phone)}">${esc(a.phone)}</a></small>
@@ -3163,7 +3162,7 @@ function dayLoadHTML(key){
 function aptScheduleForm(a, act){
   const linked=!!a.schSl, d0=aptKey(a)||aptPrefKey(a)||todayKey(), t0=a.schTime?prefTimeTo24(a.schTime):prefTimeTo24(a.prefTime);
   const durs=["15 min","30 min","45 min","1 hour"], ph={"Video call":"Meet / Zoom link","Phone call":"Who calls whom"}[a.mode]||"e.g. CEO cabin, HO";
-  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${act==="accept"?"Accept & schedule":"Reschedule"}</h2><p><b>${esc(a.manager)}</b> · ${esc(a.purpose)}<br>Asked for ${esc(a.prefDate)} · ${esc(a.prefTime)} · ${esc(a.mode)} · ${esc(a.duration)}</p></div>
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${act==="accept"?"Accept & schedule":"Reschedule"}</h2><p><b>${esc(a.manager)}</b> · ${esc(a.purpose)}<br>${a.prefDate?`Asked for ${esc(a.prefDate)} · ${esc(a.prefTime)} · `:""}${esc(a.mode)} · ${esc(a.duration)}</p></div>
     <form class="form" id="asForm" autocomplete="off">
       <div class="fld"><label>Date</label><input type="date" class="inp" id="asD" value="${d0}" required></div>
       <div class="fld"><label>Time</label><input type="time" class="inp" id="asT" value="${t0}" required></div>
