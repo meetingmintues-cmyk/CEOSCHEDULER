@@ -954,6 +954,50 @@ tr.flash td{animation:flashTd 1.3s ease}
 .oitem .acts .st-btn:hover{transform:translateY(-1px)}
 .oitem .acts .kb{width:30px;height:30px;background:none;border-color:transparent}
 .oitem .acts .kb:hover{background:var(--panel2);border-color:var(--line2);transform:none}
+/* =================== v11: appointments =================== */
+.tab{white-space:nowrap}
+@media (max-width:1560px){ .brand-txt{display:none} }
+@media (max-width:1240px){ .tab{padding:9px 10px;font-size:12.5px} .tab svg{display:none} }
+body:not(.can-apt) [data-page="appointments"]{display:none!important}
+.tbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:999px;background:#f472b6;color:#fff;font-size:10.5px;font-weight:800;font-family:'JetBrains Mono',monospace;box-shadow:0 0 0 2px var(--bg);animation:pulseB 2s infinite}
+.tbadge[hidden]{display:none}
+.bnav button{position:relative}.bnav .tbadge{position:absolute;top:2px;right:calc(50% - 22px);margin:0}
+@keyframes pulseB{50%{box-shadow:0 0 0 2px var(--bg),0 0 0 6px rgba(244,114,182,.25)}}
+.apt-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;margin-bottom:18px;flex-wrap:wrap;overflow:hidden}
+.apt-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(500px 200px at 0% 0%,rgba(244,114,182,.16),transparent 60%),radial-gradient(500px 220px at 100% 100%,rgba(34,211,238,.14),transparent 60%);border-radius:inherit;pointer-events:none}
+.ah-l{display:flex;gap:14px;align-items:center;position:relative;min-width:0;flex:1 1 360px}
+.ah-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;background:linear-gradient(135deg,rgba(244,114,182,.25),rgba(168,85,247,.25));border:1px solid var(--line2);flex:none}
+.apt-hero h2{font-size:20px;font-weight:800;letter-spacing:-.3px}.apt-hero p{color:var(--muted);font-size:12.5px;margin-top:4px;line-height:1.5}
+.ah-r{display:flex;gap:8px;position:relative;flex-wrap:wrap}
+.apt-bar{align-items:center}.apt-bar .seg{padding:0}
+.apt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.apt{position:relative;padding:16px;border-radius:18px;background:var(--panel2);border:1px solid var(--line);border-top:3px solid var(--sc);display:flex;flex-direction:column;gap:10px;min-width:0;animation:rvIn .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms);transition:transform .25s,box-shadow .25s,border-color .25s}
+.apt:hover{transform:translateY(-3px);box-shadow:var(--glow);border-color:var(--line2)}
+.apt-prio{position:absolute;top:-1px;right:16px;font-size:9.5px;font-weight:800;letter-spacing:1px;padding:3px 9px 4px;border-radius:0 0 9px 9px;color:#3b2500;background:linear-gradient(135deg,#fde68a,#fbbf24)}
+.apt-prio.u{color:#fff;background:linear-gradient(135deg,#f87171,#fb923c);animation:blink 1.6s infinite}
+.apt-top{display:flex;align-items:center;gap:12px}
+.apt-who{flex:1;min-width:0}.apt-who b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.apt-who small{font-size:11.5px;color:var(--muted)}
+.apt-purpose{font-size:15.5px;font-weight:700;line-height:1.35}
+.apt-det{font-size:12.5px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.apt-chips{display:flex;flex-wrap:wrap;gap:6px}
+.apt-chips span{font-size:11.5px;padding:5px 9px;border-radius:8px;background:var(--panel-solid);border:1px solid var(--line);white-space:nowrap}
+.apt-sch{padding:11px 13px;border-radius:12px;background:color-mix(in srgb,var(--sc) 10%,transparent);border:1px solid color-mix(in srgb,var(--sc) 32%,transparent)}
+.apt-sch b{font-size:13.5px;display:block}.apt-sch small{display:block;font-size:12px;color:var(--muted);margin-top:4px;word-break:break-word}
+.apt-foot{display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:4px;border-top:1px dashed var(--line)}
+.apt-foot>small{font-size:11px;color:var(--dim);padding-top:8px}.apt-foot a{color:var(--cyan);text-decoration:none}
+.apt-acts{display:flex;flex-wrap:wrap;gap:8px}.apt-acts .btn{flex:1 1 auto;justify-content:center}
+.btn.wa,.btn.wa-big{background:#25d366;color:#05301a;border-color:transparent;text-decoration:none;flex:0 0 auto!important}
+.btn.wa svg{width:17px;height:17px}.btn.wa-big{font-weight:800;padding:0 16px;display:inline-flex;align-items:center}
+.apt-day{display:flex;flex-wrap:wrap;gap:6px;padding:11px 12px;border-radius:12px;border:1px dashed var(--line2);font-size:12px}
+.apt-day b{width:100%;font-size:11.5px;color:var(--muted)}.apt-day.free b{color:var(--green)}
+.apt-day span{display:inline-flex;gap:6px;padding:4px 8px;border-radius:8px;border-left:3px solid var(--sc);background:var(--panel2)}
+.apt-day i{font-style:normal;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted)}
+.apt-tog{flex-direction:row!important;align-items:center;gap:10px;font-size:13px;cursor:pointer}
+.apt-tog input{display:none}.apt-tog span{width:40px;height:23px;border-radius:999px;background:var(--line2);position:relative;transition:.25s;flex:none}
+.apt-tog span::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.25s}
+.apt-tog input:checked+span{background:var(--green)}.apt-tog input:checked+span::after{left:20px}
+.apt-tog small{color:var(--muted);font-size:11px}
+@media (max-width:640px){ .apt-grid{grid-template-columns:minmax(0,1fr)} .apt-hero{padding:16px} .ah-r{width:100%}.ah-r .btn{flex:1;justify-content:center} .apt-bar .search{width:100%} }
 </style>
 </head>
 <body class="locked">
@@ -1035,6 +1079,7 @@ tr.flash td{animation:flashTd 1.3s ease}
       <button class="tab active" data-page="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>CEO Board</button>
       <button class="tab" data-page="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Calendar</button>
       <button class="tab" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8M13 12h8M13 18h8"/></svg>Overview</button>
+      <button class="tab" data-page="appointments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="M12 13v5M9.5 15.5h5"/></svg>Appointments<span class="tbadge" id="aptBadge" hidden>0</span></button>
     </nav>
     <div class="actions">
       <div class="live-pill load" id="livePill"><span class="live-dot"></span><span class="lt" id="liveTxt">Connecting…</span></div>
@@ -1220,6 +1265,18 @@ tr.flash td{animation:flashTd 1.3s ease}
   </div>
 </section>
 
+<!-- ================= APPOINTMENTS ================= -->
+<section class="page" id="page-appointments">
+  <div class="card apt-hero">
+    <div class="ah-l"><div class="ah-ic">🤝</div><div><h2>Appointment requests</h2><p>Managers request a meeting from a private link. Accept to put it on the CEO schedule — the manager sees the confirmed time on their phone.</p></div></div>
+    <div class="ah-r"><button class="btn pri" id="aShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Share request link</button><button class="btn" id="aRefresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Refresh</button></div>
+  </div>
+  <div class="kpis k4" id="aptKpis"></div>
+  <div class="card">
+    <div class="card-h apt-bar"><div class="seg" id="aptSeg"></div><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input class="inp" id="aSearch" placeholder="Search manager, purpose, APT-…"></div></div>
+    <div class="card-b"><div class="apt-grid" id="aptList"><div class="skel" style="height:180px"></div><div class="skel" style="height:180px"></div></div></div>
+  </div>
+</section>
 <footer>Built for <b>Nihas KM</b> · Fourite Group · Team Explore</footer>
 </main>
 
@@ -1228,6 +1285,7 @@ tr.flash td{animation:flashTd 1.3s ease}
   <button class="active" data-page="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Board</button>
   <button data-page="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Calendar</button>
   <button data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8M13 12h8M13 18h8"/></svg>Overview</button>
+  <button data-page="appointments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="M12 13v5M9.5 15.5h5"/></svg>Requests<span class="tbadge" id="aptBadge2" hidden>0</span></button>
 </div></nav>
 
 <div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
@@ -1237,7 +1295,8 @@ tr.flash td{animation:flashTd 1.3s ease}
  * CEO Command Center — secure backend (Google Apps Script)
  * ========================================================
  * Gives the dashboard: LOGIN (Master / CEO / PMO), live read, add, edit,
- * complete, reschedule, delete, password change and an ACTIVITY LOG tab.
+ * complete, reschedule, delete, password change, an ACTIVITY LOG tab, and
+ * APPOINTMENT requests from managers (request.html and/or a Google Form).
  *
  * INSTALL / UPDATE
  *  1. Open the Google Sheet → Extensions → Apps Script → replace everything with this file → Save.
@@ -1263,12 +1322,12 @@ const DEFAULT_USERS = {
 };
 // Starting roles &amp; permissions. After first run, Master edits roles and permissions
 // from the dashboard (👤 → Manage logins → Roles &amp; permissions); they&#x27;re stored in Script Properties.
-// Permissions: read · add · edit · complete · reschedule · delete · log · users (users = manage logins, roles &amp; layout; MASTER only)
-const ALL_PERMS = [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;delete&quot;, &quot;log&quot;, &quot;users&quot;];
+// Permissions: read · add · edit · complete · reschedule · delete · log · apt (handle appointment requests) · users (MASTER only)
+const ALL_PERMS = [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;delete&quot;, &quot;log&quot;, &quot;apt&quot;, &quot;users&quot;];
 const ROLE_CAN = {
   MASTER: ALL_PERMS,
-  CEO:    [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;delete&quot;, &quot;log&quot;],
-  PMO:    [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;]
+  CEO:    [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;delete&quot;, &quot;log&quot;, &quot;apt&quot;],
+  PMO:    [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;apt&quot;]
 };
 const ROLE_COLORS = { MASTER: &quot;#a855f7&quot;, CEO: &quot;#22d3ee&quot;, PMO: &quot;#fbbf24&quot; };
 const PALETTE = [&quot;#34d399&quot;, &quot;#f472b6&quot;, &quot;#60a5fa&quot;, &quot;#fb923c&quot;, &quot;#2dd4bf&quot;, &quot;#e879f9&quot;, &quot;#facc15&quot;, &quot;#818cf8&quot;, &quot;#f87171&quot;, &quot;#a3e635&quot;];
@@ -1303,12 +1362,17 @@ function handle_(p) {
     const action = String(p.action || &quot;&quot;);
     const data = typeof p.data === &quot;string&quot; ? JSON.parse(p.data || &quot;{}&quot;) : (p.data || {});
     if (action === &quot;login&quot;) out = login_(data);
-    else if (action === &quot;ping&quot;) out = { ok: true, msg: &quot;Backend reachable&quot;, version: 6 };
+    else if (action === &quot;ping&quot;) out = { ok: true, msg: &quot;Backend reachable&quot;, version: 7 };
     else if (action === &quot;public&quot;) out = { ok: true, profile: (getConfig_().profile || {}) };
+    else if (action === &quot;apt_submit&quot;) out = withLock_(() =&gt; aptSubmit_(data));           // managers (no login)
+    else if (action === &quot;apt_status&quot;) out = aptStatus_(data);                            // managers: own requests only (ref + private key)
+    else if (action === &quot;apt_cancel&quot;) out = withLock_(() =&gt; aptCancel_(data));
     else {
       const user = verify_(String(p.token || &quot;&quot;));
       if (action === &quot;me&quot;)        out = { ok: true, user: publicUser_(user) };
-      else if (action === &quot;read&quot;) { need_(user, &quot;read&quot;); out = read_(); out.user = publicUser_(user); }
+      else if (action === &quot;read&quot;) { need_(user, &quot;read&quot;); out = read_(); out.user = publicUser_(user); if (perms_(user.role).indexOf(&quot;apt&quot;) &gt;= 0) out.aptPending = aptPendingCount_(); }
+      else if (action === &quot;apt_list&quot;) { need_(user, &quot;apt&quot;); out = aptList_(); }
+      else if (action === &quot;apt_update&quot;) { need_(user, &quot;apt&quot;); out = withLock_(() =&gt; aptUpdate_(user, data)); }
       else if (action === &quot;log&quot;)  { need_(user, &quot;log&quot;);  out = readLog_(Number(data.limit) || 150); }
       else if (action === &quot;users&quot;){ need_(user, &quot;users&quot;); out = listUsers_(); }
       else if (action === &quot;useradd&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; userAdd_(user, data)); }
@@ -1383,6 +1447,7 @@ function perms_(role) {
   const r = roles_()[role]; if (!r) return [];
   let p = r.perms || [];
   if (p.indexOf(&quot;update&quot;) &gt;= 0) p = p.filter(x =&gt; x !== &quot;update&quot;).concat([&quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;]);
+  if (!r.aptSet &amp;&amp; (role === &quot;CEO&quot; || role === &quot;PMO&quot;) &amp;&amp; p.indexOf(&quot;apt&quot;) &lt; 0) p = p.concat([&quot;apt&quot;]);   // v7: appointments on by default
   return p.filter(x =&gt; x !== &quot;users&quot;);
 }
 function roleColor_(role) { const r = roles_()[role]; return (r &amp;&amp; r.color) || &quot;#8e98c2&quot;; }
@@ -1402,7 +1467,7 @@ function roleSave_(user, d) {
   if (!isNew &amp;&amp; d.isNew) throw new Error(&quot;Role &quot; + role + &quot; already exists.&quot;);
   const perms = [&quot;read&quot;].concat((d.perms || []).filter(p =&gt; ALL_PERMS.indexOf(p) &gt;= 0 &amp;&amp; p !== &quot;users&quot; &amp;&amp; p !== &quot;read&quot;));
   const before = isNew ? [] : perms_(role);
-  R[role] = { perms, color: /^#[0-9a-f]{6}$/i.test(d.color || &quot;&quot;) ? d.color : (R[role] &amp;&amp; R[role].color) || PALETTE[Object.keys(R).length % PALETTE.length] };
+  R[role] = { perms, aptSet: true, color: /^#[0-9a-f]{6}$/i.test(d.color || &quot;&quot;) ? d.color : (R[role] &amp;&amp; R[role].color) || PALETTE[Object.keys(R).length % PALETTE.length] };
   props_().setProperty(&quot;ROLES&quot;, JSON.stringify(R));
   const on = perms.filter(p =&gt; before.indexOf(p) &lt; 0 &amp;&amp; p !== &quot;read&quot;), off = before.filter(p =&gt; perms.indexOf(p) &lt; 0);
   log_(user, &quot;ROLE&quot;, &quot;&quot;, &quot;&quot;, (isNew ? &quot;Created role &quot; : &quot;Updated role &quot;) + role + (on.length ? &quot; · +&quot; + on.join(&quot;, +&quot;) : &quot;&quot;) + (off.length ? &quot; · −&quot; + off.join(&quot;, −&quot;) : &quot;&quot;));
@@ -1453,7 +1518,8 @@ function verify_(token) {
   if (rec.ver !== p.v) throw authErr_(&quot;Your login was updated. Please sign in again.&quot;);
   return rec;
 }
-function need_(user, what) { if (what === &quot;users&quot; ? user.role !== &quot;MASTER&quot; : perms_(user.role).indexOf(what) &lt; 0) throw new Error(&quot;Your role (&quot; + user.role + &quot;) is not allowed to &quot; + what + &quot;. Ask the master admin.&quot;); }
+const PERM_NAMES = { read: &quot;view the dashboard&quot;, add: &quot;add tasks&quot;, edit: &quot;edit tasks&quot;, complete: &quot;change task status&quot;, reschedule: &quot;reschedule tasks&quot;, delete: &quot;delete tasks&quot;, log: &quot;see the activity log&quot;, apt: &quot;handle appointments&quot;, users: &quot;manage logins&quot; };
+function need_(user, what) { if (what === &quot;users&quot; ? user.role !== &quot;MASTER&quot; : perms_(user.role).indexOf(what) &lt; 0) throw new Error(&quot;Your role (&quot; + user.role + &quot;) is not allowed to &quot; + (PERM_NAMES[what] || what) + &quot;. Ask the master admin.&quot;); }
 function listUsers_() {
   const U = users_();
   return { ok: true, roles: listRoles_().roles, users: Object.keys(U).map(k =&gt; Object.assign(publicUser_(U[k]), { custom: !U[k].def })) };
@@ -1523,7 +1589,7 @@ function setConfig_(user, d) {
 /* ================= sheet helpers ================= */
 function sheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const s = SHEET_NAME ? ss.getSheetByName(SHEET_NAME) : ss.getSheets().filter(x =&gt; x.getName() !== LOG_SHEET)[0];
+  const s = SHEET_NAME ? ss.getSheetByName(SHEET_NAME) : ss.getSheets().filter(x =&gt; x.getName() !== LOG_SHEET &amp;&amp; !isAptTab_(x.getName()) &amp;&amp; !/^form responses/i.test(x.getName()))[0];
   if (!s) throw new Error(&quot;Schedule tab not found.&quot;);
   return s;
 }
@@ -1671,8 +1737,8 @@ function bulk_(user, d) {
 
 /* ================= one-time setup ================= */
 function setup() {
-  secret_(); logSheet_(); users_(); roles_();
-  Logger.log(&quot;Setup done. Schedule tab: &quot; + sheet_().getName() + &quot;. Users: &quot; + Object.keys(DEFAULT_USERS).join(&quot;, &quot;));
+  secret_(); logSheet_(); users_(); roles_(); aptSheet_();
+  Logger.log(&quot;Setup done. Schedule tab: &quot; + sheet_().getName() + &quot; · Appointments tab: &quot; + aptSheet_().getName() + &quot;. Users: &quot; + Object.keys(DEFAULT_USERS).join(&quot;, &quot;));
 }
 /* Emergency: run this from the editor to reset ALL logins back to DEFAULT_USERS above (removes added logins). */
 function resetAllPasswords() {
@@ -1682,6 +1748,176 @@ function resetAllPasswords() {
   Object.keys(DEFAULT_USERS).forEach(u =&gt; { props_().deleteProperty(&quot;pw_&quot; + u); props_().setProperty(&quot;ver_&quot; + u, String(maxVer + 1)); });
   users_();
   Logger.log(&quot;Logins reset to defaults; everyone signed out.&quot;);
+}
+
+/* =====================================================================
+   APPOINTMENTS — managers request a meeting (public page, no login);
+   Master / CEO / PMO review, schedule, reschedule or decline in the dashboard.
+   Requests live in the &quot;APPOINTMENTS&quot; tab. Each request has a private KEY:
+   only the manager who submitted it (holding ref + key) can see its status.
+   ===================================================================== */
+const APT_SHEET = &quot;APPOINTMENT&quot;;            // your tab (APPOINTMENT or APPOINTMENTS both work)
+function isAptTab_(name) { return /^APPOINTMENTS?$/i.test(String(name).trim()); }
+const APT_HEAD = [&quot;REF&quot;, &quot;SUBMITTED&quot;, &quot;MANAGER&quot;, &quot;PHONE&quot;, &quot;DEPARTMENT/COMPANY&quot;, &quot;PURPOSE&quot;, &quot;DETAILS&quot;, &quot;PREFERRED DATE&quot;, &quot;PREFERRED TIME&quot;,
+  &quot;DURATION&quot;, &quot;MODE&quot;, &quot;PRIORITY&quot;, &quot;STATUS&quot;, &quot;SCHEDULED DATE&quot;, &quot;SCHEDULED TIME&quot;, &quot;VENUE / LINK&quot;, &quot;NOTE TO MANAGER&quot;, &quot;HANDLED BY&quot;, &quot;UPDATED&quot;, &quot;SCHEDULE SI NO&quot;, &quot;KEY&quot;];
+const APT_KEYS = [&quot;ref&quot;, &quot;submitted&quot;, &quot;manager&quot;, &quot;phone&quot;, &quot;dept&quot;, &quot;purpose&quot;, &quot;details&quot;, &quot;prefDate&quot;, &quot;prefTime&quot;, &quot;duration&quot;, &quot;mode&quot;, &quot;priority&quot;, &quot;status&quot;,
+  &quot;schDate&quot;, &quot;schTime&quot;, &quot;venue&quot;, &quot;note&quot;, &quot;handledBy&quot;, &quot;updated&quot;, &quot;schSl&quot;, &quot;key&quot;];
+const APT_PUBLIC = [&quot;ref&quot;, &quot;submitted&quot;, &quot;manager&quot;, &quot;dept&quot;, &quot;purpose&quot;, &quot;prefDate&quot;, &quot;prefTime&quot;, &quot;duration&quot;, &quot;mode&quot;, &quot;priority&quot;, &quot;status&quot;, &quot;schDate&quot;, &quot;schTime&quot;, &quot;venue&quot;, &quot;note&quot;, &quot;updated&quot;];
+
+function aptSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let s = ss.getSheets().filter(x =&gt; isAptTab_(x.getName()))[0];
+  if (!s) s = ss.insertSheet(APT_SHEET);
+  const first = String(s.getRange(1, 1).getDisplayValue()).trim().toUpperCase();
+  if (first !== &quot;REF&quot; &amp;&amp; s.getLastRow() &lt;= 1) {                // empty tab → write the column headers
+    s.getRange(1, 1, 1, APT_HEAD.length).setValues([APT_HEAD]).setFontWeight(&quot;bold&quot;).setBackground(&quot;#4c1d95&quot;).setFontColor(&quot;#ffffff&quot;);
+    s.setFrozenRows(1);
+    try { s.hideColumns(APT_HEAD.length); } catch (e) {}       // KEY column stays out of sight
+  } else if (first !== &quot;REF&quot;) throw new Error(&quot;The &quot; + s.getName() + &quot; tab already has other data. Clear it (or rename it) so the appointment columns can be created.&quot;);
+  return s;
+}
+function aptNow_() { return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), &quot;dd-MM-yyyy HH:mm&quot;); }
+function aptRows_() {
+  const s = aptSheet_(), n = s.getLastRow() - 1;
+  if (n &lt; 1) return [];
+  return s.getRange(2, 1, n, APT_HEAD.length).getDisplayValues().map((r, i) =&gt; {
+    const o = { _row: i + 2 }; APT_KEYS.forEach((k, j) =&gt; o[k] = String(r[j] || &quot;&quot;).trim()); return o;
+  }).filter(o =&gt; o.ref);
+}
+function aptFind_(ref) { const r = aptRows_().find(o =&gt; o.ref === String(ref || &quot;&quot;).trim().toUpperCase()); if (!r) throw new Error(&quot;Request not found.&quot;); return r; }
+function aptWrite_(row, fields) {
+  const s = aptSheet_();
+  Object.keys(fields).forEach(k =&gt; { const c = APT_KEYS.indexOf(k) + 1; if (c &gt; 0) s.getRange(row, c).setNumberFormat(&quot;@&quot;).setValue(String(fields[k] == null ? &quot;&quot; : fields[k])); });
+}
+function aptPublic_(o) { const p = {}; APT_PUBLIC.forEach(k =&gt; p[k] = o[k]); return p; }
+function cleanTxt_(v, max) { return String(v == null ? &quot;&quot; : v).replace(/[\u0000-\u001f]/g, &quot; &quot;).replace(/^[=+\-@]+/, &quot;&quot;).trim().slice(0, max); }   // no formula injection
+function toDmy_(v) { const s = String(v || &quot;&quot;).trim(); let m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if (m) return m[3] + &quot;-&quot; + m[2] + &quot;-&quot; + m[1]; m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/); return m ? (&quot;0&quot; + m[1]).slice(-2) + &quot;-&quot; + (&quot;0&quot; + m[2]).slice(-2) + &quot;-&quot; + m[3] : &quot;&quot;; }
+
+/* ---------- public (managers, no login) ---------- */
+function aptSubmit_(d) {
+  if (d.website) throw new Error(&quot;Please try again.&quot;);                                  // honeypot
+  if (Number(d.elapsed || 0) &lt; 2500) throw new Error(&quot;That was quick — please review the form and submit again.&quot;);
+  const name = cleanTxt_(d.manager, 60), phone = String(d.phone || &quot;&quot;).replace(/[^\d+]/g, &quot;&quot;).slice(0, 16);
+  const purpose = cleanTxt_(d.purpose, 140), prefDate = toDmy_(d.prefDate);
+  if (name.length &lt; 2) throw new Error(&quot;Please enter your name.&quot;);
+  if (phone.replace(/\D/g, &quot;&quot;).length &lt; 7) throw new Error(&quot;Please enter a valid phone number.&quot;);
+  if (purpose.length &lt; 3) throw new Error(&quot;Please tell us the purpose of the meeting.&quot;);
+  if (!prefDate) throw new Error(&quot;Please choose a preferred date.&quot;);
+  const cache = CacheService.getScriptCache(), pk = &quot;aptp_&quot; + phone, gk = &quot;apt_glob&quot;;
+  const per = Number(cache.get(pk) || 0), glob = Number(cache.get(gk) || 0);
+  if (per &gt;= 6) throw new Error(&quot;You&#x27;ve sent several requests today. Please wait for a reply.&quot;);
+  if (glob &gt;= 80) throw new Error(&quot;Too many requests right now. Please try again in an hour.&quot;);
+  cache.put(pk, String(per + 1), 86400); cache.put(gk, String(glob + 1), 3600);
+  const ref = aptNewRef_();
+  const key = Utilities.getUuid().replace(/-/g, &quot;&quot;).slice(0, 24);
+  const rec = { ref, submitted: aptNow_(), manager: name, phone, dept: cleanTxt_(d.dept, 60), purpose, details: cleanTxt_(d.details, 1000),
+    prefDate, prefTime: cleanTxt_(d.prefTime, 30) || &quot;Flexible&quot;, duration: cleanTxt_(d.duration, 20) || &quot;30 min&quot;, mode: cleanTxt_(d.mode, 30) || &quot;In person&quot;,
+    priority: cleanTxt_(d.priority, 20) || &quot;Normal&quot;, status: &quot;PENDING&quot;, schDate: &quot;&quot;, schTime: &quot;&quot;, venue: &quot;&quot;, note: &quot;&quot;, handledBy: &quot;&quot;, updated: aptNow_(), schSl: &quot;&quot;, key };
+  aptAppend_(rec, &quot;Requested&quot;);
+  return { ok: true, ref, key };
+}
+function aptNewRef_() {
+  const existing = aptRows_().map(o =&gt; o.ref); let ref;
+  do { ref = &quot;APT-&quot; + Math.random().toString(36).slice(2, 7).toUpperCase(); } while (existing.indexOf(ref) &gt;= 0 || /[^A-Z0-9-]/.test(ref) || ref.length &lt; 9);
+  return ref;
+}
+function aptAppend_(rec, how) {
+  const s = aptSheet_(), row = Math.max(s.getLastRow(), 1) + 1;
+  s.getRange(row, 1, 1, APT_KEYS.length).setNumberFormat(&quot;@&quot;).setValues([APT_KEYS.map(k =&gt; rec[k] == null ? &quot;&quot; : rec[k])]);
+  log_({ name: rec.manager, u: &quot;manager&quot;, role: &quot;MANAGER&quot; }, &quot;APPOINTMENT&quot;, rec.ref, rec.purpose, how + &quot; for &quot; + rec.prefDate + &quot; &quot; + rec.prefTime + &quot; · &quot; + rec.mode);
+}
+
+/* ---------- OPTIONAL: Google Form intake ----------
+   If you prefer a Google Form: link the form to THIS spreadsheet (Responses → Link to Sheets),
+   then run installAptFormTrigger() once. Each form response becomes an appointment request
+   (questions are matched by their titles: name, phone/WhatsApp, department/company, purpose,
+   details, date, time, duration, mode, priority). Form users can&#x27;t track status themselves —
+   reply to them with the dashboard&#x27;s WhatsApp button. */
+function installAptFormTrigger() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ScriptApp.getProjectTriggers().filter(t =&gt; t.getHandlerFunction() === &quot;onAptFormSubmit&quot;).forEach(t =&gt; ScriptApp.deleteTrigger(t));
+  ScriptApp.newTrigger(&quot;onAptFormSubmit&quot;).forSpreadsheet(ss).onFormSubmit().create();
+  Logger.log(&quot;Google Form intake is on.&quot;);
+}
+function onAptFormSubmit(e) {
+  const nv = (e &amp;&amp; e.namedValues) || {}, keys = Object.keys(nv);
+  const pick = (re, not) =&gt; { const k = keys.find(x =&gt; re.test(x) &amp;&amp; !(not &amp;&amp; not.test(x))); return k ? String((nv[k] || [&quot;&quot;])[0]).trim() : &quot;&quot;; };
+  const phone = pick(/phone|whats ?app|mobile|contact/i);
+  const rec = { ref: &quot;&quot;, submitted: aptNow_(), manager: cleanTxt_(pick(/name/i, /company|department|branch/i), 60), phone: phone.replace(/[^\d+]/g, &quot;&quot;).slice(0, 16),
+    dept: cleanTxt_(pick(/department|company|branch|division/i), 60), purpose: cleanTxt_(pick(/purpose|subject|agenda|topic|reason/i), 140),
+    details: cleanTxt_(pick(/detail|description|note|message/i), 1000), prefDate: toDmy_(pick(/date/i)) || pick(/date/i), prefTime: cleanTxt_(pick(/time|slot/i, /date/i), 30) || &quot;Flexible&quot;,
+    duration: cleanTxt_(pick(/duration|how long/i), 20) || &quot;30 min&quot;, mode: cleanTxt_(pick(/mode|meeting type|type of meeting/i), 30) || &quot;In person&quot;,
+    priority: cleanTxt_(pick(/priority|urgen/i), 20) || &quot;Normal&quot;, status: &quot;PENDING&quot;, schDate: &quot;&quot;, schTime: &quot;&quot;, venue: &quot;&quot;, note: &quot;&quot;, handledBy: &quot;&quot;, updated: aptNow_(), schSl: &quot;&quot;,
+    key: Utilities.getUuid().replace(/-/g, &quot;&quot;).slice(0, 24) };
+  if (!rec.manager &amp;&amp; !rec.purpose) return;
+  const lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try { rec.ref = aptNewRef_(); aptAppend_(rec, &quot;Google Form request&quot;); } finally { lock.releaseLock(); }
+}
+function aptStatus_(d) {
+  const items = (d.items || [{ ref: d.ref, key: d.key }]).slice(0, 30), all = aptRows_(), out = [];
+  items.forEach(it =&gt; {
+    const o = all.find(x =&gt; x.ref === String(it.ref || &quot;&quot;).trim().toUpperCase());
+    if (o &amp;&amp; it.key &amp;&amp; o.key === String(it.key)) out.push(aptPublic_(o)); else out.push({ ref: it.ref, missing: true });
+  });
+  return { ok: true, items: out };
+}
+function aptCancel_(d) {
+  const o = aptFind_(d.ref);
+  if (!d.key || o.key !== String(d.key)) throw new Error(&quot;Request not found.&quot;);
+  if (o.status !== &quot;PENDING&quot;) throw new Error(&quot;This request was already handled — contact the CEO office to change it.&quot;);
+  aptWrite_(o._row, { status: &quot;CANCELLED&quot;, updated: aptNow_(), note: &quot;Cancelled by &quot; + o.manager });
+  log_({ name: o.manager, u: &quot;manager&quot;, role: &quot;MANAGER&quot; }, &quot;APPOINTMENT&quot;, o.ref, o.purpose, &quot;Cancelled by manager&quot;);
+  return { ok: true };
+}
+
+/* ---------- signed-in users with the &quot;apt&quot; permission ---------- */
+function aptList_() {
+  const rows = aptRows_().map(o =&gt; { const c = Object.assign({}, o); delete c.key; return c; }).reverse();
+  return { ok: true, items: rows };
+}
+function aptPendingCount_() { try { return aptRows_().filter(o =&gt; o.status === &quot;PENDING&quot;).length; } catch (e) { return 0; } }
+function aptType_() {   // reuse the sheet&#x27;s own spelling for an appointment type if it has one
+  try { const s = sheet_(), h = headers_(s), c = col_(h, &quot;type&quot;); if (!c || s.getLastRow() &lt; 2) return &quot;APPOINTMENTS&quot;;
+    const v = s.getRange(2, c, s.getLastRow() - 1, 1).getDisplayValues().map(r =&gt; String(r[0]).trim()).find(x =&gt; /APPOINT/i.test(x));
+    return v || &quot;APPOINTMENTS&quot;; } catch (e) { return &quot;APPOINTMENTS&quot;; }
+}
+function aptSchedSet_(sl, fields) {   // write straight into the linked CEO-schedule row
+  if (!sl) return false;
+  const s = sheet_(), h = headers_(s);
+  let row; try { row = findRow_(s, h, { sl: sl }); } catch (e) { return false; }
+  Object.keys(fields).forEach(k =&gt; setField_(s, row, h, k, fields[k]));
+  return true;
+}
+function aptUpdate_(user, d) {
+  const o = aptFind_(d.ref), act = String(d.act || &quot;&quot;), by = user.name + &quot; (&quot; + user.role + &quot;)&quot;, now = aptNow_();
+  const date = toDmy_(d.date), time = cleanTxt_(d.time, 40), venue = cleanTxt_(d.venue, 140), note = cleanTxt_(d.note, 500);
+  let set = {}, detail = &quot;&quot;;
+  if (act === &quot;accept&quot; || act === &quot;reschedule&quot;) {
+    if (!date) throw new Error(&quot;Choose the meeting date.&quot;);
+    set = { status: act === &quot;accept&quot; ? &quot;SCHEDULED&quot; : &quot;RESCHEDULED&quot;, schDate: date, schTime: time || o.prefTime, venue, note, handledBy: by, updated: now };
+    if (d.duration) set.duration = cleanTxt_(d.duration, 20);
+    const title = (&quot;Meeting with &quot; + o.manager + &quot; — &quot; + o.purpose).toUpperCase().slice(0, 140);
+    const remarks = &quot;Appointment &quot; + o.ref + &quot; · &quot; + (o.mode || &quot;&quot;) + (venue ? &quot; · &quot; + venue : &quot;&quot;) + &quot; · &quot; + o.phone;
+    if (d.addToSchedule) {
+      if (o.schSl &amp;&amp; aptSchedSet_(o.schSl, { date, time: set.schTime, status: act === &quot;accept&quot; ? &quot;PENDING&quot; : &quot;RESCHEDULED&quot;, remarks })) { set.schSl = o.schSl; }
+      else { const r = add_(user, { date, time: set.schTime, schedule: title, type: aptType_(), status: &quot;PENDING&quot;, dept: o.dept.toUpperCase(), remarks }); set.schSl = r.sl; }
+    }
+    detail = (act === &quot;accept&quot; ? &quot;Scheduled &quot; : &quot;Rescheduled to &quot;) + date + &quot; &quot; + set.schTime + (venue ? &quot; · &quot; + venue : &quot;&quot;) + (set.schSl ? &quot; · on CEO schedule #&quot; + set.schSl : &quot;&quot;);
+  } else if (act === &quot;decline&quot;) {
+    set = { status: &quot;DECLINED&quot;, note, handledBy: by, updated: now };
+    aptSchedSet_(o.schSl, { status: &quot;CANCELLED&quot; });
+    detail = &quot;Declined&quot; + (note ? &quot;: &quot; + note : &quot;&quot;);
+  } else if (act === &quot;done&quot;) {
+    set = { status: &quot;COMPLETED&quot;, handledBy: by, updated: now };
+    aptSchedSet_(o.schSl, { status: &quot;COMPLETED&quot; });
+    detail = &quot;Marked completed&quot;;
+  } else if (act === &quot;reopen&quot;) {
+    set = { status: &quot;PENDING&quot;, handledBy: by, updated: now };
+    detail = &quot;Reopened&quot;;
+  } else throw new Error(&quot;Unknown appointment action.&quot;);
+  aptWrite_(o._row, set);
+  log_(user, &quot;APPOINTMENT&quot;, o.ref, o.purpose, detail);
+  return Object.assign({ ok: true, item: Object.assign({}, o, set, { key: undefined }) });
 }
 </textarea>
 
@@ -1694,6 +1930,7 @@ const CONFIG = {
   SHEET_URL: "https://docs.google.com/spreadsheets/d/1Ur0wLnNLcJPDspRhPORTH5eGRdBVBgWML4_krHdi3oQ/edit?usp=sharing",
   CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTbbsseGN93r6SAQJKzhaPAJgw45TH9Avj3KUMU-Vif4nU8HDrzYPLw-LsB51awbMMqH7N8P4zzYo-/pub?output=csv",
   SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxziQQovp2qDozrh0x2AB2Los2TBTcI1Gttn2bUYXM0sdDejnT9FEAduUbr6VBxdrIG7Q/exec",               // ← REQUIRED: paste your Apps Script Web-app URL (…/exec) here before deploying
+  REQUEST_URL: "",              // optional: full link to request.html (blank = same folder as this page)
   REFRESH_SECONDS: 60,          // live auto-sync interval
   REMIND_BEFORE_MIN: 10,        // reminder N minutes before a task
   DEFAULT_DURATION_MIN: 30,     // assumed length when no end time / next task
@@ -1877,7 +2114,7 @@ function gvizJSONP(){
   });
 }
 async function csvFetch(u){ const r=await fetch(u,{cache:"no-store"}); if(!r.ok) throw new Error("HTTP "+r.status); const t=await r.text(); if(!t||/^\s*</.test(t)) throw new Error("not csv"); return {table:parseCSV(t)}; }
-async function scriptRead(){ const r=await api("read",{},15000); setConfig(r.config); refreshMe(r.user); return {table:[r.headers,...r.rows], rowNums:r.rowNums, src:"script"}; }
+async function scriptRead(){ const r=await api("read",{},15000); setConfig(r.config); refreshMe(r.user); if(r.aptPending!=null) aptCount(r.aptPending); return {table:[r.headers,...r.rows], rowNums:r.rowNums, src:"script"}; }
 
 async function fetchData(manual){
   if(!S.user || S.fetching) return; S.fetching=true;
@@ -1919,7 +2156,7 @@ async function doWrite(action, data, apply, okMsg, opts={}){
   }
 }
 const rowRef = r => ({ sl:r.sl, row:r.row });
-const PERM_LABEL={add:"Add",edit:"Edit",complete:"Complete",reschedule:"Reschedule",delete:"Delete",log:"Activity log"};
+const PERM_LABEL={add:"Add",edit:"Edit",complete:"Complete",reschedule:"Reschedule",delete:"Delete",log:"Activity log",apt:"Appointments"};
 function needConn(perm){ if(!S.user){ showLogin(); return true; } if(perm && !can(perm)){ toast("Not allowed", `${S.user.role} doesn't have “${PERM_LABEL[perm]||perm}” permission. Ask the master admin.`, "#f87171", "alert"); return true; } return false; }
 function markStatus(id, status){ setStatus(id, status); }
 function setStatus(id, status, undo){
@@ -2360,7 +2597,8 @@ function refreshMe(me){
 }
 function applyUser(){
   const u=S.user; document.body.dataset.role = u? u.role : "";
-  ["add","edit","complete","reschedule","delete","users","log"].forEach(p=>document.body.classList.toggle("can-"+p, can(p)));
+  ["add","edit","complete","reschedule","delete","users","log","apt"].forEach(p=>document.body.classList.toggle("can-"+p, can(p)));
+  if(S.page==="appointments" && !can("apt")) setTimeout(()=>go("board"),0);
   if($("#tSel")) $("#tSel").style.display = can("complete")||can("delete") ? "" : "none";
   if(u && u.color){ S.roleCols=S.roleCols||{}; S.roleCols[u.role]=u.color; }
   if(!u) return;
@@ -2513,7 +2751,7 @@ function openUserForm(u){
   };
   $("#ufGo").onclick=go; $("#ufForm").onsubmit=e=>{ e.preventDefault(); go(); };
 }
-const ACT_COL={LOGIN:"#60a5fa",ADD:"#34d399",EDIT:"#22d3ee",STATUS:"#2dd4bf",RESCHEDULE:"#a855f7",DELETE:"#f87171",PASSWORD:"#fbbf24",USER:"#e879f9",SETTINGS:"#818cf8",ROLE:"#c084fc"};
+const ACT_COL={APPOINTMENT:"#f472b6",LOGIN:"#60a5fa",ADD:"#34d399",EDIT:"#22d3ee",STATUS:"#2dd4bf",RESCHEDULE:"#a855f7",DELETE:"#f87171",PASSWORD:"#fbbf24",USER:"#e879f9",SETTINGS:"#818cf8",ROLE:"#c084fc"};
 async function openActivity(){
   if(!can("log")) return;
   openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Activity log</h2><p>Every sign-in and change — who, what and when. Also saved in the “ACTIVITY LOG” tab of the sheet.</p></div>
@@ -2556,14 +2794,14 @@ const DEFAULT_PROFILE={ first:"Nihas", last:"KM", tagline:"Driving Innovation in
   chips:["Director · Fourite Group","CEO & Owner · AM Motors","Onroad Bodyshop","Meadows Residency","Beegains Tech","Regional Director · FADA"] };
 const profile=()=>Object.assign({},DEFAULT_PROFILE,(S.ui&&S.ui.profile)||{});
 const UI_GROUPS=[
-  {g:"Pages", items:[["p-calendar","Calendar page"],["p-overview","Overview page"]]},
+  {g:"Pages", items:[["p-calendar","Calendar page"],["p-overview","Overview page"],["p-appointments","Appointments page"]]},
   {g:"CEO Board", items:[["b-profile","Profile card"],["b-clock","Clock · happening-now card"],["k-total","KPI · Total Schedule"],["k-TASK","KPI · Tasks"],["k-REMINDER","KPI · Reminders"],["k-PERSONAL","KPI · Personal"],["b-anytime","No-fixed-time list"],["b-daymix","Day Mix"],["b-upcoming","Upcoming"]]},
   {g:"Calendar", items:[["c-kpis","Month KPI cards"],["c-slicer","Month slicer"],["c-day","Selected-day panel"]]},
   {g:"Overview", items:[["o-kpis","KPI cards"],["o-pending","Pending schedules"],["o-upcoming","Upcoming"],["o-nodate","No date set"],["o-resch","Rescheduled tracker"],["o-dept","Open by department"],["o-type","Open by type"],["o-register","Schedule register"]]},
   {g:"Buttons", items:[["t-add","Add-task buttons"],["t-export","Export image / Excel"],["t-voice","Voice briefing"],["t-notify","Reminder bell"]]}
 ];
 // [selector, hide the whole card around it?]
-const UI_TAGS={ "p-calendar":['[data-page="calendar"]',0], "p-overview":['[data-page="overview"]',0], "b-profile":[".profile",0], "b-clock":[".clock",0], "b-anytime":["#anytime",0],
+const UI_TAGS={ "p-calendar":['[data-page="calendar"]',0], "p-overview":['[data-page="overview"]',0], "p-appointments":['[data-page="appointments"]',0], "b-profile":[".profile",0], "b-clock":[".clock",0], "b-anytime":["#anytime",0],
   "b-daymix":["#deptBars",1], "b-upcoming":["#upList",1], "c-kpis":["#calKpis",0], "c-slicer":["#calSlicer",0], "c-day":["#calDayCard",0], "o-kpis":["#ovKpis",0],
   "o-pending":["#ovPending",1], "o-upcoming":["#ovUpcoming",1], "o-nodate":["#ovNodate",1], "o-resch":["#ovResch",1], "o-dept":["#ovDeptBars",1], "o-type":["#ovTypeBars",1], "o-register":["#tbody",1],
   "t-add":["#fabAdd,#bAdd,#cAdd,#cDayAdd,#oAdd",0], "t-export":['#btnImg,#btnXls,#tXls,[data-act="img"],[data-act="xls"]',0], "t-voice":['#btnVoice,[data-act="voice"]',0], "t-notify":['#btnNotify,[data-act="notify"]',0] };
@@ -2577,7 +2815,7 @@ function applyUI(){
     let b=el.querySelector(":scope > .ui-badge"); if(ghost && el.classList.contains("card")){ if(!b){ b=document.createElement("span"); b.className="ui-badge"; el.prepend(b); } b.textContent="Hidden for "+roles.join(" · "); } else if(b) b.remove(); });
   $$(".hero,.ov-grid").forEach(g=>{ const v=[...g.children].filter(c=>!c.classList.contains("ui-hidden")).length; g.classList.toggle("solo",v===1); g.classList.toggle("ui-empty",v===0); });
   const side=$(".board .side"); if(side) $(".board").classList.toggle("noside", ![...side.children].some(c=>!c.classList.contains("ui-hidden")));
-  if(!master && ["calendar","overview"].includes(S.page) && hiddenFor("p-"+S.page).includes(role)) setTimeout(()=>go("board"),0);
+  if(!master && ["calendar","overview","appointments"].includes(S.page) && hiddenFor("p-"+S.page).includes(role)) setTimeout(()=>go("board"),0);
 }
 function applyProfile(){
   const P=profile();
@@ -2750,6 +2988,151 @@ function bulkDelete(){
 }
 
 /* =========================================================
+   APPOINTMENTS — requests from managers (request.html / Google Form)
+   ========================================================= */
+const APT_COL={PENDING:"#fbbf24",SCHEDULED:"#34d399",RESCHEDULED:"#a855f7",DECLINED:"#f87171",COMPLETED:"#22d3ee",CANCELLED:"#8e98c2"};
+const APT_SEG=[["PENDING","Pending"],["UPCOMING","Scheduled"],["COMPLETED","Completed"],["CLOSED","Declined / cancelled"],["ALL","All"]];
+const PRIO={Urgent:3,Important:2,Normal:1};
+function requestLink(){ if(CONFIG.REQUEST_URL) return CONFIG.REQUEST_URL; try{ if(/^https?:/.test(location.href)) return location.href.split(/[?#]/)[0].replace(/[^/]*$/,"")+"request.html"; }catch(e){} return "request.html"; }
+const aptKey=a=>{ const d=parseDate(a.schDate||""); return d? ymd(d) : ""; };
+const aptPrefKey=a=>{ const d=parseDate(a.prefDate||""); return d? ymd(d) : ""; };
+function waNum(p){ let d=String(p||"").replace(/\D/g,""); if(d.length===10) d="91"+d; return d; }
+function aptCount(n){
+  const prev=S.aptPending; S.aptPending=n; updAptBadge();
+  if(prev!=null && n>prev){ toast("New appointment request", `${n-prev} new request${n-prev>1?"s":""} waiting for you`, "#f472b6", "bell", {label:"View", fn:()=>go("appointments")}); if(S.notify) beep(); if(S.page==="appointments") loadApts(true); }
+}
+function updAptBadge(){ ["#aptBadge","#aptBadge2"].forEach(id=>{ const b=$(id); if(!b) return; b.textContent=S.aptPending||0; b.hidden=!S.aptPending; }); }
+async function loadApts(silent){
+  if(!can("apt")) return;
+  try{ const r=await api("apt_list",{},20000); S.apts=r.items||[]; S.aptPending=S.apts.filter(a=>a.status==="PENDING").length; updAptBadge(); if(S.page==="appointments") renderApts(); }
+  catch(e){ if(!e.auth && !silent) toast("Couldn't load appointments", e.message, "#f87171", "alert"); if(!e.auth && S.page==="appointments" && !S.apts) $("#aptList").innerHTML=`<div class="empty"><b>Couldn't load requests</b>${esc(e.message)}</div>`; }
+}
+function aptFiltered(){
+  const f=S.aptFilter||"PENDING", q=($("#aSearch").value||"").toLowerCase(), t=todayKey();
+  let L=(S.apts||[]).filter(a=> f==="ALL" ? true : f==="UPCOMING" ? /SCHEDULED|RESCHEDULED/.test(a.status) : f==="CLOSED" ? /DECLINED|CANCELLED/.test(a.status) : a.status===f);
+  if(q) L=L.filter(a=>[a.ref,a.manager,a.dept,a.purpose,a.details,a.phone].join(" ").toLowerCase().includes(q));
+  if(f==="PENDING") L.sort((a,b)=>(PRIO[b.priority]||1)-(PRIO[a.priority]||1) || aptPrefKey(a).localeCompare(aptPrefKey(b)));
+  else if(f==="UPCOMING") L.sort((a,b)=>aptKey(a).localeCompare(aptKey(b)) || String(a.schTime).localeCompare(String(b.schTime)));
+  return L;
+}
+function renderApts(){
+  if(!can("apt")){ $("#aptList").innerHTML=`<div class="empty"><b>No access</b>Ask the master admin for the Appointments permission.</div>`; return; }
+  if(!S.apts){ loadApts(true); return; }
+  const A=S.apts, t=todayKey(), up=A.filter(a=>/SCHEDULED|RESCHEDULED/.test(a.status) && aptKey(a)>=t);
+  $("#aptKpis").innerHTML=kpiHTML([
+    {l:"Pending requests", v:A.filter(a=>a.status==="PENDING").length, s:`${A.filter(a=>a.status==="PENDING"&&a.priority==="Urgent").length} urgent`, c:"#fbbf24", i:"bell"},
+    {l:"Today", v:A.filter(a=>/SCHEDULED|RESCHEDULED/.test(a.status)&&aptKey(a)===t).length, s:"appointments today", c:"#22d3ee", i:"clock"},
+    {l:"Upcoming", v:up.length, s:"confirmed & ahead", c:"#34d399", i:"cal"},
+    {l:"Declined / cancelled", v:A.filter(a=>/DECLINED|CANCELLED/.test(a.status)).length, s:`${A.length} requests in total`, c:"#f87171", i:"x"}
+  ]); animateKpis($("#aptKpis"));
+  const cnt=k=>A.filter(a=> k==="ALL"?true : k==="UPCOMING"? /SCHEDULED|RESCHEDULED/.test(a.status) : k==="CLOSED"? /DECLINED|CANCELLED/.test(a.status) : a.status===k).length;
+  $("#aptSeg").innerHTML=APT_SEG.map(([k,l])=>`<button class="${(S.aptFilter||"PENDING")===k?"active":""}" data-f="${k}">${l} <span class="n">${cnt(k)}</span></button>`).join("");
+  $$("#aptSeg button").forEach(b=>b.onclick=()=>{ S.aptFilter=b.dataset.f; renderApts(); });
+  const L=aptFiltered();
+  $("#aptList").innerHTML = L.length ? L.map((a,i)=>aptCard(a,i)).join("") :
+    `<div class="empty" style="grid-column:1/-1"><div class="em">${svg("cal")}</div><b>${(S.aptFilter||"PENDING")==="PENDING"?"No pending requests":"Nothing here"}</b>${(S.aptFilter||"PENDING")==="PENDING"?"Share the request link with your managers — new requests appear here instantly.":"Try another filter."}</div>`;
+  $$("#aptList [data-aa]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); aptAction(b.dataset.ref, b.dataset.aa); });
+  applyUI();
+}
+function aptCard(a,i){
+  const c=APT_COL[a.status]||"#8e98c2", sch=/SCHEDULED|RESCHEDULED|COMPLETED/.test(a.status)&&a.schDate, mi={"Video call":"🎥","Phone call":"📞"}[a.mode]||"🤝";
+  const btn=(k,l,cls="")=>`<button class="btn ${cls}" data-aa="${k}" data-ref="${esc(a.ref)}">${l}</button>`;
+  const acts = a.status==="PENDING" ? btn("accept",svg("check")+"Accept & schedule","pri")+btn("decline","Decline")
+    : /SCHEDULED|RESCHEDULED/.test(a.status) ? btn("reschedule",svg("resch")+"Reschedule")+btn("done",svg("check")+"Done")+btn("decline","Cancel")
+    : btn("reopen",svg("undo")+"Reopen");
+  const pd=parseDate(a.prefDate||""), sd=parseDate(a.schDate||"");
+  return `<div class="apt" style="--sc:${c};--i:${Math.min(i,10)}">
+    ${a.priority&&a.priority!=="Normal"?`<span class="apt-prio ${a.priority==="Urgent"?"u":""}">${esc(a.priority.toUpperCase())}</span>`:""}
+    <div class="apt-top"><span class="uav" style="--rc:${colorOf(a.manager.toUpperCase())}">${esc(initials(a.manager))}</span>
+      <div class="apt-who"><b>${esc(a.manager)}</b><small>${esc(a.dept||"—")}</small></div><span class="status" style="--sc:${c}">${esc(a.status)}</span></div>
+    <div class="apt-purpose">${esc(a.purpose)}</div>
+    ${a.details?`<p class="apt-det">${esc(a.details)}</p>`:""}
+    <div class="apt-chips"><span title="Preferred">🗓 ${pd?esc(DAYS[pd.getDay()]+", "+shortDate(pd)):esc(a.prefDate)} · ${esc(a.prefTime)}</span><span>${mi} ${esc(a.mode)}</span><span>⏱ ${esc(a.duration)}</span></div>
+    ${sch?`<div class="apt-sch"><b>${a.status==="COMPLETED"?"✓ Met on":"📅 Confirmed"} ${sd?esc(DAYS[sd.getDay()]+", "+shortDate(sd)+" "+sd.getFullYear()):esc(a.schDate)} · ${esc(a.schTime)}</b>${a.venue?`<small>📍 ${esc(a.venue)}</small>`:""}${a.note?`<small>📝 ${esc(a.note)}</small>`:""}${a.schSl?`<small>On CEO schedule · #${esc(a.schSl)}</small>`:""}</div>`:""}
+    ${/DECLINED|CANCELLED/.test(a.status)&&a.note?`<div class="apt-sch"><small>📝 ${esc(a.note)}</small></div>`:""}
+    <div class="apt-foot"><small><span class="mono">${esc(a.ref)}</span> · ${esc(a.submitted)}${a.handledBy?` · ${esc(a.handledBy)}`:""} · <a href="tel:${esc(a.phone)}">${esc(a.phone)}</a></small>
+      <div class="apt-acts">${acts}<a class="btn wa" href="https://wa.me/${waNum(a.phone)}?text=${encodeURIComponent(aptMsg(a))}" target="_blank" rel="noopener" title="WhatsApp ${esc(a.manager)}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.4 1.8 2.2 1.3 1.1 2.3 1.4 2.6 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg></a></div></div>
+  </div>`;
+}
+function aptMsg(a){
+  const first=String(a.manager).split(/\s+/)[0], sd=parseDate(a.schDate||""), when=sd? `${DAYS[sd.getDay()]}, ${shortDate(sd)} ${sd.getFullYear()} at ${a.schTime}` : "";
+  if(/SCHEDULED|RESCHEDULED/.test(a.status)) return `Hi ${first}, your meeting request (${a.ref}) — “${a.purpose}” — is ${a.status==="RESCHEDULED"?"rescheduled to":"confirmed for"} ${when}${a.venue?` · ${a.venue}`:""} (${a.duration}).${a.note?`\nNote: ${a.note}`:""}\n— CEO Office, Fourite Group`;
+  if(a.status==="DECLINED") return `Hi ${first}, regarding your meeting request (${a.ref}) — “${a.purpose}”: it isn't possible this time.${a.note?`\nNote: ${a.note}`:""}\n— CEO Office, Fourite Group`;
+  if(a.status==="COMPLETED") return `Hi ${first}, thanks for the meeting on “${a.purpose}”. — CEO Office`;
+  return `Hi ${first}, we received your meeting request (${a.ref}) — “${a.purpose}”. We'll confirm a time shortly. — CEO Office`;
+}
+function prefTimeTo24(t){ const m=String(t||"").match(/(\d{1,2})[:.](\d{2})\s*(AM|PM)?/i); if(m){ let h=+m[1]; if(m[3]){ if(/PM/i.test(m[3])&&h<12) h+=12; if(/AM/i.test(m[3])&&h===12) h=0; } return pad(h)+":"+m[2]; }
+  if(/morning/i.test(t)) return "10:00"; if(/afternoon/i.test(t)) return "14:00"; if(/evening/i.test(t)) return "16:00"; return "10:00"; }
+function aptAction(ref, act){
+  const a=(S.apts||[]).find(x=>x.ref===ref); if(!a) return;
+  if(act==="accept"||act==="reschedule") return aptScheduleForm(a, act);
+  if(act==="decline") return aptDeclineForm(a);
+  aptSave(a, {act}, act==="done"?"Marked as done":"Reopened");
+}
+function dayLoadHTML(key){
+  const rows=dayRows(key);
+  return rows.length ? `<div class="apt-day"><b>On ${esc(relDay(key))} the CEO already has ${rows.length}:</b>${rows.slice(0,8).map(r=>`<span style="--sc:${statusColor(r.status)}"><i>${esc(shortTime(r))}</i>${esc(title(r.schedule))}</span>`).join("")}</div>` : `<div class="apt-day free"><b>${esc(relDay(key))} is free on the CEO schedule ✓</b></div>`;
+}
+function aptScheduleForm(a, act){
+  const linked=!!a.schSl, d0=aptKey(a)||aptPrefKey(a)||todayKey(), t0=a.schTime?prefTimeTo24(a.schTime):prefTimeTo24(a.prefTime);
+  const durs=["15 min","30 min","45 min","1 hour"], ph={"Video call":"Meet / Zoom link","Phone call":"Who calls whom"}[a.mode]||"e.g. CEO cabin, HO";
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${act==="accept"?"Accept & schedule":"Reschedule"}</h2><p><b>${esc(a.manager)}</b> · ${esc(a.purpose)}<br>Asked for ${esc(a.prefDate)} · ${esc(a.prefTime)} · ${esc(a.mode)} · ${esc(a.duration)}</p></div>
+    <form class="form" id="asForm" autocomplete="off">
+      <div class="fld"><label>Date</label><input type="date" class="inp" id="asD" value="${d0}" required></div>
+      <div class="fld"><label>Time</label><input type="time" class="inp" id="asT" value="${t0}" required></div>
+      <div class="fld full" id="asLoad">${dayLoadHTML(d0)}</div>
+      <div class="fld full"><label>Duration</label><div class="permpick" id="asDur">${durs.map(x=>`<label class="pp"><input type="radio" name="dur" value="${x}" ${x===a.duration||(!durs.includes(a.duration)&&x==="30 min")?"checked":""}><span>${x}</span></label>`).join("")}</div></div>
+      <div class="fld full"><label>Venue / link</label><input class="inp" id="asV" maxlength="140" placeholder="${esc(ph)}" value="${esc(a.venue||"")}"></div>
+      <div class="fld full"><label>Note to ${esc(String(a.manager).split(/\s+/)[0])} (they'll see it)</label><textarea class="inp" id="asN" maxlength="500" placeholder="e.g. Please bring the Q3 numbers.">${esc(a.note||"")}</textarea></div>
+      <label class="fld full apt-tog"><input type="checkbox" id="asAdd" checked><span></span>${linked?`Update the CEO schedule entry #${esc(a.schSl)}`:"Add to the CEO schedule"} <small>(type APPOINTMENTS)</small></label>
+      <div class="ferr" id="asErr"></div>
+    </form>
+    <div class="mfoot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn pri" id="asGo">${svg(act==="accept"?"check":"resch")}${act==="accept"?"Confirm meeting":"Save new time"}</button></div>`, "#34d399");
+  $("#asD").onchange=()=>{ if($("#asD").value) $("#asLoad").innerHTML=dayLoadHTML($("#asD").value); };
+  const go=()=>{ const d=$("#asD").value, t=$("#asT").value; if(!d) return ($("#asErr").textContent="Pick a date.",$("#asErr").style.display="block");
+    const [h,m]=(t||"10:00").split(":").map(Number);
+    aptSave(a, {act, date:d, time:fmt12(h*60+m), duration:($("#asDur input:checked")||{}).value, venue:$("#asV").value.trim(), note:$("#asN").value.trim(), addToSchedule:$("#asAdd").checked},
+      act==="accept"?"Meeting confirmed":"Meeting rescheduled", true); };
+  $("#asGo").onclick=go; $("#asForm").onsubmit=e=>{ e.preventDefault(); go(); };
+}
+function aptDeclineForm(a){
+  const reasons=["The CEO is travelling that week","Please discuss with the PMO first","Can be handled by your department head","Please send the details by email first"];
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>${a.status==="PENDING"?"Decline request":"Cancel meeting"}</h2><p><b>${esc(a.manager)}</b> · ${esc(a.purpose)}</p></div>
+    <form class="form" id="adForm"><div class="fld full"><label>Quick reasons</label><div class="permpick">${reasons.map(r=>`<label class="pp"><input type="radio" name="rs" value="${esc(r)}"><span>${esc(r)}</span></label>`).join("")}</div></div>
+      <div class="fld full"><label>Message to ${esc(String(a.manager).split(/\s+/)[0])} (they'll see it)</label><textarea class="inp" id="adN" maxlength="500" placeholder="Optional reason">${esc(a.note||"")}</textarea></div></form>
+    <div class="mfoot"><button class="btn" onclick="closeModal()">Back</button><button class="btn danger" id="adGo">${svg("x")}${a.status==="PENDING"?"Decline":"Cancel meeting"}</button></div>`, "#f87171");
+  $$('#adForm input[name=rs]').forEach(x=>x.onchange=()=>{ $("#adN").value=x.value; });
+  $("#adGo").onclick=()=>aptSave(a, {act:"decline", note:$("#adN").value.trim()}, a.status==="PENDING"?"Request declined":"Meeting cancelled", true);
+}
+async function aptSave(a, d, msg, notify){
+  const b=$("#asGo")||$("#adGo"); if(b){ b.disabled=true; b.innerHTML='<span class="spn"></span>Saving…'; }
+  try{
+    const r=await api("apt_update", {ref:a.ref, ...d, date:d.date?dmy(d.date):undefined});
+    const i=S.apts.findIndex(x=>x.ref===a.ref); if(i>=0 && r.item){ S.apts[i]=Object.assign({}, S.apts[i], r.item); }
+    S.aptPending=S.apts.filter(x=>x.status==="PENDING").length; updAptBadge(); renderApts();
+    if(d.addToSchedule || /decline|done/.test(d.act)){ S.hash=""; fetchData(false); }
+    toast(msg+" ✓", `${a.manager} · ${a.purpose}`, APT_COL[(r.item||{}).status]||"#34d399", "check");
+    if(notify) aptNotifySheet(S.apts[i]); else closeModal();
+  }catch(e){ if(b){ b.disabled=false; b.textContent="Try again"; } if(!e.auth) toast("Couldn't save", e.message, "#f87171", "alert"); }
+}
+function aptNotifySheet(a){
+  const msg=aptMsg(a), first=String(a.manager).split(/\s+/)[0];
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Let ${esc(first)} know</h2><p>${esc(first)} can already see this on their request page. Send a WhatsApp too:</p></div>
+    <div class="form"><div class="fld full"><textarea class="inp" id="nfMsg" style="height:150px">${esc(msg)}</textarea></div></div>
+    <div class="mfoot"><button class="btn" id="nfCopy">${svg("sheet")}Copy</button><button class="btn" onclick="closeModal()">Done</button><a class="btn wa-big" id="nfWa" target="_blank" rel="noopener">WhatsApp ${esc(first)}</a></div>`, "#25d366");
+  const upd=()=>{ $("#nfWa").href=`https://wa.me/${waNum(a.phone)}?text=${encodeURIComponent($("#nfMsg").value)}`; }; upd(); $("#nfMsg").oninput=upd;
+  $("#nfCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText($("#nfMsg").value); toast("Copied","Message copied.","#34d399","check"); }catch(e){} };
+}
+function shareRequestLink(){
+  const link=requestLink(), txt=`Hi team — to request a meeting with ${profile().first} ${profile().last}, please use this link:\n${link}`;
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Share the request link</h2><p>Send this to your managers. They fill the form; requests arrive here. Each manager only sees their own requests.</p></div>
+    <div class="form"><div class="fld full"><label>Link</label><input class="inp mono" id="shL" value="${esc(link)}" readonly></div><div class="fld full"><label>Message</label><textarea class="inp" id="shM" style="height:96px">${esc(txt)}</textarea></div></div>
+    <div class="mfoot"><button class="btn" id="shC">${svg("sheet")}Copy link</button><a class="btn" href="${esc(link)}" target="_blank" rel="noopener">${svg("eye")}Open form</a><a class="btn wa-big" id="shW" target="_blank" rel="noopener">WhatsApp</a></div>`, "#f472b6");
+  const upd=()=>{ $("#shW").href="https://wa.me/?text="+encodeURIComponent($("#shM").value); }; upd(); $("#shM").oninput=upd;
+  $("#shC").onclick=async()=>{ try{ await navigator.clipboard.writeText(link); toast("Link copied", link, "#34d399", "check"); }catch(e){ $("#shL").select(); } };
+}
+
+/* =========================================================
    PAGE 2 — CALENDAR (month slicer)
    ========================================================= */
 function renderCalendar(){
@@ -2904,7 +3287,7 @@ function renderTable(rows){
 /* =========================================================
    EXPORTS
    ========================================================= */
-const PAGE_NAME={board:"CEO Board",calendar:"Calendar",overview:"Overview"};
+const PAGE_NAME={board:"CEO Board",calendar:"Calendar",overview:"Overview",appointments:"Appointments"};
 function download(blob, name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
 function exportName(ext){ return S.page==="board" ? `CEO_Board_${S.boardDate}.${ext}` : S.page==="calendar" ? `CEO_Calendar_${S.cal.y}-${pad(S.cal.m+1)}.${ext}` : `CEO_${PAGE_NAME[S.page]}_${todayKey()}.${ext}`; }
 async function exportImage(){
@@ -2971,6 +3354,11 @@ function exportExcel(){
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(B.open,r=>r.dept,"Department/Company")), "Open by Department");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum(ovRows(),r=>r.type?typeInfo(r).p:"Untyped","Type of schedule")), "By Type");
     add([...regRows()].sort(byDate),"Schedule Register");
+  } else if(S.page==="appointments"){
+    const cols=[["ref","REF"],["submitted","SUBMITTED"],["manager","MANAGER"],["phone","PHONE"],["dept","DEPARTMENT/COMPANY"],["purpose","PURPOSE"],["details","DETAILS"],["prefDate","PREFERRED DATE"],["prefTime","PREFERRED TIME"],["duration","DURATION"],["mode","MODE"],["priority","PRIORITY"],["status","STATUS"],["schDate","SCHEDULED DATE"],["schTime","SCHEDULED TIME"],["venue","VENUE / LINK"],["note","NOTE TO MANAGER"],["handledBy","HANDLED BY"]];
+    const sheetOf=list=>XLSX.utils.json_to_sheet(list.length? list.map(a=>Object.fromEntries(cols.map(([k,l])=>[l,a[k]||""]))) : [{REF:"(none)"}]);
+    XLSX.utils.book_append_sheet(wb, sheetOf(aptFiltered()), "Appointments (view)");
+    XLSX.utils.book_append_sheet(wb, sheetOf(S.apts||[]), "All requests");
   }
   const name=exportName("xlsx"); XLSX.writeFile(wb, name); toast("Excel exported", name, "#34d399", "check");
 }
@@ -3006,8 +3394,9 @@ function toast(h, s, c="#22d3ee", i="check", action){
 function save(k,v){ try{ if(v==="") localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){} }
 function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function setTheme(t){ document.documentElement.dataset.theme=t; save("ceo_theme",t); document.querySelector('meta[name=theme-color]').content = t==="dark"?"#070a14":"#eef1fb"; }
-const RENDER={board:()=>renderBoard(), calendar:()=>renderCalendar(), overview:()=>renderOverview()};
+const RENDER={board:()=>renderBoard(), calendar:()=>renderCalendar(), overview:()=>renderOverview(), appointments:()=>renderApts()};
 function go(p){ if(S.sel) endSel(); closePop(); if(!RENDER[p]) p="board"; if(S.user && S.user.role!=="MASTER" && p!=="board" && hiddenFor("p-"+p).includes(S.user.role)) p="board";
+  if(p==="appointments" && can("apt")) loadApts(true);
   const same=p===S.page;
   withTransition(()=>{ S.page=p; $$(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+p)); $$("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===p)); window.scrollTo({top:0}); RENDER[p](); });
   if(!same) requestAnimationFrame(()=>revealPage(false)); try{ history.replaceState(null,"","#"+p); }catch(e){} }
@@ -3047,11 +3436,13 @@ $("#calYear").onchange=e=>{ S.cal.y=+e.target.value; S.cal.sel=S.cal.y+"-"+pad(S
 function swipe(el, fn){ let x0=null,y0=null; el.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true}); el.addEventListener("touchend",e=>{ if(x0==null) return; const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0; if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5) fn(dx<0?1:-1); x0=null; },{passive:true}); }
 swipe($("#timelineCard"), shiftDay); swipe($("#calGrid"), shiftMonth);
 $("#tSel").onclick=()=>{ if(S.sel && S.sel.scope==="reg") endSel(); else { endSel(); startSel("reg"); } };
+$("#aShare").onclick=shareRequestLink; $("#aRefresh").onclick=()=>loadApts(false);
+let ast; $("#aSearch").oninput=()=>{ clearTimeout(ast); ast=setTimeout(renderApts,160); };
 let stt; $("#tSearch").oninput=()=>{ clearTimeout(stt); stt=setTimeout(()=>renderTable(regRows()),180); };
 // keyboard: 1-3 pages, N new task, R refresh, T theme, ←/→ day or month
 document.addEventListener("keydown",e=>{ if(!S.user||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.metaKey||e.ctrlKey||e.altKey||$("#modal").classList.contains("open")) return;
-  const k=e.key.toLowerCase(), pages=["board","calendar","overview"];
-  if(k>="1"&&k<="3") go(pages[+k-1]); if(k==="r") act("refresh"); if(k==="t") act("theme"); if(k==="n") openForm(null, addFor());
+  const k=e.key.toLowerCase(), pages=["board","calendar","overview","appointments"];
+  if(k>="1"&&k<="4") go(pages[+k-1]); if(k==="r") act("refresh"); if(k==="t") act("theme"); if(k==="n") openForm(null, addFor());
   if(e.key==="ArrowLeft"){ if(S.page==="board") shiftDay(-1); if(S.page==="calendar") shiftMonth(-1); }
   if(e.key==="ArrowRight"){ if(S.page==="board") shiftDay(1); if(S.page==="calendar") shiftMonth(1); } });
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.user && S.lastSync && Date.now()-S.lastSync>20000) fetchData(false); });
