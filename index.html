@@ -985,8 +985,6 @@ body:not(.can-apt) [data-page="appointments"]{display:none!important}
 .apt-sch b{font-size:13.5px;display:block}.apt-sch small{display:block;font-size:12px;color:var(--muted);margin-top:4px;word-break:break-word}
 .apt-foot{display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:4px;border-top:1px dashed var(--line)}
 .apt-foot>small{font-size:11px;color:var(--dim);padding-top:8px}
-.pin-on{color:#34d399;font-weight:600}.pin-off{color:var(--dim);font-style:italic}
-.pin-rs{border:1px solid var(--line2);background:transparent;color:var(--muted);font-size:10.5px;font-weight:700;border-radius:7px;padding:2px 8px;margin-left:4px;cursor:pointer;font-family:inherit}.pin-rs:hover{color:#fbbf24;border-color:#fbbf24}.apt-foot a{color:var(--cyan);text-decoration:none}
 .apt-acts{display:flex;flex-wrap:wrap;gap:8px}.apt-acts .btn{flex:1 1 auto;justify-content:center}
 .btn.wa,.btn.wa-big{background:#25d366;color:#05301a;border-color:transparent;text-decoration:none;flex:0 0 auto!important}
 .btn.wa svg{width:17px;height:17px}.btn.wa-big{font-weight:800;padding:0 16px;display:inline-flex;align-items:center}
@@ -1270,7 +1268,7 @@ body:not(.can-apt) [data-page="appointments"]{display:none!important}
 <!-- ================= APPOINTMENTS ================= -->
 <section class="page" id="page-appointments">
   <div class="card apt-hero">
-    <div class="ah-l"><div class="ah-ic">🤝</div><div><h2>Appointment requests</h2><p>Managers request a meeting with their WhatsApp number + PIN. Accept to put it on the CEO schedule — the manager sees the confirmed time on their phone.</p></div></div>
+    <div class="ah-l"><div class="ah-ic">🤝</div><div><h2>Appointment requests</h2><p>Managers request a meeting with their WhatsApp number. Accept to put it on the CEO schedule — the manager sees the confirmed time on their phone.</p></div></div>
     <div class="ah-r"><button class="btn pri" id="aShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Share request link</button><button class="btn" id="aRefresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Refresh</button></div>
   </div>
   <div class="kpis k4" id="aptKpis"></div>
@@ -1369,14 +1367,13 @@ function handle_(p) {
     else if (action === "apt_submit") out = withLock_(() =&gt; aptSubmit_(data));           // managers (no login)
     else if (action === "apt_status") out = aptStatus_(data);                            // managers: own requests only (ref + private key)
     else if (action === "apt_cancel") out = withLock_(() =&gt; aptCancel_(data));
-    else if (action === "apt_mine") out = aptMine_(data);                                // managers: all their requests (phone + PIN)
+    else if (action === "apt_mine") out = aptMine_(data);                                // managers: all their requests (by mobile number)
     else {
       const user = verify_(String(p.token || ""));
       if (action === "me")        out = { ok: true, user: publicUser_(user) };
       else if (action === "read") { need_(user, "read"); out = read_(); out.user = publicUser_(user); if (perms_(user.role).indexOf("apt") &gt;= 0) out.aptPending = aptPendingCount_(); }
       else if (action === "apt_list") { need_(user, "apt"); out = aptList_(); }
       else if (action === "apt_update") { need_(user, "apt"); out = withLock_(() =&gt; aptUpdate_(user, data)); }
-      else if (action === "apt_pinreset") { need_(user, "apt"); out = withLock_(() =&gt; pinReset_(user, data)); }
       else if (action === "log")  { need_(user, "log");  out = readLog_(Number(data.limit) || 150); }
       else if (action === "users"){ need_(user, "users"); out = listUsers_(); }
       else if (action === "useradd"){ need_(user, "users"); out = withLock_(() =&gt; userAdd_(user, data)); }
@@ -1808,7 +1805,6 @@ function aptSubmit_(d) {
   if (purpose.length &lt; 3) throw new Error("Please tell us the purpose of the meeting.");
   if (!prefDate) throw new Error("Please choose a preferred date.");
   const pk0 = phoneKey_(phone);
-  pinCheck_(pk0, d.pin, true);                                                          // first request sets the PIN
   const cache = CacheService.getScriptCache(), pk = "aptp_" + phone, gk = "apt_glob";
   const per = Number(cache.get(pk) || 0), glob = Number(cache.get(gk) || 0);
   if (per &gt;= 6) throw new Error("You've sent several requests today. Please wait for a reply.");
@@ -1882,8 +1878,7 @@ function aptCancel_(d) {
 
 /* ---------- signed-in users with the "apt" permission ---------- */
 function aptList_() {
-  const P = props_().getProperties();
-  const rows = aptRows_().map(o =&gt; { const c = Object.assign({}, o); delete c.key; c.pinSet = !!P["pin_" + phoneKey_(o.phone)]; return c; }).reverse();
+  const rows = aptRows_().map(o =&gt; { const c = Object.assign({}, o); delete c.key; return c; }).reverse();
   return { ok: true, items: rows };
 }
 function aptPendingCount_() { try { return aptRows_().filter(o =&gt; o.status === "PENDING").length; } catch (e) { return 0; } }
@@ -1934,85 +1929,53 @@ function aptUpdate_(user, d) {
 
 
 /* =====================================================================
-   MANAGER IDENTITY — WhatsApp number + 4-digit PIN
-   The phone number is the manager's ID: every request from that number is
-   linked to them. The first request sets their PIN; after that the same PIN
-   opens "My requests" on any phone. The "APPOINTMENT MANAGERS" tab keeps a
-   live count per manager. PINs are stored hashed (Script Properties), never
-   in the sheet. Dashboard users with the appointments permission can reset one.
+   MANAGER IDENTITY — WhatsApp / mobile number
+   The number is the manager's ID: every request from that number is linked
+   to them, and "My requests" on the request page lists them by number.
+   The "APPOINTMENT MANAGERS" tab keeps a live count per manager.
    ===================================================================== */
 const MGR_SHEET = "APPOINTMENT MANAGERS";
-const MGR_HEAD = ["PHONE", "NAME", "DEPARTMENT/COMPANY", "FIRST REQUEST", "LAST REQUEST", "TOTAL", "PENDING", "SCHEDULED", "DECLINED / CANCELLED", "COMPLETED", "PIN SET", "UPDATED"];
-const MGR_DAYS = 90;
+const MGR_HEAD = ["PHONE", "NAME", "DEPARTMENT/COMPANY", "FIRST REQUEST", "LAST REQUEST", "TOTAL", "PENDING", "SCHEDULED", "DECLINED / CANCELLED", "COMPLETED", "UPDATED"];
+const MGR_DAYS = 180;
 function phoneKey_(p) {
   let d = String(p || "").replace(/\D/g, "");
   if (d.length === 11 &amp;&amp; d[0] === "0") d = d.slice(1);
   if (d.length === 10) d = "91" + d;                       // local Indian number → +91
   return d;
 }
-function pinHash_(k, pin) { return hash_("mgr:" + k, String(pin)); }
-function pinCheck_(k, pin, allowSet) {
-  if (!k || k.length &lt; 7) throw new Error("Please enter a valid WhatsApp number.");
-  pin = String(pin || "").trim();
-  if (!/^\d{4}$/.test(pin)) throw new Error("Enter your 4-digit PIN.");
-  const cache = CacheService.getScriptCache(), fk = "pinf_" + k, fails = Number(cache.get(fk) || 0);
-  if (fails &gt;= 5) throw new Error("Too many wrong PINs. Try again in 15 minutes, or ask the CEO office to reset your PIN.");
-  const saved = props_().getProperty("pin_" + k);
-  if (!saved) {
-    if (!allowSet) {
-      if (!aptRows_().some(o =&gt; phoneKey_(o.phone) === k)) throw new Error("No requests found for this number yet.");
-    }
-    props_().setProperty("pin_" + k, pinHash_(k, pin));    // first use → this becomes the PIN
-    if (!props_().getProperty("pinv_" + k)) props_().setProperty("pinv_" + k, "1");
-    return "new";
-  }
-  if (saved !== pinHash_(k, pin)) {
-    cache.put(fk, String(fails + 1), 900); Utilities.sleep(300);
-    throw new Error("Wrong PIN for this number." + (fails &gt;= 3 ? " One more wrong try locks it for 15 minutes." : ""));
-  }
-  cache.remove(fk);
-  return "ok";
-}
-function mgrToken_(k) { return sign_({ m: k, v: Number(props_().getProperty("pinv_" + k) || 1), exp: Date.now() + MGR_DAYS * 864e5 }); }
+function mgrToken_(k) { return sign_({ m: k, exp: Date.now() + MGR_DAYS * 864e5 }); }
 function mgrVerify_(token) {
   const parts = String(token || "").split(".");
-  const bad = () =&gt; authErr_("Please sign in with your number and PIN.");
+  const bad = () =&gt; authErr_("Please enter your mobile number.");
   if (parts.length !== 2) throw bad();
   if (b64_(Utilities.computeHmacSha256Signature(parts[0], secret_())) !== parts[1]) throw bad();
   const p = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString());
   if (!p.m || !p.exp || Date.now() &gt; p.exp) throw bad();
-  if (!props_().getProperty("pin_" + p.m) || Number(props_().getProperty("pinv_" + p.m) || 1) !== p.v) throw authErr_("Your PIN was reset. Sign in again with a new PIN.");
   return p.m;
 }
-/* Manager's own list: { token } or { phone, pin } */
+/* Manager's own list: { phone } or { token } */
 function aptMine_(d) {
   let k, token = d.token;
   if (d.phone) {
     k = phoneKey_(d.phone);
-    const lock = LockService.getScriptLock(); lock.waitLock(15000);
-    try { if (pinCheck_(k, d.pin, false) === "new") mgrRefresh_(k); } finally { lock.releaseLock(); }
+    if (k.length &lt; 7) throw new Error("Please enter a valid mobile number.");
+    const cache = CacheService.getScriptCache(), ck = "mine_glob", n = Number(cache.get(ck) || 0);
+    if (n &gt;= 300) throw new Error("Too many look-ups right now. Please try again in a few minutes.");
+    cache.put(ck, String(n + 1), 600);
     token = mgrToken_(k);
   } else k = mgrVerify_(token);
   const mine = aptRows_().filter(o =&gt; phoneKey_(o.phone) === k);
+  if (d.phone &amp;&amp; !mine.length) throw new Error("No requests found for this number yet.");
   const last = mine[mine.length - 1] || {};
   return { ok: true, token, phone: k, name: last.manager || "", dept: last.dept || "", items: mine.map(aptPublic_).reverse() };
-}
-function pinReset_(user, d) {
-  const k = phoneKey_(d.phone);
-  if (!k) throw new Error("No phone number.");
-  props_().deleteProperty("pin_" + k);
-  props_().setProperty("pinv_" + k, String(Number(props_().getProperty("pinv_" + k) || 1) + 1));
-  CacheService.getScriptCache().remove("pinf_" + k);
-  log_(user, "APPOINTMENT", "", "+" + k, "PIN reset — the manager's next request or sign-in sets a new PIN");
-  mgrRefresh_(k);
-  return { ok: true };
 }
 /* ---------- APPOINTMENT MANAGERS tab ---------- */
 function mgrSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let s = ss.getSheetByName(MGR_SHEET);
   if (!s) s = ss.insertSheet(MGR_SHEET);
-  if (String(s.getRange(1, 1).getDisplayValue()).trim().toUpperCase() !== "PHONE") {
+  if (String(s.getRange(1, 1).getDisplayValue()).trim().toUpperCase() !== "PHONE" || String(s.getRange(1, MGR_HEAD.length).getDisplayValue()).trim().toUpperCase() !== "UPDATED") {
+    s.getRange(1, 1, 1, MGR_HEAD.length + 1).clearContent();
     s.getRange(1, 1, 1, MGR_HEAD.length).setValues([MGR_HEAD]).setFontWeight("bold").setBackground("#0f766e").setFontColor("#ffffff");
     s.setFrozenRows(1);
   }
@@ -2023,7 +1986,7 @@ function mgrStats_(k, rows) {
   if (!mine.length) return null;
   const c = st =&gt; mine.filter(o =&gt; st.indexOf(o.status) &gt;= 0).length, last = mine[mine.length - 1];
   return ["+" + k, last.manager, last.dept, mine[0].submitted, last.submitted, mine.length, c(["PENDING"]), c(["SCHEDULED", "RESCHEDULED"]),
-    c(["DECLINED", "CANCELLED"]), c(["COMPLETED"]), props_().getProperty("pin_" + k) ? "YES" : "NO", aptNow_()];
+    c(["DECLINED", "CANCELLED"]), c(["COMPLETED"]), aptNow_()];
 }
 function mgrRefresh_(phone) {
   try {
@@ -2039,7 +2002,7 @@ function mgrRefresh_(phone) {
 function mgrRebuild() {
   const s = mgrSheet_(), rows = aptRows_(), seen = [];
   rows.forEach(o =&gt; { const k = phoneKey_(o.phone); if (k &amp;&amp; seen.indexOf(k) &lt; 0) seen.push(k); });
-  if (s.getLastRow() &gt; 1) s.getRange(2, 1, s.getLastRow() - 1, MGR_HEAD.length).clearContent();
+  if (s.getLastRow() &gt; 1) s.getRange(2, 1, s.getLastRow() - 1, MGR_HEAD.length + 1).clearContent();
   const out = seen.map(k =&gt; mgrStats_(k, rows).map(String));
   if (out.length) s.getRange(2, 1, out.length, MGR_HEAD.length).setNumberFormat("@").setValues(out);
 }
@@ -2053,7 +2016,7 @@ const CONFIG = {
   SHEET_ID: "1Ur0wLnNLcJPDspRhPORTH5eGRdBVBgWML4_krHdi3oQ",
   SHEET_URL: "https://docs.google.com/spreadsheets/d/1Ur0wLnNLcJPDspRhPORTH5eGRdBVBgWML4_krHdi3oQ/edit?usp=sharing",
   CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTbbsseGN93r6SAQJKzhaPAJgw45TH9Avj3KUMU-Vif4nU8HDrzYPLw-LsB51awbMMqH7N8P4zzYo-/pub?output=csv",
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw33GpAybRYO4oHqRzqxgJ9F4wE0J5LbzuOE88eFnAyZbQ_8yJE4Nutb_IFLKFFdklWhg/exec",               // ← REQUIRED: paste your Apps Script Web-app URL (…/exec) here before deploying
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwS01agUwW32xK2rVziFpg-aRxG0v1N6w-kqGcPIlzHcOK5OXCuPa-Jdtz98xsPJNZjAw/exec",               // ← REQUIRED: paste your Apps Script Web-app URL (…/exec) here before deploying
   REQUEST_URL: "",              // optional: full link to request.html (blank = same folder as this page)
   REFRESH_SECONDS: 60,          // live auto-sync interval
   REMIND_BEFORE_MIN: 10,        // reminder N minutes before a task
@@ -3156,7 +3119,6 @@ function renderApts(){
   $("#aptList").innerHTML = L.length ? L.map((a,i)=>aptCard(a,i)).join("") :
     `<div class="empty" style="grid-column:1/-1"><div class="em">${svg("cal")}</div><b>${(S.aptFilter||"PENDING")==="PENDING"?"No pending requests":"Nothing here"}</b>${(S.aptFilter||"PENDING")==="PENDING"?"Share the request link with your managers — new requests appear here instantly.":"Try another filter."}</div>`;
   $$("#aptList [data-aa]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); aptAction(b.dataset.ref, b.dataset.aa); });
-  $$("#aptList [data-pinreset]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); aptPinReset(b.dataset.pinreset, b.dataset.name); });
   applyUI();
 }
 function aptCard(a,i){
@@ -3175,7 +3137,7 @@ function aptCard(a,i){
     <div class="apt-chips"><span title="Preferred">🗓 ${pd?esc(DAYS[pd.getDay()]+", "+shortDate(pd)):esc(a.prefDate)} · ${esc(a.prefTime)}</span><span>${mi} ${esc(a.mode)}</span><span>⏱ ${esc(a.duration)}</span></div>
     ${sch?`<div class="apt-sch"><b>${a.status==="COMPLETED"?"✓ Met on":"📅 Confirmed"} ${sd?esc(DAYS[sd.getDay()]+", "+shortDate(sd)+" "+sd.getFullYear()):esc(a.schDate)} · ${esc(a.schTime)}</b>${a.venue?`<small>📍 ${esc(a.venue)}</small>`:""}${a.note?`<small>📝 ${esc(a.note)}</small>`:""}${a.schSl?`<small>On CEO schedule · #${esc(a.schSl)}</small>`:""}</div>`:""}
     ${/DECLINED|CANCELLED/.test(a.status)&&a.note?`<div class="apt-sch"><small>📝 ${esc(a.note)}</small></div>`:""}
-    <div class="apt-foot"><small><span class="mono">${esc(a.ref)}</span> · ${esc(a.submitted)}${a.handledBy?` · ${esc(a.handledBy)}`:""} · <a href="tel:${esc(a.phone)}">${esc(a.phone)}</a> · ${a.pinSet?`<span class="pin-on" title="This manager has a PIN">🔐 PIN set</span> <button class="pin-rs" data-pinreset="${esc(a.phone)}" data-name="${esc(a.manager)}">Reset PIN</button>`:`<span class="pin-off" title="Their next request or sign-in sets a PIN">No PIN yet</span>`}</small>
+    <div class="apt-foot"><small><span class="mono">${esc(a.ref)}</span> · ${esc(a.submitted)}${a.handledBy?` · ${esc(a.handledBy)}`:""} · <a href="tel:${esc(a.phone)}">${esc(a.phone)}</a></small>
       <div class="apt-acts">${acts}<a class="btn wa" href="https://wa.me/${waNum(a.phone)}?text=${encodeURIComponent(aptMsg(a))}" target="_blank" rel="noopener" title="WhatsApp ${esc(a.manager)}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.4 1.8 2.2 1.3 1.1 2.3 1.4 2.6 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg></a></div></div>
   </div>`;
 }
@@ -3239,15 +3201,6 @@ async function aptSave(a, d, msg, notify){
     toast(msg+" ✓", `${a.manager} · ${a.purpose}`, APT_COL[(r.item||{}).status]||"#34d399", "check");
     if(notify) aptNotifySheet(S.apts[i]); else closeModal();
   }catch(e){ if(b){ b.disabled=false; b.textContent="Try again"; } if(!e.auth) toast("Couldn't save", e.message, "#f87171", "alert"); }
-}
-function aptPinReset(phone, name){
-  const first=String(name||"").split(/\s+/)[0]||"the manager";
-  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Reset ${esc(first)}'s PIN?</h2><p>${esc(name)} · ${esc(phone)}<br>Their old PIN stops working and they are signed out on every phone. Their next request or sign-in on the request page sets a new PIN. Their requests are not changed.</p></div>
-    <div class="mfoot"><button class="btn" onclick="closeModal()">Keep PIN</button><button class="btn pri" id="prGo">Reset PIN</button></div>`, "#fbbf24");
-  $("#prGo").onclick=async()=>{ const b=$("#prGo"); b.disabled=true; b.innerHTML='<span class="spn"></span>Resetting…';
-    try{ await api("apt_pinreset",{phone}); const k=waNum(phone); (S.apts||[]).forEach(x=>{ if(waNum(x.phone)===k) x.pinSet=false; }); renderApts(); closeModal();
-      toast("PIN reset ✓", `${first} can choose a new PIN on the request page.`, "#fbbf24", "check"); }
-    catch(e){ b.disabled=false; b.textContent="Try again"; if(!e.auth) toast("Couldn't reset", e.message, "#f87171", "alert"); } };
 }
 function aptNotifySheet(a){
   const msg=aptMsg(a), first=String(a.manager).split(/\s+/)[0];
