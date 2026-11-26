@@ -984,7 +984,9 @@ body:not(.can-apt) [data-page="appointments"]{display:none!important}
 .apt-sch{padding:11px 13px;border-radius:12px;background:color-mix(in srgb,var(--sc) 10%,transparent);border:1px solid color-mix(in srgb,var(--sc) 32%,transparent)}
 .apt-sch b{font-size:13.5px;display:block}.apt-sch small{display:block;font-size:12px;color:var(--muted);margin-top:4px;word-break:break-word}
 .apt-foot{display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:4px;border-top:1px dashed var(--line)}
-.apt-foot>small{font-size:11px;color:var(--dim);padding-top:8px}.apt-foot a{color:var(--cyan);text-decoration:none}
+.apt-foot>small{font-size:11px;color:var(--dim);padding-top:8px}
+.pin-on{color:#34d399;font-weight:600}.pin-off{color:var(--dim);font-style:italic}
+.pin-rs{border:1px solid var(--line2);background:transparent;color:var(--muted);font-size:10.5px;font-weight:700;border-radius:7px;padding:2px 8px;margin-left:4px;cursor:pointer;font-family:inherit}.pin-rs:hover{color:#fbbf24;border-color:#fbbf24}.apt-foot a{color:var(--cyan);text-decoration:none}
 .apt-acts{display:flex;flex-wrap:wrap;gap:8px}.apt-acts .btn{flex:1 1 auto;justify-content:center}
 .btn.wa,.btn.wa-big{background:#25d366;color:#05301a;border-color:transparent;text-decoration:none;flex:0 0 auto!important}
 .btn.wa svg{width:17px;height:17px}.btn.wa-big{font-weight:800;padding:0 16px;display:inline-flex;align-items:center}
@@ -1268,7 +1270,7 @@ body:not(.can-apt) [data-page="appointments"]{display:none!important}
 <!-- ================= APPOINTMENTS ================= -->
 <section class="page" id="page-appointments">
   <div class="card apt-hero">
-    <div class="ah-l"><div class="ah-ic">🤝</div><div><h2>Appointment requests</h2><p>Managers request a meeting from a private link. Accept to put it on the CEO schedule — the manager sees the confirmed time on their phone.</p></div></div>
+    <div class="ah-l"><div class="ah-ic">🤝</div><div><h2>Appointment requests</h2><p>Managers request a meeting with their WhatsApp number + PIN. Accept to put it on the CEO schedule — the manager sees the confirmed time on their phone.</p></div></div>
     <div class="ah-r"><button class="btn pri" id="aShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Share request link</button><button class="btn" id="aRefresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Refresh</button></div>
   </div>
   <div class="kpis k4" id="aptKpis"></div>
@@ -1300,54 +1302,54 @@ body:not(.can-apt) [data-page="appointments"]{display:none!important}
  *
  * INSTALL / UPDATE
  *  1. Open the Google Sheet → Extensions → Apps Script → replace everything with this file → Save.
- *  2. Run ▶ &quot;setup&quot; once from the editor (choose setup in the function list) and allow access.
- *  3. Deploy → New deployment → type &quot;Web app&quot;
+ *  2. Run ▶ "setup" once from the editor (choose setup in the function list) and allow access.
+ *  3. Deploy → New deployment → type "Web app"
  *        Execute as:      Me
  *        Who has access:  Anyone
  *     (Updating later: Deploy → Manage deployments → ✎ Edit → Version: New version → Deploy. URL stays the same.)
- *  4. Paste the Web-app URL (ends in /exec) into SCRIPT_URL in the dashboard&#x27;s index.html.
+ *  4. Paste the Web-app URL (ends in /exec) into SCRIPT_URL in the dashboard's index.html.
  *
  * The users below are only the STARTING accounts (created on first run). After that,
  * Master manages logins from the dashboard (👤 menu → Manage users): add, rename,
  * change role, reset password, delete. Accounts and dashboard layout settings are
  * stored in Script Properties (passwords hashed) — not in the sheet or the web page.
  */
-const SHEET_NAME = &quot;&quot;;            // blank = first tab (the schedule)
-const LOG_SHEET  = &quot;ACTIVITY LOG&quot;;
+const SHEET_NAME = "";            // blank = first tab (the schedule)
+const LOG_SHEET  = "ACTIVITY LOG";
 
 const DEFAULT_USERS = {
-  master: { pass: &quot;master123&quot;, role: &quot;MASTER&quot;, name: &quot;Master Admin&quot; },
-  ceo:    { pass: &quot;ceo123&quot;,    role: &quot;CEO&quot;,    name: &quot;Nihas KM&quot; },
-  pmo:    { pass: &quot;pmo123&quot;,    role: &quot;PMO&quot;,    name: &quot;PMO Office&quot; }
+  master: { pass: "master123", role: "MASTER", name: "Master Admin" },
+  ceo:    { pass: "ceo123",    role: "CEO",    name: "Nihas KM" },
+  pmo:    { pass: "pmo123",    role: "PMO",    name: "PMO Office" }
 };
 // Starting roles &amp; permissions. After first run, Master edits roles and permissions
-// from the dashboard (👤 → Manage logins → Roles &amp; permissions); they&#x27;re stored in Script Properties.
+// from the dashboard (👤 → Manage logins → Roles &amp; permissions); they're stored in Script Properties.
 // Permissions: read · add · edit · complete · reschedule · delete · log · apt (handle appointment requests) · users (MASTER only)
-const ALL_PERMS = [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;delete&quot;, &quot;log&quot;, &quot;apt&quot;, &quot;users&quot;];
+const ALL_PERMS = ["read", "add", "edit", "complete", "reschedule", "delete", "log", "apt", "users"];
 const ROLE_CAN = {
   MASTER: ALL_PERMS,
-  CEO:    [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;delete&quot;, &quot;log&quot;, &quot;apt&quot;],
-  PMO:    [&quot;read&quot;, &quot;add&quot;, &quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;, &quot;apt&quot;]
+  CEO:    ["read", "add", "edit", "complete", "reschedule", "delete", "log", "apt"],
+  PMO:    ["read", "add", "edit", "complete", "reschedule", "apt"]
 };
-const ROLE_COLORS = { MASTER: &quot;#a855f7&quot;, CEO: &quot;#22d3ee&quot;, PMO: &quot;#fbbf24&quot; };
-const PALETTE = [&quot;#34d399&quot;, &quot;#f472b6&quot;, &quot;#60a5fa&quot;, &quot;#fb923c&quot;, &quot;#2dd4bf&quot;, &quot;#e879f9&quot;, &quot;#facc15&quot;, &quot;#818cf8&quot;, &quot;#f87171&quot;, &quot;#a3e635&quot;];
+const ROLE_COLORS = { MASTER: "#a855f7", CEO: "#22d3ee", PMO: "#fbbf24" };
+const PALETTE = ["#34d399", "#f472b6", "#60a5fa", "#fb923c", "#2dd4bf", "#e879f9", "#facc15", "#818cf8", "#f87171", "#a3e635"];
 const SESSION_HOURS = 12;         // normal sign-in
-const REMEMBER_DAYS = 30;         // &quot;keep me signed in&quot;
+const REMEMBER_DAYS = 30;         // "keep me signed in"
 const MAX_FAILS = 5;              // wrong passwords before a 10-minute lock
 
 const FIELDS = {
-  sl:       [&quot;SINO&quot;, &quot;SLNO&quot;, &quot;SNO&quot;, &quot;SERIAL&quot;],
-  date:     [&quot;DATE&quot;],
-  time:     [&quot;TIME&quot;],
-  schedule: [&quot;SCHEDULE&quot;, &quot;TASK&quot;, &quot;EVENT&quot;, &quot;TITLE&quot;],
-  type:     [&quot;TYPEOFSCHEDULE&quot;, &quot;SCHEDULETYPE&quot;, &quot;TYPE&quot;, &quot;CATEGORY&quot;],
-  status:   [&quot;STATUS&quot;],
-  location: [&quot;LOCATION&quot;, &quot;PLACE&quot;, &quot;VENUE&quot;],
-  dept:     [&quot;DEPARTMENTCOMPANY&quot;, &quot;DEPARTMENT&quot;, &quot;COMPANY&quot;, &quot;DEPT&quot;],
-  remarks:  [&quot;REMARKS&quot;, &quot;REMARK&quot;, &quot;NOTES&quot;, &quot;NOTE&quot;, &quot;DESCRIPTION&quot;],
-  rfrom:    [&quot;RESCHEDULEDFROM&quot;]
+  sl:       ["SINO", "SLNO", "SNO", "SERIAL"],
+  date:     ["DATE"],
+  time:     ["TIME"],
+  schedule: ["SCHEDULE", "TASK", "EVENT", "TITLE"],
+  type:     ["TYPEOFSCHEDULE", "SCHEDULETYPE", "TYPE", "CATEGORY"],
+  status:   ["STATUS"],
+  location: ["LOCATION", "PLACE", "VENUE"],
+  dept:     ["DEPARTMENTCOMPANY", "DEPARTMENT", "COMPANY", "DEPT"],
+  remarks:  ["REMARKS", "REMARK", "NOTES", "NOTE", "DESCRIPTION"],
+  rfrom:    ["RESCHEDULEDFROM"]
 };
-const WRITE_KEYS = [&quot;date&quot;, &quot;time&quot;, &quot;schedule&quot;, &quot;type&quot;, &quot;status&quot;, &quot;location&quot;, &quot;dept&quot;, &quot;remarks&quot;, &quot;rfrom&quot;];
+const WRITE_KEYS = ["date", "time", "schedule", "type", "status", "location", "dept", "remarks", "rfrom"];
 
 /* ================= entry points ================= */
 function doGet(e)  { return handle_(e.parameter || {}); }
@@ -1359,44 +1361,46 @@ function doPost(e) {
 function handle_(p) {
   let out;
   try {
-    const action = String(p.action || &quot;&quot;);
-    const data = typeof p.data === &quot;string&quot; ? JSON.parse(p.data || &quot;{}&quot;) : (p.data || {});
-    if (action === &quot;login&quot;) out = login_(data);
-    else if (action === &quot;ping&quot;) out = { ok: true, msg: &quot;Backend reachable&quot;, version: 7 };
-    else if (action === &quot;public&quot;) out = { ok: true, profile: (getConfig_().profile || {}) };
-    else if (action === &quot;apt_submit&quot;) out = withLock_(() =&gt; aptSubmit_(data));           // managers (no login)
-    else if (action === &quot;apt_status&quot;) out = aptStatus_(data);                            // managers: own requests only (ref + private key)
-    else if (action === &quot;apt_cancel&quot;) out = withLock_(() =&gt; aptCancel_(data));
+    const action = String(p.action || "");
+    const data = typeof p.data === "string" ? JSON.parse(p.data || "{}") : (p.data || {});
+    if (action === "login") out = login_(data);
+    else if (action === "ping") out = { ok: true, msg: "Backend reachable", version: 8 };
+    else if (action === "public") out = { ok: true, profile: (getConfig_().profile || {}) };
+    else if (action === "apt_submit") out = withLock_(() =&gt; aptSubmit_(data));           // managers (no login)
+    else if (action === "apt_status") out = aptStatus_(data);                            // managers: own requests only (ref + private key)
+    else if (action === "apt_cancel") out = withLock_(() =&gt; aptCancel_(data));
+    else if (action === "apt_mine") out = aptMine_(data);                                // managers: all their requests (phone + PIN)
     else {
-      const user = verify_(String(p.token || &quot;&quot;));
-      if (action === &quot;me&quot;)        out = { ok: true, user: publicUser_(user) };
-      else if (action === &quot;read&quot;) { need_(user, &quot;read&quot;); out = read_(); out.user = publicUser_(user); if (perms_(user.role).indexOf(&quot;apt&quot;) &gt;= 0) out.aptPending = aptPendingCount_(); }
-      else if (action === &quot;apt_list&quot;) { need_(user, &quot;apt&quot;); out = aptList_(); }
-      else if (action === &quot;apt_update&quot;) { need_(user, &quot;apt&quot;); out = withLock_(() =&gt; aptUpdate_(user, data)); }
-      else if (action === &quot;log&quot;)  { need_(user, &quot;log&quot;);  out = readLog_(Number(data.limit) || 150); }
-      else if (action === &quot;users&quot;){ need_(user, &quot;users&quot;); out = listUsers_(); }
-      else if (action === &quot;useradd&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; userAdd_(user, data)); }
-      else if (action === &quot;userupdate&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; userUpdate_(user, data)); }
-      else if (action === &quot;userdel&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; userDel_(user, data)); }
-      else if (action === &quot;config&quot;) out = { ok: true, config: getConfig_() };
-      else if (action === &quot;setconfig&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; setConfig_(user, data)); }
-      else if (action === &quot;setpass&quot;) out = withLock_(() =&gt; setPass_(user, data));
-      else if (action === &quot;add&quot;)    { need_(user, &quot;add&quot;);    out = withLock_(() =&gt; add_(user, data)); }
-      else if (action === &quot;update&quot;) out = withLock_(() =&gt; update_(user, data));          // edit / complete / reschedule checked inside
-      else if (action === &quot;roles&quot;){ need_(user, &quot;users&quot;); out = listRoles_(); }
-      else if (action === &quot;rolesave&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; roleSave_(user, data)); }
-      else if (action === &quot;roledel&quot;){ need_(user, &quot;users&quot;); out = withLock_(() =&gt; roleDel_(user, data)); }
-      else if (action === &quot;delete&quot;) { need_(user, &quot;delete&quot;); out = withLock_(() =&gt; del_(user, data)); }
-      else if (action === &quot;bulk&quot;) out = withLock_(() =&gt; bulk_(user, data));
-      else throw new Error(&quot;Unknown action: &quot; + action);
+      const user = verify_(String(p.token || ""));
+      if (action === "me")        out = { ok: true, user: publicUser_(user) };
+      else if (action === "read") { need_(user, "read"); out = read_(); out.user = publicUser_(user); if (perms_(user.role).indexOf("apt") &gt;= 0) out.aptPending = aptPendingCount_(); }
+      else if (action === "apt_list") { need_(user, "apt"); out = aptList_(); }
+      else if (action === "apt_update") { need_(user, "apt"); out = withLock_(() =&gt; aptUpdate_(user, data)); }
+      else if (action === "apt_pinreset") { need_(user, "apt"); out = withLock_(() =&gt; pinReset_(user, data)); }
+      else if (action === "log")  { need_(user, "log");  out = readLog_(Number(data.limit) || 150); }
+      else if (action === "users"){ need_(user, "users"); out = listUsers_(); }
+      else if (action === "useradd"){ need_(user, "users"); out = withLock_(() =&gt; userAdd_(user, data)); }
+      else if (action === "userupdate"){ need_(user, "users"); out = withLock_(() =&gt; userUpdate_(user, data)); }
+      else if (action === "userdel"){ need_(user, "users"); out = withLock_(() =&gt; userDel_(user, data)); }
+      else if (action === "config") out = { ok: true, config: getConfig_() };
+      else if (action === "setconfig"){ need_(user, "users"); out = withLock_(() =&gt; setConfig_(user, data)); }
+      else if (action === "setpass") out = withLock_(() =&gt; setPass_(user, data));
+      else if (action === "add")    { need_(user, "add");    out = withLock_(() =&gt; add_(user, data)); }
+      else if (action === "update") out = withLock_(() =&gt; update_(user, data));          // edit / complete / reschedule checked inside
+      else if (action === "roles"){ need_(user, "users"); out = listRoles_(); }
+      else if (action === "rolesave"){ need_(user, "users"); out = withLock_(() =&gt; roleSave_(user, data)); }
+      else if (action === "roledel"){ need_(user, "users"); out = withLock_(() =&gt; roleDel_(user, data)); }
+      else if (action === "delete") { need_(user, "delete"); out = withLock_(() =&gt; del_(user, data)); }
+      else if (action === "bulk") out = withLock_(() =&gt; bulk_(user, data));
+      else throw new Error("Unknown action: " + action);
     }
   } catch (err) {
     out = { ok: false, error: String(err.message || err), auth: !!err.auth };
   }
   const json = JSON.stringify(out);
   if (p.callback) {
-    const cb = String(p.callback).replace(/[^\w$.]/g, &quot;&quot;);
-    return ContentService.createTextOutput(cb + &quot;(&quot; + json + &quot;);&quot;).setMimeType(ContentService.MimeType.JAVASCRIPT);
+    const cb = String(p.callback).replace(/[^\w$.]/g, "");
+    return ContentService.createTextOutput(cb + "(" + json + ");").setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
   return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
 }
@@ -1406,24 +1410,24 @@ function withLock_(fn) { const l = LockService.getScriptLock(); l.waitLock(15000
 const props_ = () =&gt; PropertiesService.getScriptProperties();
 function authErr_(m) { const e = new Error(m); e.auth = true; return e; }
 function secret_() {
-  let s = props_().getProperty(&quot;SECRET&quot;);
-  if (!s) { s = Utilities.getUuid() + Utilities.getUuid(); props_().setProperty(&quot;SECRET&quot;, s); }
+  let s = props_().getProperty("SECRET");
+  if (!s) { s = Utilities.getUuid() + Utilities.getUuid(); props_().setProperty("SECRET", s); }
   return s;
 }
-function b64_(bytesOrStr) { return Utilities.base64EncodeWebSafe(bytesOrStr).replace(/=+$/, &quot;&quot;); }
+function b64_(bytesOrStr) { return Utilities.base64EncodeWebSafe(bytesOrStr).replace(/=+$/, ""); }
 function hash_(user, pass) {
-  const salt = secret_().slice(0, 16) + &quot;:&quot; + user;
-  return b64_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + &quot;:&quot; + pass, Utilities.Charset.UTF_8));
+  const salt = secret_().slice(0, 16) + ":" + user;
+  return b64_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + ":" + pass, Utilities.Charset.UTF_8));
 }
-/* ---- user store (Script Properties &quot;USERS&quot;: {u:{name,role,hash,ver,def}}) ---- */
+/* ---- user store (Script Properties "USERS": {u:{name,role,hash,ver,def}}) ---- */
 function users_() {
-  const raw = props_().getProperty(&quot;USERS&quot;);
+  const raw = props_().getProperty("USERS");
   if (raw) { const st = JSON.parse(raw); Object.keys(st).forEach(u =&gt; st[u].u = u); return st; }
   // first run (or after resetAllPasswords): seed from DEFAULT_USERS, keeping any v3 password changes
   const st = {};
   Object.keys(DEFAULT_USERS).forEach(u =&gt; {
-    const d = DEFAULT_USERS[u], old = props_().getProperty(&quot;pw_&quot; + u);
-    st[u] = { name: d.name, role: d.role, hash: old || hash_(u, d.pass), def: !old, ver: Number(props_().getProperty(&quot;ver_&quot; + u) || 1) };
+    const d = DEFAULT_USERS[u], old = props_().getProperty("pw_" + u);
+    st[u] = { name: d.name, role: d.role, hash: old || hash_(u, d.pass), def: !old, ver: Number(props_().getProperty("ver_" + u) || 1) };
   });
   saveUsers_(st);
   Object.keys(st).forEach(u =&gt; st[u].u = u);
@@ -1431,195 +1435,195 @@ function users_() {
 }
 function saveUsers_(st) {
   const clean = {}; Object.keys(st).forEach(u =&gt; { const x = st[u]; clean[u] = { name: x.name, role: x.role, hash: x.hash, def: !!x.def, ver: x.ver || 1 }; });
-  props_().setProperty(&quot;USERS&quot;, JSON.stringify(clean));
+  props_().setProperty("USERS", JSON.stringify(clean));
 }
-/* ---- role store (Script Properties &quot;ROLES&quot;: {ROLE:{perms,color}}) ---- */
+/* ---- role store (Script Properties "ROLES": {ROLE:{perms,color}}) ---- */
 function roles_() {
-  const raw = props_().getProperty(&quot;ROLES&quot;);
+  const raw = props_().getProperty("ROLES");
   if (raw) return JSON.parse(raw);
   const st = {};
   Object.keys(ROLE_CAN).forEach(r =&gt; st[r] = { perms: ROLE_CAN[r].slice(), color: ROLE_COLORS[r] || PALETTE[0] });
-  props_().setProperty(&quot;ROLES&quot;, JSON.stringify(st));
+  props_().setProperty("ROLES", JSON.stringify(st));
   return st;
 }
 function perms_(role) {
-  if (role === &quot;MASTER&quot;) return ALL_PERMS.slice();                     // master can never be locked out
+  if (role === "MASTER") return ALL_PERMS.slice();                     // master can never be locked out
   const r = roles_()[role]; if (!r) return [];
   let p = r.perms || [];
-  if (p.indexOf(&quot;update&quot;) &gt;= 0) p = p.filter(x =&gt; x !== &quot;update&quot;).concat([&quot;edit&quot;, &quot;complete&quot;, &quot;reschedule&quot;]);
-  if (!r.aptSet &amp;&amp; (role === &quot;CEO&quot; || role === &quot;PMO&quot;) &amp;&amp; p.indexOf(&quot;apt&quot;) &lt; 0) p = p.concat([&quot;apt&quot;]);   // v7: appointments on by default
-  return p.filter(x =&gt; x !== &quot;users&quot;);
+  if (p.indexOf("update") &gt;= 0) p = p.filter(x =&gt; x !== "update").concat(["edit", "complete", "reschedule"]);
+  if (!r.aptSet &amp;&amp; (role === "CEO" || role === "PMO") &amp;&amp; p.indexOf("apt") &lt; 0) p = p.concat(["apt"]);   // v7: appointments on by default
+  return p.filter(x =&gt; x !== "users");
 }
-function roleColor_(role) { const r = roles_()[role]; return (r &amp;&amp; r.color) || &quot;#8e98c2&quot;; }
+function roleColor_(role) { const r = roles_()[role]; return (r &amp;&amp; r.color) || "#8e98c2"; }
 function publicUser_(x) { return { u: x.u, name: x.name, role: x.role, can: perms_(x.role), color: roleColor_(x.role) }; }
 function listRoles_() {
   const R = roles_(), U = users_();
-  return { ok: true, perms: ALL_PERMS.filter(p =&gt; p !== &quot;users&quot; &amp;&amp; p !== &quot;read&quot;),
-    roles: Object.keys(R).map(r =&gt; ({ role: r, perms: perms_(r), color: R[r].color, locked: r === &quot;MASTER&quot;,
+  return { ok: true, perms: ALL_PERMS.filter(p =&gt; p !== "users" &amp;&amp; p !== "read"),
+    roles: Object.keys(R).map(r =&gt; ({ role: r, perms: perms_(r), color: R[r].color, locked: r === "MASTER",
       count: Object.keys(U).filter(u =&gt; U[u].role === r).length })) };
 }
 function roleSave_(user, d) {
-  const R = roles_(), role = String(d.role || &quot;&quot;).trim().toUpperCase().replace(/\s+/g, &quot; &quot;);
-  if (!/^[A-Z0-9][A-Z0-9 &amp;._-]{1,19}$/.test(role)) throw new Error(&quot;Role name: 2–20 characters (letters, numbers, space . _ - &amp;).&quot;);
-  if (role === &quot;MASTER&quot;) throw new Error(&quot;MASTER always has every permission.&quot;);
+  const R = roles_(), role = String(d.role || "").trim().toUpperCase().replace(/\s+/g, " ");
+  if (!/^[A-Z0-9][A-Z0-9 &amp;._-]{1,19}$/.test(role)) throw new Error("Role name: 2–20 characters (letters, numbers, space . _ - &amp;).");
+  if (role === "MASTER") throw new Error("MASTER always has every permission.");
   const isNew = !R[role];
-  if (isNew &amp;&amp; d.isNew === false) throw new Error(&quot;Unknown role.&quot;);
-  if (!isNew &amp;&amp; d.isNew) throw new Error(&quot;Role &quot; + role + &quot; already exists.&quot;);
-  const perms = [&quot;read&quot;].concat((d.perms || []).filter(p =&gt; ALL_PERMS.indexOf(p) &gt;= 0 &amp;&amp; p !== &quot;users&quot; &amp;&amp; p !== &quot;read&quot;));
+  if (isNew &amp;&amp; d.isNew === false) throw new Error("Unknown role.");
+  if (!isNew &amp;&amp; d.isNew) throw new Error("Role " + role + " already exists.");
+  const perms = ["read"].concat((d.perms || []).filter(p =&gt; ALL_PERMS.indexOf(p) &gt;= 0 &amp;&amp; p !== "users" &amp;&amp; p !== "read"));
   const before = isNew ? [] : perms_(role);
-  R[role] = { perms, aptSet: true, color: /^#[0-9a-f]{6}$/i.test(d.color || &quot;&quot;) ? d.color : (R[role] &amp;&amp; R[role].color) || PALETTE[Object.keys(R).length % PALETTE.length] };
-  props_().setProperty(&quot;ROLES&quot;, JSON.stringify(R));
-  const on = perms.filter(p =&gt; before.indexOf(p) &lt; 0 &amp;&amp; p !== &quot;read&quot;), off = before.filter(p =&gt; perms.indexOf(p) &lt; 0);
-  log_(user, &quot;ROLE&quot;, &quot;&quot;, &quot;&quot;, (isNew ? &quot;Created role &quot; : &quot;Updated role &quot;) + role + (on.length ? &quot; · +&quot; + on.join(&quot;, +&quot;) : &quot;&quot;) + (off.length ? &quot; · −&quot; + off.join(&quot;, −&quot;) : &quot;&quot;));
+  R[role] = { perms, aptSet: true, color: /^#[0-9a-f]{6}$/i.test(d.color || "") ? d.color : (R[role] &amp;&amp; R[role].color) || PALETTE[Object.keys(R).length % PALETTE.length] };
+  props_().setProperty("ROLES", JSON.stringify(R));
+  const on = perms.filter(p =&gt; before.indexOf(p) &lt; 0 &amp;&amp; p !== "read"), off = before.filter(p =&gt; perms.indexOf(p) &lt; 0);
+  log_(user, "ROLE", "", "", (isNew ? "Created role " : "Updated role ") + role + (on.length ? " · +" + on.join(", +") : "") + (off.length ? " · −" + off.join(", −") : ""));
   return listRoles_();
 }
 function roleDel_(user, d) {
-  const R = roles_(), role = String(d.role || &quot;&quot;).toUpperCase(), U = users_();
-  if (!R[role]) throw new Error(&quot;Unknown role.&quot;);
-  if (role === &quot;MASTER&quot;) throw new Error(&quot;MASTER can&#x27;t be deleted.&quot;);
+  const R = roles_(), role = String(d.role || "").toUpperCase(), U = users_();
+  if (!R[role]) throw new Error("Unknown role.");
+  if (role === "MASTER") throw new Error("MASTER can't be deleted.");
   const n = Object.keys(U).filter(u =&gt; U[u].role === role).length;
-  if (n) throw new Error(n + &quot; login(s) still use &quot; + role + &quot;. Move them to another role first.&quot;);
-  delete R[role]; props_().setProperty(&quot;ROLES&quot;, JSON.stringify(R));
-  log_(user, &quot;ROLE&quot;, &quot;&quot;, &quot;&quot;, &quot;Deleted role &quot; + role);
+  if (n) throw new Error(n + " login(s) still use " + role + ". Move them to another role first.");
+  delete R[role]; props_().setProperty("ROLES", JSON.stringify(R));
+  log_(user, "ROLE", "", "", "Deleted role " + role);
   return listRoles_();
 }
 function checkPass_(rec, pass) { return rec.hash === hash_(rec.u, pass); }
 function sign_(payload) {
   const body = b64_(JSON.stringify(payload));
   const sig = b64_(Utilities.computeHmacSha256Signature(body, secret_()));
-  return body + &quot;.&quot; + sig;
+  return body + "." + sig;
 }
 function login_(d) {
-  const u = String(d.username || &quot;&quot;).trim().toLowerCase(), pass = String(d.password || &quot;&quot;);
-  const cache = CacheService.getScriptCache(), key = &quot;fail_&quot; + u, fails = Number(cache.get(key) || 0);
-  if (fails &gt;= MAX_FAILS) throw new Error(&quot;Too many attempts. Try again in 10 minutes.&quot;);
+  const u = String(d.username || "").trim().toLowerCase(), pass = String(d.password || "");
+  const cache = CacheService.getScriptCache(), key = "fail_" + u, fails = Number(cache.get(key) || 0);
+  if (fails &gt;= MAX_FAILS) throw new Error("Too many attempts. Try again in 10 minutes.");
   const rec = users_()[u];
   if (!rec || !checkPass_(rec, pass)) {
     cache.put(key, String(fails + 1), 600);
     Utilities.sleep(400);
-    throw new Error(&quot;Wrong username or password.&quot;);
+    throw new Error("Wrong username or password.");
   }
   cache.remove(key);
   const hours = d.remember ? REMEMBER_DAYS * 24 : SESSION_HOURS;
   const token = sign_({ u: rec.u, v: rec.ver, exp: Date.now() + hours * 3600e3 });
-  log_(rec, &quot;LOGIN&quot;, &quot;&quot;, &quot;&quot;, d.remember ? &quot;Signed in (remember me)&quot; : &quot;Signed in&quot;);
+  log_(rec, "LOGIN", "", "", d.remember ? "Signed in (remember me)" : "Signed in");
   return { ok: true, token, user: publicUser_(rec), expires: Date.now() + hours * 3600e3, config: getConfig_() };
 }
 function verify_(token) {
-  if (!token) throw authErr_(&quot;Please sign in.&quot;);
-  const parts = token.split(&quot;.&quot;);
-  if (parts.length !== 2) throw authErr_(&quot;Invalid session. Please sign in again.&quot;);
+  if (!token) throw authErr_("Please sign in.");
+  const parts = token.split(".");
+  if (parts.length !== 2) throw authErr_("Invalid session. Please sign in again.");
   const sig = b64_(Utilities.computeHmacSha256Signature(parts[0], secret_()));
-  if (sig !== parts[1]) throw authErr_(&quot;Invalid session. Please sign in again.&quot;);
+  if (sig !== parts[1]) throw authErr_("Invalid session. Please sign in again.");
   const p = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString());
-  if (!p.exp || Date.now() &gt; p.exp) throw authErr_(&quot;Session expired. Please sign in again.&quot;);
+  if (!p.exp || Date.now() &gt; p.exp) throw authErr_("Session expired. Please sign in again.");
   const rec = users_()[p.u];
-  if (!rec) throw authErr_(&quot;This login was removed. Contact the master admin.&quot;);
-  if (rec.ver !== p.v) throw authErr_(&quot;Your login was updated. Please sign in again.&quot;);
+  if (!rec) throw authErr_("This login was removed. Contact the master admin.");
+  if (rec.ver !== p.v) throw authErr_("Your login was updated. Please sign in again.");
   return rec;
 }
-const PERM_NAMES = { read: &quot;view the dashboard&quot;, add: &quot;add tasks&quot;, edit: &quot;edit tasks&quot;, complete: &quot;change task status&quot;, reschedule: &quot;reschedule tasks&quot;, delete: &quot;delete tasks&quot;, log: &quot;see the activity log&quot;, apt: &quot;handle appointments&quot;, users: &quot;manage logins&quot; };
-function need_(user, what) { if (what === &quot;users&quot; ? user.role !== &quot;MASTER&quot; : perms_(user.role).indexOf(what) &lt; 0) throw new Error(&quot;Your role (&quot; + user.role + &quot;) is not allowed to &quot; + (PERM_NAMES[what] || what) + &quot;. Ask the master admin.&quot;); }
+const PERM_NAMES = { read: "view the dashboard", add: "add tasks", edit: "edit tasks", complete: "change task status", reschedule: "reschedule tasks", delete: "delete tasks", log: "see the activity log", apt: "handle appointments", users: "manage logins" };
+function need_(user, what) { if (what === "users" ? user.role !== "MASTER" : perms_(user.role).indexOf(what) &lt; 0) throw new Error("Your role (" + user.role + ") is not allowed to " + (PERM_NAMES[what] || what) + ". Ask the master admin."); }
 function listUsers_() {
   const U = users_();
   return { ok: true, roles: listRoles_().roles, users: Object.keys(U).map(k =&gt; Object.assign(publicUser_(U[k]), { custom: !U[k].def })) };
 }
-function masters_(U) { return Object.keys(U).filter(k =&gt; U[k].role === &quot;MASTER&quot;); }
+function masters_(U) { return Object.keys(U).filter(k =&gt; U[k].role === "MASTER"); }
 function userAdd_(user, d) {
-  const U = users_(), u = String(d.u || &quot;&quot;).trim().toLowerCase(), role = String(d.role || &quot;&quot;).toUpperCase(), name = String(d.name || &quot;&quot;).trim();
-  if (!/^[a-z0-9._-]{3,20}$/.test(u)) throw new Error(&quot;Username: 3–20 characters, letters/numbers/._- only.&quot;);
-  if (U[u]) throw new Error(&quot;Username “&quot; + u + &quot;” already exists.&quot;);
-  if (!roles_()[role]) throw new Error(&quot;Choose a role.&quot;);
-  if (!name) throw new Error(&quot;Enter a display name.&quot;);
-  if (String(d.pass || &quot;&quot;).length &lt; 6) throw new Error(&quot;Password must be at least 6 characters.&quot;);
+  const U = users_(), u = String(d.u || "").trim().toLowerCase(), role = String(d.role || "").toUpperCase(), name = String(d.name || "").trim();
+  if (!/^[a-z0-9._-]{3,20}$/.test(u)) throw new Error("Username: 3–20 characters, letters/numbers/._- only.");
+  if (U[u]) throw new Error("Username “" + u + "” already exists.");
+  if (!roles_()[role]) throw new Error("Choose a role.");
+  if (!name) throw new Error("Enter a display name.");
+  if (String(d.pass || "").length &lt; 6) throw new Error("Password must be at least 6 characters.");
   U[u] = { name: name.slice(0, 40), role, hash: hash_(u, String(d.pass)), def: false, ver: 1 };
   saveUsers_(U);
-  log_(user, &quot;USER&quot;, &quot;&quot;, &quot;&quot;, &quot;Added login @&quot; + u + &quot; (&quot; + role + &quot;)&quot;);
+  log_(user, "USER", "", "", "Added login @" + u + " (" + role + ")");
   return listUsers_();
 }
 function userUpdate_(user, d) {
-  const U = users_(), u = String(d.u || &quot;&quot;).toLowerCase(), rec = U[u];
-  if (!rec) throw new Error(&quot;Unknown user.&quot;);
+  const U = users_(), u = String(d.u || "").toLowerCase(), rec = U[u];
+  if (!rec) throw new Error("Unknown user.");
   const changes = [];
-  if (d.name !== undefined &amp;&amp; String(d.name).trim() &amp;&amp; String(d.name).trim() !== rec.name) { changes.push(&quot;name → &quot; + String(d.name).trim()); rec.name = String(d.name).trim().slice(0, 40); }
+  if (d.name !== undefined &amp;&amp; String(d.name).trim() &amp;&amp; String(d.name).trim() !== rec.name) { changes.push("name → " + String(d.name).trim()); rec.name = String(d.name).trim().slice(0, 40); }
   if (d.role !== undefined &amp;&amp; String(d.role).toUpperCase() !== rec.role) {
     const role = String(d.role).toUpperCase();
-    if (!roles_()[role]) throw new Error(&quot;Unknown role.&quot;);
-    if (rec.role === &quot;MASTER&quot; &amp;&amp; masters_(U).length &lt;= 1) throw new Error(&quot;Keep at least one MASTER login.&quot;);
-    changes.push(&quot;role &quot; + rec.role + &quot; → &quot; + role); rec.role = role; rec.ver = (rec.ver || 1) + 1;   // re-login with new rights
+    if (!roles_()[role]) throw new Error("Unknown role.");
+    if (rec.role === "MASTER" &amp;&amp; masters_(U).length &lt;= 1) throw new Error("Keep at least one MASTER login.");
+    changes.push("role " + rec.role + " → " + role); rec.role = role; rec.ver = (rec.ver || 1) + 1;   // re-login with new rights
   }
   saveUsers_(U);
-  log_(user, &quot;USER&quot;, &quot;&quot;, &quot;&quot;, &quot;Updated @&quot; + u + (changes.length ? &quot;: &quot; + changes.join(&quot;, &quot;) : &quot;&quot;));
+  log_(user, "USER", "", "", "Updated @" + u + (changes.length ? ": " + changes.join(", ") : ""));
   return listUsers_();
 }
 function userDel_(user, d) {
-  const U = users_(), u = String(d.u || &quot;&quot;).toLowerCase();
-  if (!U[u]) throw new Error(&quot;Unknown user.&quot;);
-  if (u === user.u) throw new Error(&quot;You can&#x27;t delete the login you are using.&quot;);
-  if (U[u].role === &quot;MASTER&quot; &amp;&amp; masters_(U).length &lt;= 1) throw new Error(&quot;Keep at least one MASTER login.&quot;);
+  const U = users_(), u = String(d.u || "").toLowerCase();
+  if (!U[u]) throw new Error("Unknown user.");
+  if (u === user.u) throw new Error("You can't delete the login you are using.");
+  if (U[u].role === "MASTER" &amp;&amp; masters_(U).length &lt;= 1) throw new Error("Keep at least one MASTER login.");
   delete U[u]; saveUsers_(U);
-  log_(user, &quot;USER&quot;, &quot;&quot;, &quot;&quot;, &quot;Deleted login @&quot; + u);
+  log_(user, "USER", "", "", "Deleted login @" + u);
   return listUsers_();
 }
 function setPass_(user, d) {
   const target = String(d.user || user.u).toLowerCase(), U = users_(), rec = U[target];
-  if (!rec) throw new Error(&quot;Unknown user.&quot;);
-  const isMaster = user.role === &quot;MASTER&quot;;
-  if (target !== user.u &amp;&amp; !isMaster) throw new Error(&quot;Only master can change other users&#x27; passwords.&quot;);
-  if (target === user.u &amp;&amp; !isMaster &amp;&amp; !checkPass_(rec, String(d.old || &quot;&quot;))) throw new Error(&quot;Current password is wrong.&quot;);
-  const np = String(d.pass || &quot;&quot;);
-  if (np.length &lt; 6) throw new Error(&quot;New password must be at least 6 characters.&quot;);
+  if (!rec) throw new Error("Unknown user.");
+  const isMaster = user.role === "MASTER";
+  if (target !== user.u &amp;&amp; !isMaster) throw new Error("Only master can change other users' passwords.");
+  if (target === user.u &amp;&amp; !isMaster &amp;&amp; !checkPass_(rec, String(d.old || ""))) throw new Error("Current password is wrong.");
+  const np = String(d.pass || "");
+  if (np.length &lt; 6) throw new Error("New password must be at least 6 characters.");
   rec.hash = hash_(target, np); rec.def = false; rec.ver = (rec.ver || 1) + 1;     // signs that user out everywhere
   saveUsers_(U);
-  log_(user, &quot;PASSWORD&quot;, &quot;&quot;, &quot;&quot;, &quot;Changed password of &quot; + target);
+  log_(user, "PASSWORD", "", "", "Changed password of " + target);
   return { ok: true, relogin: target === user.u };
 }
 
 /* ---- dashboard layout / profile settings (shared by every login) ---- */
-function getConfig_() { try { return JSON.parse(props_().getProperty(&quot;UI_CONFIG&quot;) || &quot;{}&quot;); } catch (e) { return {}; } }
+function getConfig_() { try { return JSON.parse(props_().getProperty("UI_CONFIG") || "{}"); } catch (e) { return {}; } }
 function setConfig_(user, d) {
   const json = JSON.stringify(d.config || {});
-  if (json.length &gt; 8000) throw new Error(&quot;Settings too large.&quot;);
-  props_().setProperty(&quot;UI_CONFIG&quot;, json);
+  if (json.length &gt; 8000) throw new Error("Settings too large.");
+  props_().setProperty("UI_CONFIG", json);
   const hidden = Object.keys((d.config &amp;&amp; d.config.hide) || {}).filter(k =&gt; (d.config.hide[k] || []).length).length;
-  log_(user, &quot;SETTINGS&quot;, &quot;&quot;, &quot;&quot;, &quot;Dashboard layout updated · &quot; + hidden + &quot; item(s) hidden for some roles&quot;);
+  log_(user, "SETTINGS", "", "", "Dashboard layout updated · " + hidden + " item(s) hidden for some roles");
   return { ok: true, config: getConfig_() };
 }
 
 /* ================= sheet helpers ================= */
 function sheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const s = SHEET_NAME ? ss.getSheetByName(SHEET_NAME) : ss.getSheets().filter(x =&gt; x.getName() !== LOG_SHEET &amp;&amp; !isAptTab_(x.getName()) &amp;&amp; !/^form responses/i.test(x.getName()))[0];
-  if (!s) throw new Error(&quot;Schedule tab not found.&quot;);
+  const s = SHEET_NAME ? ss.getSheetByName(SHEET_NAME) : ss.getSheets().filter(x =&gt; x.getName() !== LOG_SHEET &amp;&amp; !isAptTab_(x.getName()) &amp;&amp; x.getName() !== MGR_SHEET &amp;&amp; !/^form responses/i.test(x.getName()))[0];
+  if (!s) throw new Error("Schedule tab not found.");
   return s;
 }
-const norm_ = x =&gt; String(x || &quot;&quot;).toUpperCase().replace(/[^A-Z]/g, &quot;&quot;);
+const norm_ = x =&gt; String(x || "").toUpperCase().replace(/[^A-Z]/g, "");
 function headers_(s) { return s.getRange(1, 1, 1, Math.max(1, s.getLastColumn())).getDisplayValues()[0].map(norm_); }
 function col_(h, key) {
   const names = FIELDS[key];
   for (const n of names) { const i = h.indexOf(n); if (i &gt;= 0) return i + 1; }
   for (const n of names) {
-    const i = h.findIndex(x =&gt; x.includes(n) &amp;&amp; !(key === &quot;schedule&quot; &amp;&amp; (x.startsWith(&quot;RESCHEDULED&quot;) || x.includes(&quot;TYPE&quot;))) &amp;&amp; !(key === &quot;date&quot; &amp;&amp; x.startsWith(&quot;RESCHEDULED&quot;)));
+    const i = h.findIndex(x =&gt; x.includes(n) &amp;&amp; !(key === "schedule" &amp;&amp; (x.startsWith("RESCHEDULED") || x.includes("TYPE"))) &amp;&amp; !(key === "date" &amp;&amp; x.startsWith("RESCHEDULED")));
     if (i &gt;= 0) return i + 1;
   }
   return 0;
 }
 function ensureRfromCol_(s) {
-  if (!col_(headers_(s), &quot;rfrom&quot;)) s.getRange(1, s.getLastColumn() + 1).setValue(&quot;RESCHEDULED FROM&quot;);
+  if (!col_(headers_(s), "rfrom")) s.getRange(1, s.getLastColumn() + 1).setValue("RESCHEDULED FROM");
   return headers_(s);
 }
-function parseDmy_(v) { const m = String(v || &quot;&quot;).match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/); return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null; }
+function parseDmy_(v) { const m = String(v || "").match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/); return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null; }
 function setField_(s, row, h, key, val) {
   const c = col_(h, key); if (!c) return;
   const cell = s.getRange(row, c);
-  if (key === &quot;date&quot;) { const d = parseDmy_(val); if (d) { cell.setValue(d).setNumberFormat(&quot;dd-mm-yyyy&quot;); return; } }
-  if (key === &quot;sl&quot;) { cell.setValue(val); return; }
-  cell.setNumberFormat(&quot;@&quot;).setValue(val == null ? &quot;&quot; : String(val));
+  if (key === "date") { const d = parseDmy_(val); if (d) { cell.setValue(d).setNumberFormat("dd-mm-yyyy"); return; } }
+  if (key === "sl") { cell.setValue(val); return; }
+  cell.setNumberFormat("@").setValue(val == null ? "" : String(val));
 }
-function getField_(s, row, h, key) { const c = col_(h, key); return c ? String(s.getRange(row, c).getDisplayValue()) : &quot;&quot;; }
+function getField_(s, row, h, key) { const c = col_(h, key); return c ? String(s.getRange(row, c).getDisplayValue()) : ""; }
 function findRow_(s, h, d) {
-  const last = s.getLastRow(), slc = col_(h, &quot;sl&quot;);
-  if (slc &amp;&amp; d.sl !== undefined &amp;&amp; d.sl !== &quot;&quot;) {
+  const last = s.getLastRow(), slc = col_(h, "sl");
+  if (slc &amp;&amp; d.sl !== undefined &amp;&amp; d.sl !== "") {
     const vals = s.getRange(1, slc, last, 1).getDisplayValues().map(r =&gt; String(r[0]).trim());
     const hint = Number(d.row);
     if (hint &gt;= 2 &amp;&amp; hint &lt;= last &amp;&amp; vals[hint - 1] === String(d.sl)) return hint;
@@ -1628,7 +1632,7 @@ function findRow_(s, h, d) {
   }
   const r = Number(d.row);
   if (r &gt;= 2 &amp;&amp; r &lt;= last) return r;
-  throw new Error(&quot;Row not found (SI NO &quot; + d.sl + &quot;). Refresh and try again.&quot;);
+  throw new Error("Row not found (SI NO " + d.sl + "). Refresh and try again.");
 }
 
 /* ================= activity log ================= */
@@ -1637,16 +1641,16 @@ function logSheet_() {
   let l = ss.getSheetByName(LOG_SHEET);
   if (!l) {
     l = ss.insertSheet(LOG_SHEET);
-    l.getRange(1, 1, 1, 7).setValues([[&quot;TIME&quot;, &quot;USER&quot;, &quot;ROLE&quot;, &quot;ACTION&quot;, &quot;SI NO&quot;, &quot;SCHEDULE&quot;, &quot;DETAILS&quot;]])
-      .setFontWeight(&quot;bold&quot;).setBackground(&quot;#111827&quot;).setFontColor(&quot;#ffffff&quot;);
+    l.getRange(1, 1, 1, 7).setValues([["TIME", "USER", "ROLE", "ACTION", "SI NO", "SCHEDULE", "DETAILS"]])
+      .setFontWeight("bold").setBackground("#111827").setFontColor("#ffffff");
     l.setFrozenRows(1); l.setColumnWidth(1, 150); l.setColumnWidth(6, 260); l.setColumnWidth(7, 380);
   }
   return l;
 }
 function log_(user, action, sl, schedule, details) {
   try {
-    logSheet_().appendRow([Utilities.formatDate(new Date(), Session.getScriptTimeZone(), &quot;dd-MM-yyyy HH:mm:ss&quot;),
-      user.name + &quot; (&quot; + user.u + &quot;)&quot;, user.role, action, sl, schedule, details]);
+    logSheet_().appendRow([Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MM-yyyy HH:mm:ss"),
+      user.name + " (" + user.u + ")", user.role, action, sl, schedule, details]);
   } catch (e) {}
 }
 function readLog_(limit) {
@@ -1663,223 +1667,230 @@ function read_() {
   const v = s.getDataRange().getDisplayValues();
   const headers = v.shift() || [];
   const rows = [], rowNums = [];
-  v.forEach((r, i) =&gt; { if (r.some(x =&gt; String(x).trim() !== &quot;&quot;)) { rows.push(r); rowNums.push(i + 2); } });
+  v.forEach((r, i) =&gt; { if (r.some(x =&gt; String(x).trim() !== "")) { rows.push(r); rowNums.push(i + 2); } });
   return { ok: true, headers, rows, rowNums, at: new Date().toISOString(), config: getConfig_() };
 }
 function add_(user, d) {
   const s = sheet_(); const h = d.rfrom ? ensureRfromCol_(s) : headers_(s);
-  const slc = col_(h, &quot;sl&quot;); let sl = 1;
+  const slc = col_(h, "sl"); let sl = 1;
   if (slc &amp;&amp; s.getLastRow() &gt;= 2) {
     const nums = s.getRange(2, slc, s.getLastRow() - 1, 1).getValues().map(r =&gt; Number(r[0]) || 0);
     sl = Math.max(0, ...nums) + 1;
   }
   // first row after the last row that has a SCHEDULE value (ignores empty dropdown rows)
-  const sc = col_(h, &quot;schedule&quot;), last = s.getLastRow();
+  const sc = col_(h, "schedule"), last = s.getLastRow();
   let row = last + 1;
   if (sc &amp;&amp; last &gt;= 2) {
     const vals = s.getRange(2, sc, last - 1, 1).getDisplayValues();
     let lastUsed = 1; vals.forEach((r, i) =&gt; { if (String(r[0]).trim()) lastUsed = i + 2; });
     row = lastUsed + 1;
   }
-  setField_(s, row, h, &quot;sl&quot;, sl);
+  setField_(s, row, h, "sl", sl);
   WRITE_KEYS.forEach(k =&gt; { if (d[k] !== undefined) setField_(s, row, h, k, d[k]); });
-  log_(user, &quot;ADD&quot;, sl, d.schedule || &quot;&quot;, [d.date, d.time, d.type, d.status].filter(Boolean).join(&quot; · &quot;));
+  log_(user, "ADD", sl, d.schedule || "", [d.date, d.time, d.type, d.status].filter(Boolean).join(" · "));
   return { ok: true, sl: String(sl), row };
 }
 function update_(user, d) {
   const set = d.set || {}, keys = Object.keys(set);
-  const perm = keys.some(k =&gt; [&quot;schedule&quot;, &quot;type&quot;, &quot;dept&quot;, &quot;location&quot;].indexOf(k) &gt;= 0) ? &quot;edit&quot;
-             : keys.indexOf(&quot;date&quot;) &gt;= 0 ? &quot;reschedule&quot;
-             : (keys.length === 1 &amp;&amp; keys[0] === &quot;status&quot;) ? &quot;complete&quot; : &quot;edit&quot;;
+  const perm = keys.some(k =&gt; ["schedule", "type", "dept", "location"].indexOf(k) &gt;= 0) ? "edit"
+             : keys.indexOf("date") &gt;= 0 ? "reschedule"
+             : (keys.length === 1 &amp;&amp; keys[0] === "status") ? "complete" : "edit";
   need_(user, perm);                                   // checked before anything is written
   const s = sheet_(); const h = set.rfrom ? ensureRfromCol_(s) : headers_(s);
   const row = findRow_(s, h, d), changes = [];
-  const name = getField_(s, row, h, &quot;schedule&quot;);
+  const name = getField_(s, row, h, "schedule");
   WRITE_KEYS.forEach(k =&gt; {
     if (!d.set || d.set[k] === undefined) return;
     const before = getField_(s, row, h, k);
-    if (String(before) !== String(d.set[k])) changes.push(k.toUpperCase() + &quot;: &quot; + (before || &quot;—&quot;) + &quot; → &quot; + (d.set[k] || &quot;—&quot;));
+    if (String(before) !== String(d.set[k])) changes.push(k.toUpperCase() + ": " + (before || "—") + " → " + (d.set[k] || "—"));
     setField_(s, row, h, k, d.set[k]);
   });
-  const act = d.set &amp;&amp; d.set.rfrom ? &quot;RESCHEDULE&quot; : (d.set &amp;&amp; Object.keys(d.set).length === 1 &amp;&amp; d.set.status) ? &quot;STATUS&quot; : &quot;EDIT&quot;;
-  log_(user, act, getField_(s, row, h, &quot;sl&quot;), d.set &amp;&amp; d.set.schedule || name, changes.join(&quot; | &quot;) || &quot;No change&quot;);
+  const act = d.set &amp;&amp; d.set.rfrom ? "RESCHEDULE" : (d.set &amp;&amp; Object.keys(d.set).length === 1 &amp;&amp; d.set.status) ? "STATUS" : "EDIT";
+  log_(user, act, getField_(s, row, h, "sl"), d.set &amp;&amp; d.set.schedule || name, changes.join(" | ") || "No change");
   return { ok: true, row };
 }
 function del_(user, d) {
   const s = sheet_(); const h = headers_(s);
-  const row = findRow_(s, h, d), name = getField_(s, row, h, &quot;schedule&quot;), sl = getField_(s, row, h, &quot;sl&quot;);
-  const snapshot = WRITE_KEYS.map(k =&gt; getField_(s, row, h, k)).filter(Boolean).join(&quot; · &quot;);
+  const row = findRow_(s, h, d), name = getField_(s, row, h, "schedule"), sl = getField_(s, row, h, "sl");
+  const snapshot = WRITE_KEYS.map(k =&gt; getField_(s, row, h, k)).filter(Boolean).join(" · ");
   s.deleteRow(row);
-  log_(user, &quot;DELETE&quot;, sl, name, snapshot);
+  log_(user, "DELETE", sl, name, snapshot);
   return { ok: true, row };
 }
 
 /* Many changes in one call (bulk status / bulk delete). Each op is permission-checked like a single call. */
 function bulk_(user, d) {
   const ops = (d.ops || []).slice(0, 150), done = [], errors = [];
-  ops.filter(o =&gt; o.op === &quot;update&quot;).forEach(o =&gt; {
-    try { update_(user, o); done.push(o.sl); } catch (e) { errors.push((o.sl || &quot;?&quot;) + &quot;: &quot; + e.message); }
+  ops.filter(o =&gt; o.op === "update").forEach(o =&gt; {
+    try { update_(user, o); done.push(o.sl); } catch (e) { errors.push((o.sl || "?") + ": " + e.message); }
   });
-  const dels = ops.filter(o =&gt; o.op === &quot;delete&quot;);
+  const dels = ops.filter(o =&gt; o.op === "delete");
   if (dels.length) {
-    let allowed = true; try { need_(user, &quot;delete&quot;); } catch (e) { errors.push(e.message); allowed = false; }
+    let allowed = true; try { need_(user, "delete"); } catch (e) { errors.push(e.message); allowed = false; }
     if (allowed) {
     // delete bottom-up so earlier row numbers stay valid
     const s = sheet_(), h = headers_(s);
-    dels.map(o =&gt; { try { return Object.assign({}, o, { _r: findRow_(s, h, o) }); } catch (e) { errors.push((o.sl || &quot;?&quot;) + &quot;: &quot; + e.message); return null; } })
+    dels.map(o =&gt; { try { return Object.assign({}, o, { _r: findRow_(s, h, o) }); } catch (e) { errors.push((o.sl || "?") + ": " + e.message); return null; } })
       .filter(Boolean).sort((a, b) =&gt; b._r - a._r)
-      .forEach(o =&gt; { try { del_(user, { sl: o.sl, row: o._r }); done.push(o.sl); } catch (e) { errors.push((o.sl || &quot;?&quot;) + &quot;: &quot; + e.message); } });
+      .forEach(o =&gt; { try { del_(user, { sl: o.sl, row: o._r }); done.push(o.sl); } catch (e) { errors.push((o.sl || "?") + ": " + e.message); } });
     }
   }
-  if (ops.length &amp;&amp; !done.length) return { ok: false, error: errors.slice(0, 3).join(&quot; · &quot;) || &quot;Nothing was changed.&quot;, done, errors };
+  if (ops.length &amp;&amp; !done.length) return { ok: false, error: errors.slice(0, 3).join(" · ") || "Nothing was changed.", done, errors };
   return { ok: true, done, errors };
 }
 
 /* ================= one-time setup ================= */
 function setup() {
-  secret_(); logSheet_(); users_(); roles_(); aptSheet_();
-  Logger.log(&quot;Setup done. Schedule tab: &quot; + sheet_().getName() + &quot; · Appointments tab: &quot; + aptSheet_().getName() + &quot;. Users: &quot; + Object.keys(DEFAULT_USERS).join(&quot;, &quot;));
+  secret_(); logSheet_(); users_(); roles_(); aptSheet_(); mgrSheet_(); mgrRebuild();
+  Logger.log("Setup done. Schedule tab: " + sheet_().getName() + " · Appointments tab: " + aptSheet_().getName() + ". Users: " + Object.keys(DEFAULT_USERS).join(", "));
 }
 /* Emergency: run this from the editor to reset ALL logins back to DEFAULT_USERS above (removes added logins). */
 function resetAllPasswords() {
-  const old = props_().getProperty(&quot;USERS&quot;); let maxVer = 1;
+  const old = props_().getProperty("USERS"); let maxVer = 1;
   if (old) { const st = JSON.parse(old); Object.keys(st).forEach(u =&gt; maxVer = Math.max(maxVer, st[u].ver || 1)); }
-  props_().deleteProperty(&quot;USERS&quot;);
-  Object.keys(DEFAULT_USERS).forEach(u =&gt; { props_().deleteProperty(&quot;pw_&quot; + u); props_().setProperty(&quot;ver_&quot; + u, String(maxVer + 1)); });
+  props_().deleteProperty("USERS");
+  Object.keys(DEFAULT_USERS).forEach(u =&gt; { props_().deleteProperty("pw_" + u); props_().setProperty("ver_" + u, String(maxVer + 1)); });
   users_();
-  Logger.log(&quot;Logins reset to defaults; everyone signed out.&quot;);
+  Logger.log("Logins reset to defaults; everyone signed out.");
 }
 
 /* =====================================================================
    APPOINTMENTS — managers request a meeting (public page, no login);
    Master / CEO / PMO review, schedule, reschedule or decline in the dashboard.
-   Requests live in the &quot;APPOINTMENTS&quot; tab. Each request has a private KEY:
+   Requests live in the "APPOINTMENTS" tab. Each request has a private KEY:
    only the manager who submitted it (holding ref + key) can see its status.
    ===================================================================== */
-const APT_SHEET = &quot;APPOINTMENT&quot;;            // your tab (APPOINTMENT or APPOINTMENTS both work)
+const APT_SHEET = "APPOINTMENT";            // your tab (APPOINTMENT or APPOINTMENTS both work)
 function isAptTab_(name) { return /^APPOINTMENTS?$/i.test(String(name).trim()); }
-const APT_HEAD = [&quot;REF&quot;, &quot;SUBMITTED&quot;, &quot;MANAGER&quot;, &quot;PHONE&quot;, &quot;DEPARTMENT/COMPANY&quot;, &quot;PURPOSE&quot;, &quot;DETAILS&quot;, &quot;PREFERRED DATE&quot;, &quot;PREFERRED TIME&quot;,
-  &quot;DURATION&quot;, &quot;MODE&quot;, &quot;PRIORITY&quot;, &quot;STATUS&quot;, &quot;SCHEDULED DATE&quot;, &quot;SCHEDULED TIME&quot;, &quot;VENUE / LINK&quot;, &quot;NOTE TO MANAGER&quot;, &quot;HANDLED BY&quot;, &quot;UPDATED&quot;, &quot;SCHEDULE SI NO&quot;, &quot;KEY&quot;];
-const APT_KEYS = [&quot;ref&quot;, &quot;submitted&quot;, &quot;manager&quot;, &quot;phone&quot;, &quot;dept&quot;, &quot;purpose&quot;, &quot;details&quot;, &quot;prefDate&quot;, &quot;prefTime&quot;, &quot;duration&quot;, &quot;mode&quot;, &quot;priority&quot;, &quot;status&quot;,
-  &quot;schDate&quot;, &quot;schTime&quot;, &quot;venue&quot;, &quot;note&quot;, &quot;handledBy&quot;, &quot;updated&quot;, &quot;schSl&quot;, &quot;key&quot;];
-const APT_PUBLIC = [&quot;ref&quot;, &quot;submitted&quot;, &quot;manager&quot;, &quot;dept&quot;, &quot;purpose&quot;, &quot;prefDate&quot;, &quot;prefTime&quot;, &quot;duration&quot;, &quot;mode&quot;, &quot;priority&quot;, &quot;status&quot;, &quot;schDate&quot;, &quot;schTime&quot;, &quot;venue&quot;, &quot;note&quot;, &quot;updated&quot;];
+const APT_HEAD = ["REF", "SUBMITTED", "MANAGER", "PHONE", "DEPARTMENT/COMPANY", "PURPOSE", "DETAILS", "PREFERRED DATE", "PREFERRED TIME",
+  "DURATION", "MODE", "PRIORITY", "STATUS", "SCHEDULED DATE", "SCHEDULED TIME", "VENUE / LINK", "NOTE TO MANAGER", "HANDLED BY", "UPDATED", "SCHEDULE SI NO", "KEY"];
+const APT_KEYS = ["ref", "submitted", "manager", "phone", "dept", "purpose", "details", "prefDate", "prefTime", "duration", "mode", "priority", "status",
+  "schDate", "schTime", "venue", "note", "handledBy", "updated", "schSl", "key"];
+const APT_PUBLIC = ["ref", "submitted", "manager", "dept", "purpose", "prefDate", "prefTime", "duration", "mode", "priority", "status", "schDate", "schTime", "venue", "note", "updated"];
 
 function aptSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let s = ss.getSheets().filter(x =&gt; isAptTab_(x.getName()))[0];
   if (!s) s = ss.insertSheet(APT_SHEET);
   const first = String(s.getRange(1, 1).getDisplayValue()).trim().toUpperCase();
-  if (first !== &quot;REF&quot; &amp;&amp; s.getLastRow() &lt;= 1) {                // empty tab → write the column headers
-    s.getRange(1, 1, 1, APT_HEAD.length).setValues([APT_HEAD]).setFontWeight(&quot;bold&quot;).setBackground(&quot;#4c1d95&quot;).setFontColor(&quot;#ffffff&quot;);
+  if (first !== "REF" &amp;&amp; s.getLastRow() &lt;= 1) {                // empty tab → write the column headers
+    s.getRange(1, 1, 1, APT_HEAD.length).setValues([APT_HEAD]).setFontWeight("bold").setBackground("#4c1d95").setFontColor("#ffffff");
     s.setFrozenRows(1);
     try { s.hideColumns(APT_HEAD.length); } catch (e) {}       // KEY column stays out of sight
-  } else if (first !== &quot;REF&quot;) throw new Error(&quot;The &quot; + s.getName() + &quot; tab already has other data. Clear it (or rename it) so the appointment columns can be created.&quot;);
+  } else if (first !== "REF") throw new Error("The " + s.getName() + " tab already has other data. Clear it (or rename it) so the appointment columns can be created.");
   return s;
 }
-function aptNow_() { return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), &quot;dd-MM-yyyy HH:mm&quot;); }
+function aptNow_() { return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MM-yyyy HH:mm"); }
 function aptRows_() {
   const s = aptSheet_(), n = s.getLastRow() - 1;
   if (n &lt; 1) return [];
   return s.getRange(2, 1, n, APT_HEAD.length).getDisplayValues().map((r, i) =&gt; {
-    const o = { _row: i + 2 }; APT_KEYS.forEach((k, j) =&gt; o[k] = String(r[j] || &quot;&quot;).trim()); return o;
+    const o = { _row: i + 2 }; APT_KEYS.forEach((k, j) =&gt; o[k] = String(r[j] || "").trim()); return o;
   }).filter(o =&gt; o.ref);
 }
-function aptFind_(ref) { const r = aptRows_().find(o =&gt; o.ref === String(ref || &quot;&quot;).trim().toUpperCase()); if (!r) throw new Error(&quot;Request not found.&quot;); return r; }
+function aptFind_(ref) { const r = aptRows_().find(o =&gt; o.ref === String(ref || "").trim().toUpperCase()); if (!r) throw new Error("Request not found."); return r; }
 function aptWrite_(row, fields) {
   const s = aptSheet_();
-  Object.keys(fields).forEach(k =&gt; { const c = APT_KEYS.indexOf(k) + 1; if (c &gt; 0) s.getRange(row, c).setNumberFormat(&quot;@&quot;).setValue(String(fields[k] == null ? &quot;&quot; : fields[k])); });
+  Object.keys(fields).forEach(k =&gt; { const c = APT_KEYS.indexOf(k) + 1; if (c &gt; 0) s.getRange(row, c).setNumberFormat("@").setValue(String(fields[k] == null ? "" : fields[k])); });
 }
 function aptPublic_(o) { const p = {}; APT_PUBLIC.forEach(k =&gt; p[k] = o[k]); return p; }
-function cleanTxt_(v, max) { return String(v == null ? &quot;&quot; : v).replace(/[\u0000-\u001f]/g, &quot; &quot;).replace(/^[=+\-@]+/, &quot;&quot;).trim().slice(0, max); }   // no formula injection
-function toDmy_(v) { const s = String(v || &quot;&quot;).trim(); let m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if (m) return m[3] + &quot;-&quot; + m[2] + &quot;-&quot; + m[1]; m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/); return m ? (&quot;0&quot; + m[1]).slice(-2) + &quot;-&quot; + (&quot;0&quot; + m[2]).slice(-2) + &quot;-&quot; + m[3] : &quot;&quot;; }
+function cleanTxt_(v, max) { return String(v == null ? "" : v).replace(/[\u0000-\u001f]/g, " ").replace(/^[=+\-@]+/, "").trim().slice(0, max); }   // no formula injection
+function toDmy_(v) { const s = String(v || "").trim(); let m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if (m) return m[3] + "-" + m[2] + "-" + m[1]; m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/); return m ? ("0" + m[1]).slice(-2) + "-" + ("0" + m[2]).slice(-2) + "-" + m[3] : ""; }
 
 /* ---------- public (managers, no login) ---------- */
 function aptSubmit_(d) {
-  if (d.website) throw new Error(&quot;Please try again.&quot;);                                  // honeypot
-  if (Number(d.elapsed || 0) &lt; 2500) throw new Error(&quot;That was quick — please review the form and submit again.&quot;);
-  const name = cleanTxt_(d.manager, 60), phone = String(d.phone || &quot;&quot;).replace(/[^\d+]/g, &quot;&quot;).slice(0, 16);
+  if (d.website) throw new Error("Please try again.");                                  // honeypot
+  if (Number(d.elapsed || 0) &lt; 2500) throw new Error("That was quick — please review the form and submit again.");
+  const name = cleanTxt_(d.manager, 60), phone = String(d.phone || "").replace(/[^\d+]/g, "").slice(0, 16);
   const purpose = cleanTxt_(d.purpose, 140), prefDate = toDmy_(d.prefDate);
-  if (name.length &lt; 2) throw new Error(&quot;Please enter your name.&quot;);
-  if (phone.replace(/\D/g, &quot;&quot;).length &lt; 7) throw new Error(&quot;Please enter a valid phone number.&quot;);
-  if (purpose.length &lt; 3) throw new Error(&quot;Please tell us the purpose of the meeting.&quot;);
-  if (!prefDate) throw new Error(&quot;Please choose a preferred date.&quot;);
-  const cache = CacheService.getScriptCache(), pk = &quot;aptp_&quot; + phone, gk = &quot;apt_glob&quot;;
+  if (name.length &lt; 2) throw new Error("Please enter your name.");
+  if (phone.replace(/\D/g, "").length &lt; 7) throw new Error("Please enter a valid phone number.");
+  if (purpose.length &lt; 3) throw new Error("Please tell us the purpose of the meeting.");
+  if (!prefDate) throw new Error("Please choose a preferred date.");
+  const pk0 = phoneKey_(phone);
+  pinCheck_(pk0, d.pin, true);                                                          // first request sets the PIN
+  const cache = CacheService.getScriptCache(), pk = "aptp_" + phone, gk = "apt_glob";
   const per = Number(cache.get(pk) || 0), glob = Number(cache.get(gk) || 0);
-  if (per &gt;= 6) throw new Error(&quot;You&#x27;ve sent several requests today. Please wait for a reply.&quot;);
-  if (glob &gt;= 80) throw new Error(&quot;Too many requests right now. Please try again in an hour.&quot;);
+  if (per &gt;= 6) throw new Error("You've sent several requests today. Please wait for a reply.");
+  if (glob &gt;= 80) throw new Error("Too many requests right now. Please try again in an hour.");
   cache.put(pk, String(per + 1), 86400); cache.put(gk, String(glob + 1), 3600);
   const ref = aptNewRef_();
-  const key = Utilities.getUuid().replace(/-/g, &quot;&quot;).slice(0, 24);
+  const key = Utilities.getUuid().replace(/-/g, "").slice(0, 24);
   const rec = { ref, submitted: aptNow_(), manager: name, phone, dept: cleanTxt_(d.dept, 60), purpose, details: cleanTxt_(d.details, 1000),
-    prefDate, prefTime: cleanTxt_(d.prefTime, 30) || &quot;Flexible&quot;, duration: cleanTxt_(d.duration, 20) || &quot;30 min&quot;, mode: cleanTxt_(d.mode, 30) || &quot;In person&quot;,
-    priority: cleanTxt_(d.priority, 20) || &quot;Normal&quot;, status: &quot;PENDING&quot;, schDate: &quot;&quot;, schTime: &quot;&quot;, venue: &quot;&quot;, note: &quot;&quot;, handledBy: &quot;&quot;, updated: aptNow_(), schSl: &quot;&quot;, key };
-  aptAppend_(rec, &quot;Requested&quot;);
-  return { ok: true, ref, key };
+    prefDate, prefTime: cleanTxt_(d.prefTime, 30) || "Flexible", duration: cleanTxt_(d.duration, 20) || "30 min", mode: cleanTxt_(d.mode, 30) || "In person",
+    priority: cleanTxt_(d.priority, 20) || "Normal", status: "PENDING", schDate: "", schTime: "", venue: "", note: "", handledBy: "", updated: aptNow_(), schSl: "", key };
+  aptAppend_(rec, "Requested");
+  mgrRefresh_(phone);
+  return { ok: true, ref, key, token: mgrToken_(pk0), phone: pk0 };
 }
 function aptNewRef_() {
   const existing = aptRows_().map(o =&gt; o.ref); let ref;
-  do { ref = &quot;APT-&quot; + Math.random().toString(36).slice(2, 7).toUpperCase(); } while (existing.indexOf(ref) &gt;= 0 || /[^A-Z0-9-]/.test(ref) || ref.length &lt; 9);
+  do { ref = "APT-" + Math.random().toString(36).slice(2, 7).toUpperCase(); } while (existing.indexOf(ref) &gt;= 0 || /[^A-Z0-9-]/.test(ref) || ref.length &lt; 9);
   return ref;
 }
 function aptAppend_(rec, how) {
   const s = aptSheet_(), row = Math.max(s.getLastRow(), 1) + 1;
-  s.getRange(row, 1, 1, APT_KEYS.length).setNumberFormat(&quot;@&quot;).setValues([APT_KEYS.map(k =&gt; rec[k] == null ? &quot;&quot; : rec[k])]);
-  log_({ name: rec.manager, u: &quot;manager&quot;, role: &quot;MANAGER&quot; }, &quot;APPOINTMENT&quot;, rec.ref, rec.purpose, how + &quot; for &quot; + rec.prefDate + &quot; &quot; + rec.prefTime + &quot; · &quot; + rec.mode);
+  s.getRange(row, 1, 1, APT_KEYS.length).setNumberFormat("@").setValues([APT_KEYS.map(k =&gt; rec[k] == null ? "" : rec[k])]);
+  log_({ name: rec.manager, u: "manager", role: "MANAGER" }, "APPOINTMENT", rec.ref, rec.purpose, how + " for " + rec.prefDate + " " + rec.prefTime + " · " + rec.mode);
 }
 
 /* ---------- OPTIONAL: Google Form intake ----------
    If you prefer a Google Form: link the form to THIS spreadsheet (Responses → Link to Sheets),
    then run installAptFormTrigger() once. Each form response becomes an appointment request
    (questions are matched by their titles: name, phone/WhatsApp, department/company, purpose,
-   details, date, time, duration, mode, priority). Form users can&#x27;t track status themselves —
-   reply to them with the dashboard&#x27;s WhatsApp button. */
+   details, date, time, duration, mode, priority). Form users can't track status themselves —
+   reply to them with the dashboard's WhatsApp button. */
 function installAptFormTrigger() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  ScriptApp.getProjectTriggers().filter(t =&gt; t.getHandlerFunction() === &quot;onAptFormSubmit&quot;).forEach(t =&gt; ScriptApp.deleteTrigger(t));
-  ScriptApp.newTrigger(&quot;onAptFormSubmit&quot;).forSpreadsheet(ss).onFormSubmit().create();
-  Logger.log(&quot;Google Form intake is on.&quot;);
+  ScriptApp.getProjectTriggers().filter(t =&gt; t.getHandlerFunction() === "onAptFormSubmit").forEach(t =&gt; ScriptApp.deleteTrigger(t));
+  ScriptApp.newTrigger("onAptFormSubmit").forSpreadsheet(ss).onFormSubmit().create();
+  Logger.log("Google Form intake is on.");
 }
 function onAptFormSubmit(e) {
   const nv = (e &amp;&amp; e.namedValues) || {}, keys = Object.keys(nv);
-  const pick = (re, not) =&gt; { const k = keys.find(x =&gt; re.test(x) &amp;&amp; !(not &amp;&amp; not.test(x))); return k ? String((nv[k] || [&quot;&quot;])[0]).trim() : &quot;&quot;; };
+  const pick = (re, not) =&gt; { const k = keys.find(x =&gt; re.test(x) &amp;&amp; !(not &amp;&amp; not.test(x))); return k ? String((nv[k] || [""])[0]).trim() : ""; };
   const phone = pick(/phone|whats ?app|mobile|contact/i);
-  const rec = { ref: &quot;&quot;, submitted: aptNow_(), manager: cleanTxt_(pick(/name/i, /company|department|branch/i), 60), phone: phone.replace(/[^\d+]/g, &quot;&quot;).slice(0, 16),
+  const rec = { ref: "", submitted: aptNow_(), manager: cleanTxt_(pick(/name/i, /company|department|branch/i), 60), phone: phone.replace(/[^\d+]/g, "").slice(0, 16),
     dept: cleanTxt_(pick(/department|company|branch|division/i), 60), purpose: cleanTxt_(pick(/purpose|subject|agenda|topic|reason/i), 140),
-    details: cleanTxt_(pick(/detail|description|note|message/i), 1000), prefDate: toDmy_(pick(/date/i)) || pick(/date/i), prefTime: cleanTxt_(pick(/time|slot/i, /date/i), 30) || &quot;Flexible&quot;,
-    duration: cleanTxt_(pick(/duration|how long/i), 20) || &quot;30 min&quot;, mode: cleanTxt_(pick(/mode|meeting type|type of meeting/i), 30) || &quot;In person&quot;,
-    priority: cleanTxt_(pick(/priority|urgen/i), 20) || &quot;Normal&quot;, status: &quot;PENDING&quot;, schDate: &quot;&quot;, schTime: &quot;&quot;, venue: &quot;&quot;, note: &quot;&quot;, handledBy: &quot;&quot;, updated: aptNow_(), schSl: &quot;&quot;,
-    key: Utilities.getUuid().replace(/-/g, &quot;&quot;).slice(0, 24) };
+    details: cleanTxt_(pick(/detail|description|note|message/i), 1000), prefDate: toDmy_(pick(/date/i)) || pick(/date/i), prefTime: cleanTxt_(pick(/time|slot/i, /date/i), 30) || "Flexible",
+    duration: cleanTxt_(pick(/duration|how long/i), 20) || "30 min", mode: cleanTxt_(pick(/mode|meeting type|type of meeting/i), 30) || "In person",
+    priority: cleanTxt_(pick(/priority|urgen/i), 20) || "Normal", status: "PENDING", schDate: "", schTime: "", venue: "", note: "", handledBy: "", updated: aptNow_(), schSl: "",
+    key: Utilities.getUuid().replace(/-/g, "").slice(0, 24) };
   if (!rec.manager &amp;&amp; !rec.purpose) return;
   const lock = LockService.getScriptLock(); lock.waitLock(15000);
-  try { rec.ref = aptNewRef_(); aptAppend_(rec, &quot;Google Form request&quot;); } finally { lock.releaseLock(); }
+  try { rec.ref = aptNewRef_(); aptAppend_(rec, "Google Form request"); mgrRefresh_(rec.phone); } finally { lock.releaseLock(); }
 }
 function aptStatus_(d) {
   const items = (d.items || [{ ref: d.ref, key: d.key }]).slice(0, 30), all = aptRows_(), out = [];
   items.forEach(it =&gt; {
-    const o = all.find(x =&gt; x.ref === String(it.ref || &quot;&quot;).trim().toUpperCase());
+    const o = all.find(x =&gt; x.ref === String(it.ref || "").trim().toUpperCase());
     if (o &amp;&amp; it.key &amp;&amp; o.key === String(it.key)) out.push(aptPublic_(o)); else out.push({ ref: it.ref, missing: true });
   });
   return { ok: true, items: out };
 }
 function aptCancel_(d) {
   const o = aptFind_(d.ref);
-  if (!d.key || o.key !== String(d.key)) throw new Error(&quot;Request not found.&quot;);
-  if (o.status !== &quot;PENDING&quot;) throw new Error(&quot;This request was already handled — contact the CEO office to change it.&quot;);
-  aptWrite_(o._row, { status: &quot;CANCELLED&quot;, updated: aptNow_(), note: &quot;Cancelled by &quot; + o.manager });
-  log_({ name: o.manager, u: &quot;manager&quot;, role: &quot;MANAGER&quot; }, &quot;APPOINTMENT&quot;, o.ref, o.purpose, &quot;Cancelled by manager&quot;);
+  let okWho = d.key &amp;&amp; o.key === String(d.key);
+  if (!okWho &amp;&amp; d.token) { try { okWho = mgrVerify_(d.token) === phoneKey_(o.phone); } catch (e) { throw e; } }
+  if (!okWho) throw new Error("Request not found.");
+  if (o.status !== "PENDING") throw new Error("This request was already handled — contact the CEO office to change it.");
+  aptWrite_(o._row, { status: "CANCELLED", updated: aptNow_(), note: "Cancelled by " + o.manager });
+  log_({ name: o.manager, u: "manager", role: "MANAGER" }, "APPOINTMENT", o.ref, o.purpose, "Cancelled by manager");
+  mgrRefresh_(o.phone);
   return { ok: true };
 }
 
-/* ---------- signed-in users with the &quot;apt&quot; permission ---------- */
+/* ---------- signed-in users with the "apt" permission ---------- */
 function aptList_() {
-  const rows = aptRows_().map(o =&gt; { const c = Object.assign({}, o); delete c.key; return c; }).reverse();
+  const P = props_().getProperties();
+  const rows = aptRows_().map(o =&gt; { const c = Object.assign({}, o); delete c.key; c.pinSet = !!P["pin_" + phoneKey_(o.phone)]; return c; }).reverse();
   return { ok: true, items: rows };
 }
-function aptPendingCount_() { try { return aptRows_().filter(o =&gt; o.status === &quot;PENDING&quot;).length; } catch (e) { return 0; } }
-function aptType_() {   // reuse the sheet&#x27;s own spelling for an appointment type if it has one
-  try { const s = sheet_(), h = headers_(s), c = col_(h, &quot;type&quot;); if (!c || s.getLastRow() &lt; 2) return &quot;APPOINTMENTS&quot;;
+function aptPendingCount_() { try { return aptRows_().filter(o =&gt; o.status === "PENDING").length; } catch (e) { return 0; } }
+function aptType_() {   // reuse the sheet's own spelling for an appointment type if it has one
+  try { const s = sheet_(), h = headers_(s), c = col_(h, "type"); if (!c || s.getLastRow() &lt; 2) return "APPOINTMENTS";
     const v = s.getRange(2, c, s.getLastRow() - 1, 1).getDisplayValues().map(r =&gt; String(r[0]).trim()).find(x =&gt; /APPOINT/i.test(x));
-    return v || &quot;APPOINTMENTS&quot;; } catch (e) { return &quot;APPOINTMENTS&quot;; }
+    return v || "APPOINTMENTS"; } catch (e) { return "APPOINTMENTS"; }
 }
 function aptSchedSet_(sl, fields) {   // write straight into the linked CEO-schedule row
   if (!sl) return false;
@@ -1889,35 +1900,148 @@ function aptSchedSet_(sl, fields) {   // write straight into the linked CEO-sche
   return true;
 }
 function aptUpdate_(user, d) {
-  const o = aptFind_(d.ref), act = String(d.act || &quot;&quot;), by = user.name + &quot; (&quot; + user.role + &quot;)&quot;, now = aptNow_();
+  const o = aptFind_(d.ref), act = String(d.act || ""), by = user.name + " (" + user.role + ")", now = aptNow_();
   const date = toDmy_(d.date), time = cleanTxt_(d.time, 40), venue = cleanTxt_(d.venue, 140), note = cleanTxt_(d.note, 500);
-  let set = {}, detail = &quot;&quot;;
-  if (act === &quot;accept&quot; || act === &quot;reschedule&quot;) {
-    if (!date) throw new Error(&quot;Choose the meeting date.&quot;);
-    set = { status: act === &quot;accept&quot; ? &quot;SCHEDULED&quot; : &quot;RESCHEDULED&quot;, schDate: date, schTime: time || o.prefTime, venue, note, handledBy: by, updated: now };
+  let set = {}, detail = "";
+  if (act === "accept" || act === "reschedule") {
+    if (!date) throw new Error("Choose the meeting date.");
+    set = { status: act === "accept" ? "SCHEDULED" : "RESCHEDULED", schDate: date, schTime: time || o.prefTime, venue, note, handledBy: by, updated: now };
     if (d.duration) set.duration = cleanTxt_(d.duration, 20);
-    const title = (&quot;Meeting with &quot; + o.manager + &quot; — &quot; + o.purpose).toUpperCase().slice(0, 140);
-    const remarks = &quot;Appointment &quot; + o.ref + &quot; · &quot; + (o.mode || &quot;&quot;) + (venue ? &quot; · &quot; + venue : &quot;&quot;) + &quot; · &quot; + o.phone;
+    const title = ("Meeting with " + o.manager + " — " + o.purpose).toUpperCase().slice(0, 140);
+    const remarks = "Appointment " + o.ref + " · " + (o.mode || "") + (venue ? " · " + venue : "") + " · " + o.phone;
     if (d.addToSchedule) {
-      if (o.schSl &amp;&amp; aptSchedSet_(o.schSl, { date, time: set.schTime, status: act === &quot;accept&quot; ? &quot;PENDING&quot; : &quot;RESCHEDULED&quot;, remarks })) { set.schSl = o.schSl; }
-      else { const r = add_(user, { date, time: set.schTime, schedule: title, type: aptType_(), status: &quot;PENDING&quot;, dept: o.dept.toUpperCase(), remarks }); set.schSl = r.sl; }
+      if (o.schSl &amp;&amp; aptSchedSet_(o.schSl, { date, time: set.schTime, status: act === "accept" ? "PENDING" : "RESCHEDULED", remarks })) { set.schSl = o.schSl; }
+      else { const r = add_(user, { date, time: set.schTime, schedule: title, type: aptType_(), status: "PENDING", dept: o.dept.toUpperCase(), remarks }); set.schSl = r.sl; }
     }
-    detail = (act === &quot;accept&quot; ? &quot;Scheduled &quot; : &quot;Rescheduled to &quot;) + date + &quot; &quot; + set.schTime + (venue ? &quot; · &quot; + venue : &quot;&quot;) + (set.schSl ? &quot; · on CEO schedule #&quot; + set.schSl : &quot;&quot;);
-  } else if (act === &quot;decline&quot;) {
-    set = { status: &quot;DECLINED&quot;, note, handledBy: by, updated: now };
-    aptSchedSet_(o.schSl, { status: &quot;CANCELLED&quot; });
-    detail = &quot;Declined&quot; + (note ? &quot;: &quot; + note : &quot;&quot;);
-  } else if (act === &quot;done&quot;) {
-    set = { status: &quot;COMPLETED&quot;, handledBy: by, updated: now };
-    aptSchedSet_(o.schSl, { status: &quot;COMPLETED&quot; });
-    detail = &quot;Marked completed&quot;;
-  } else if (act === &quot;reopen&quot;) {
-    set = { status: &quot;PENDING&quot;, handledBy: by, updated: now };
-    detail = &quot;Reopened&quot;;
-  } else throw new Error(&quot;Unknown appointment action.&quot;);
+    detail = (act === "accept" ? "Scheduled " : "Rescheduled to ") + date + " " + set.schTime + (venue ? " · " + venue : "") + (set.schSl ? " · on CEO schedule #" + set.schSl : "");
+  } else if (act === "decline") {
+    set = { status: "DECLINED", note, handledBy: by, updated: now };
+    aptSchedSet_(o.schSl, { status: "CANCELLED" });
+    detail = "Declined" + (note ? ": " + note : "");
+  } else if (act === "done") {
+    set = { status: "COMPLETED", handledBy: by, updated: now };
+    aptSchedSet_(o.schSl, { status: "COMPLETED" });
+    detail = "Marked completed";
+  } else if (act === "reopen") {
+    set = { status: "PENDING", handledBy: by, updated: now };
+    detail = "Reopened";
+  } else throw new Error("Unknown appointment action.");
   aptWrite_(o._row, set);
-  log_(user, &quot;APPOINTMENT&quot;, o.ref, o.purpose, detail);
+  log_(user, "APPOINTMENT", o.ref, o.purpose, detail);
+  mgrRefresh_(o.phone);
   return Object.assign({ ok: true, item: Object.assign({}, o, set, { key: undefined }) });
+}
+
+
+/* =====================================================================
+   MANAGER IDENTITY — WhatsApp number + 4-digit PIN
+   The phone number is the manager's ID: every request from that number is
+   linked to them. The first request sets their PIN; after that the same PIN
+   opens "My requests" on any phone. The "APPOINTMENT MANAGERS" tab keeps a
+   live count per manager. PINs are stored hashed (Script Properties), never
+   in the sheet. Dashboard users with the appointments permission can reset one.
+   ===================================================================== */
+const MGR_SHEET = "APPOINTMENT MANAGERS";
+const MGR_HEAD = ["PHONE", "NAME", "DEPARTMENT/COMPANY", "FIRST REQUEST", "LAST REQUEST", "TOTAL", "PENDING", "SCHEDULED", "DECLINED / CANCELLED", "COMPLETED", "PIN SET", "UPDATED"];
+const MGR_DAYS = 90;
+function phoneKey_(p) {
+  let d = String(p || "").replace(/\D/g, "");
+  if (d.length === 11 &amp;&amp; d[0] === "0") d = d.slice(1);
+  if (d.length === 10) d = "91" + d;                       // local Indian number → +91
+  return d;
+}
+function pinHash_(k, pin) { return hash_("mgr:" + k, String(pin)); }
+function pinCheck_(k, pin, allowSet) {
+  if (!k || k.length &lt; 7) throw new Error("Please enter a valid WhatsApp number.");
+  pin = String(pin || "").trim();
+  if (!/^\d{4}$/.test(pin)) throw new Error("Enter your 4-digit PIN.");
+  const cache = CacheService.getScriptCache(), fk = "pinf_" + k, fails = Number(cache.get(fk) || 0);
+  if (fails &gt;= 5) throw new Error("Too many wrong PINs. Try again in 15 minutes, or ask the CEO office to reset your PIN.");
+  const saved = props_().getProperty("pin_" + k);
+  if (!saved) {
+    if (!allowSet) {
+      if (!aptRows_().some(o =&gt; phoneKey_(o.phone) === k)) throw new Error("No requests found for this number yet.");
+    }
+    props_().setProperty("pin_" + k, pinHash_(k, pin));    // first use → this becomes the PIN
+    if (!props_().getProperty("pinv_" + k)) props_().setProperty("pinv_" + k, "1");
+    return "new";
+  }
+  if (saved !== pinHash_(k, pin)) {
+    cache.put(fk, String(fails + 1), 900); Utilities.sleep(300);
+    throw new Error("Wrong PIN for this number." + (fails &gt;= 3 ? " One more wrong try locks it for 15 minutes." : ""));
+  }
+  cache.remove(fk);
+  return "ok";
+}
+function mgrToken_(k) { return sign_({ m: k, v: Number(props_().getProperty("pinv_" + k) || 1), exp: Date.now() + MGR_DAYS * 864e5 }); }
+function mgrVerify_(token) {
+  const parts = String(token || "").split(".");
+  const bad = () =&gt; authErr_("Please sign in with your number and PIN.");
+  if (parts.length !== 2) throw bad();
+  if (b64_(Utilities.computeHmacSha256Signature(parts[0], secret_())) !== parts[1]) throw bad();
+  const p = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString());
+  if (!p.m || !p.exp || Date.now() &gt; p.exp) throw bad();
+  if (!props_().getProperty("pin_" + p.m) || Number(props_().getProperty("pinv_" + p.m) || 1) !== p.v) throw authErr_("Your PIN was reset. Sign in again with a new PIN.");
+  return p.m;
+}
+/* Manager's own list: { token } or { phone, pin } */
+function aptMine_(d) {
+  let k, token = d.token;
+  if (d.phone) {
+    k = phoneKey_(d.phone);
+    const lock = LockService.getScriptLock(); lock.waitLock(15000);
+    try { if (pinCheck_(k, d.pin, false) === "new") mgrRefresh_(k); } finally { lock.releaseLock(); }
+    token = mgrToken_(k);
+  } else k = mgrVerify_(token);
+  const mine = aptRows_().filter(o =&gt; phoneKey_(o.phone) === k);
+  const last = mine[mine.length - 1] || {};
+  return { ok: true, token, phone: k, name: last.manager || "", dept: last.dept || "", items: mine.map(aptPublic_).reverse() };
+}
+function pinReset_(user, d) {
+  const k = phoneKey_(d.phone);
+  if (!k) throw new Error("No phone number.");
+  props_().deleteProperty("pin_" + k);
+  props_().setProperty("pinv_" + k, String(Number(props_().getProperty("pinv_" + k) || 1) + 1));
+  CacheService.getScriptCache().remove("pinf_" + k);
+  log_(user, "APPOINTMENT", "", "+" + k, "PIN reset — the manager's next request or sign-in sets a new PIN");
+  mgrRefresh_(k);
+  return { ok: true };
+}
+/* ---------- APPOINTMENT MANAGERS tab ---------- */
+function mgrSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let s = ss.getSheetByName(MGR_SHEET);
+  if (!s) s = ss.insertSheet(MGR_SHEET);
+  if (String(s.getRange(1, 1).getDisplayValue()).trim().toUpperCase() !== "PHONE") {
+    s.getRange(1, 1, 1, MGR_HEAD.length).setValues([MGR_HEAD]).setFontWeight("bold").setBackground("#0f766e").setFontColor("#ffffff");
+    s.setFrozenRows(1);
+  }
+  return s;
+}
+function mgrStats_(k, rows) {
+  const mine = rows.filter(o =&gt; phoneKey_(o.phone) === k);
+  if (!mine.length) return null;
+  const c = st =&gt; mine.filter(o =&gt; st.indexOf(o.status) &gt;= 0).length, last = mine[mine.length - 1];
+  return ["+" + k, last.manager, last.dept, mine[0].submitted, last.submitted, mine.length, c(["PENDING"]), c(["SCHEDULED", "RESCHEDULED"]),
+    c(["DECLINED", "CANCELLED"]), c(["COMPLETED"]), props_().getProperty("pin_" + k) ? "YES" : "NO", aptNow_()];
+}
+function mgrRefresh_(phone) {
+  try {
+    const k = phoneKey_(phone); if (!k) return;
+    const s = mgrSheet_(), row = mgrStats_(k, aptRows_()); if (!row) return;
+    const n = s.getLastRow() - 1;
+    const keys = n &gt; 0 ? s.getRange(2, 1, n, 1).getDisplayValues().map(r =&gt; phoneKey_(r[0])) : [];
+    const at = keys.indexOf(k), r = at &gt;= 0 ? at + 2 : Math.max(s.getLastRow(), 1) + 1;
+    s.getRange(r, 1, 1, row.length).setNumberFormat("@").setValues([row.map(String)]);
+  } catch (e) {}
+}
+/* Run once from the editor (setup() also runs it) to rebuild the whole managers tab from existing requests. */
+function mgrRebuild() {
+  const s = mgrSheet_(), rows = aptRows_(), seen = [];
+  rows.forEach(o =&gt; { const k = phoneKey_(o.phone); if (k &amp;&amp; seen.indexOf(k) &lt; 0) seen.push(k); });
+  if (s.getLastRow() &gt; 1) s.getRange(2, 1, s.getLastRow() - 1, MGR_HEAD.length).clearContent();
+  const out = seen.map(k =&gt; mgrStats_(k, rows).map(String));
+  if (out.length) s.getRange(2, 1, out.length, MGR_HEAD.length).setNumberFormat("@").setValues(out);
 }
 </textarea>
 
@@ -1929,7 +2053,7 @@ const CONFIG = {
   SHEET_ID: "1Ur0wLnNLcJPDspRhPORTH5eGRdBVBgWML4_krHdi3oQ",
   SHEET_URL: "https://docs.google.com/spreadsheets/d/1Ur0wLnNLcJPDspRhPORTH5eGRdBVBgWML4_krHdi3oQ/edit?usp=sharing",
   CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTbbsseGN93r6SAQJKzhaPAJgw45TH9Avj3KUMU-Vif4nU8HDrzYPLw-LsB51awbMMqH7N8P4zzYo-/pub?output=csv",
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwuxYH7f1WtqSDaAPVltMh328ex9W0XogoSmQ8_qHN02t0xKWFHW4Kf5PtNXocygv2fwQ/exec",               // ← REQUIRED: paste your Apps Script Web-app URL (…/exec) here before deploying
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw33GpAybRYO4oHqRzqxgJ9F4wE0J5LbzuOE88eFnAyZbQ_8yJE4Nutb_IFLKFFdklWhg/exec",               // ← REQUIRED: paste your Apps Script Web-app URL (…/exec) here before deploying
   REQUEST_URL: "",              // optional: full link to request.html (blank = same folder as this page)
   REFRESH_SECONDS: 60,          // live auto-sync interval
   REMIND_BEFORE_MIN: 10,        // reminder N minutes before a task
@@ -3032,6 +3156,7 @@ function renderApts(){
   $("#aptList").innerHTML = L.length ? L.map((a,i)=>aptCard(a,i)).join("") :
     `<div class="empty" style="grid-column:1/-1"><div class="em">${svg("cal")}</div><b>${(S.aptFilter||"PENDING")==="PENDING"?"No pending requests":"Nothing here"}</b>${(S.aptFilter||"PENDING")==="PENDING"?"Share the request link with your managers — new requests appear here instantly.":"Try another filter."}</div>`;
   $$("#aptList [data-aa]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); aptAction(b.dataset.ref, b.dataset.aa); });
+  $$("#aptList [data-pinreset]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); aptPinReset(b.dataset.pinreset, b.dataset.name); });
   applyUI();
 }
 function aptCard(a,i){
@@ -3050,7 +3175,7 @@ function aptCard(a,i){
     <div class="apt-chips"><span title="Preferred">🗓 ${pd?esc(DAYS[pd.getDay()]+", "+shortDate(pd)):esc(a.prefDate)} · ${esc(a.prefTime)}</span><span>${mi} ${esc(a.mode)}</span><span>⏱ ${esc(a.duration)}</span></div>
     ${sch?`<div class="apt-sch"><b>${a.status==="COMPLETED"?"✓ Met on":"📅 Confirmed"} ${sd?esc(DAYS[sd.getDay()]+", "+shortDate(sd)+" "+sd.getFullYear()):esc(a.schDate)} · ${esc(a.schTime)}</b>${a.venue?`<small>📍 ${esc(a.venue)}</small>`:""}${a.note?`<small>📝 ${esc(a.note)}</small>`:""}${a.schSl?`<small>On CEO schedule · #${esc(a.schSl)}</small>`:""}</div>`:""}
     ${/DECLINED|CANCELLED/.test(a.status)&&a.note?`<div class="apt-sch"><small>📝 ${esc(a.note)}</small></div>`:""}
-    <div class="apt-foot"><small><span class="mono">${esc(a.ref)}</span> · ${esc(a.submitted)}${a.handledBy?` · ${esc(a.handledBy)}`:""} · <a href="tel:${esc(a.phone)}">${esc(a.phone)}</a></small>
+    <div class="apt-foot"><small><span class="mono">${esc(a.ref)}</span> · ${esc(a.submitted)}${a.handledBy?` · ${esc(a.handledBy)}`:""} · <a href="tel:${esc(a.phone)}">${esc(a.phone)}</a> · ${a.pinSet?`<span class="pin-on" title="This manager has a PIN">🔐 PIN set</span> <button class="pin-rs" data-pinreset="${esc(a.phone)}" data-name="${esc(a.manager)}">Reset PIN</button>`:`<span class="pin-off" title="Their next request or sign-in sets a PIN">No PIN yet</span>`}</small>
       <div class="apt-acts">${acts}<a class="btn wa" href="https://wa.me/${waNum(a.phone)}?text=${encodeURIComponent(aptMsg(a))}" target="_blank" rel="noopener" title="WhatsApp ${esc(a.manager)}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.4 1.8 2.2 1.3 1.1 2.3 1.4 2.6 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg></a></div></div>
   </div>`;
 }
@@ -3114,6 +3239,15 @@ async function aptSave(a, d, msg, notify){
     toast(msg+" ✓", `${a.manager} · ${a.purpose}`, APT_COL[(r.item||{}).status]||"#34d399", "check");
     if(notify) aptNotifySheet(S.apts[i]); else closeModal();
   }catch(e){ if(b){ b.disabled=false; b.textContent="Try again"; } if(!e.auth) toast("Couldn't save", e.message, "#f87171", "alert"); }
+}
+function aptPinReset(phone, name){
+  const first=String(name||"").split(/\s+/)[0]||"the manager";
+  openSheet(`<div class="fhead"><button class="mclose" onclick="closeModal()">${XI}</button><h2>Reset ${esc(first)}'s PIN?</h2><p>${esc(name)} · ${esc(phone)}<br>Their old PIN stops working and they are signed out on every phone. Their next request or sign-in on the request page sets a new PIN. Their requests are not changed.</p></div>
+    <div class="mfoot"><button class="btn" onclick="closeModal()">Keep PIN</button><button class="btn pri" id="prGo">Reset PIN</button></div>`, "#fbbf24");
+  $("#prGo").onclick=async()=>{ const b=$("#prGo"); b.disabled=true; b.innerHTML='<span class="spn"></span>Resetting…';
+    try{ await api("apt_pinreset",{phone}); const k=waNum(phone); (S.apts||[]).forEach(x=>{ if(waNum(x.phone)===k) x.pinSet=false; }); renderApts(); closeModal();
+      toast("PIN reset ✓", `${first} can choose a new PIN on the request page.`, "#fbbf24", "check"); }
+    catch(e){ b.disabled=false; b.textContent="Try again"; if(!e.auth) toast("Couldn't reset", e.message, "#f87171", "alert"); } };
 }
 function aptNotifySheet(a){
   const msg=aptMsg(a), first=String(a.manager).split(/\s+/)[0];
